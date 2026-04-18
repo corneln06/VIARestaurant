@@ -5,10 +5,12 @@ public class Manager extends Workers {
     //    private int id;
     //    private String firstName;
     //    private String lastName;
+    private final WorkerRole role;
 
     public Manager(int id, String fn, String ln)
     {
         super(id,fn,ln);
+        this.role = WorkerRole.Manager;
     }
 
     @Override
@@ -24,5 +26,9 @@ public class Manager extends Workers {
     @Override
     public int getId() {
         return super.getId();
+    }
+
+    public WorkerRole getRole() {
+        return role;
     }
 }
