@@ -11,7 +11,4 @@ public class ReservedState implements TableState
   public void setReserved(Table table){
     System.out.println("Already reserved");
   }
-  public void setReservedSeated(Table table){
-    table.setState(new ReservedSeatedState());
-  }
 }

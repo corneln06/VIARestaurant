@@ -11,7 +11,4 @@ public class AvailableState implements TableState
   public void setReserved(Table table){
     table.setState(new ReservedState());
   }
-  public void setReservedSeated(Table table){
-    table.setState(new ReservedSeatedState());
-  }
 }

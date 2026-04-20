@@ -38,7 +38,4 @@ public class Table
   public void setReserved(){
     status.setReserved(this);
   }
-  public void setReservedSeated(){
-    status.setReservedSeated(this);
-  }
 }
