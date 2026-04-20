@@ -1,5 +1,7 @@
 package org.store.viarestaurant;
 
+
+
 public class Table
 {
   private int id;
