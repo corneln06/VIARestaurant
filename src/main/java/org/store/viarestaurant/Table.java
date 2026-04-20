@@ -7,12 +7,14 @@ public class Table
   private int id;
   private int maxSitting;
   private TableState status;
+  private internalSchedule internalSchedule;
 
 
   public Table(int id, int maxSitting ,TableState status){
     this.id = id;
     this.status = new AvailableState();
     this.maxSitting = maxSitting;
+   
   }
   public void setState(TableState status){
     this.status = status;
