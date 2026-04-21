@@ -1,4 +1,4 @@
-package org.store.viarestaurant;
+package org.store.viarestaurant.view;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
