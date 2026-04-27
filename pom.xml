@@ -61,7 +61,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                org.store.viarestaurant/org.store.viarestaurant.HelloApplication
+                                org.store.viarestaurant/org.store.viarestaurant.view.HelloApplication
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

@@ -1,4 +1,6 @@
-package org.store.viarestaurant;
+package org.store.viarestaurant.model.entities;
+
+import org.store.viarestaurant.model.enums.MenuTypes;
 
 import java.util.ArrayList;
 
