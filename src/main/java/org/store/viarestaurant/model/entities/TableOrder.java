@@ -1,23 +1,23 @@
 package org.store.viarestaurant.model.entities;
 
-import java.util.ArrayList;
+// import java.util.ArrayList;
 
 public class TableOrder {
     private final int id;
     private Table table;
     private Waiter waiter;
     private int partySize;
-    private ArrayList<MenuItems> menuItems;
+    // To Be Created, put into constructor, and create the methods
+    // private ArrayList<> menuItemsRelationship;
     private String notes;
     private double check;
     private boolean isReservation;
 
-    public TableOrder(int id, Table table, Waiter waiter, int partySize, ArrayList<MenuItems> menuItems, String notes, double check) {
+    public TableOrder(int id, Table table, Waiter waiter, int partySize, String notes, double check) {
         this.id = id;
         this.table = table;
         this.waiter = waiter;
         this.partySize = partySize;
-        this.menuItems = menuItems;
         this.notes = notes;
         this.check = check;
     }
@@ -48,14 +48,6 @@ public class TableOrder {
 
     public void setPartySize(int partySize) {
         this.partySize = partySize;
-    }
-
-    public ArrayList<MenuItems> getMenuItems() {
-        return menuItems;
-    }
-
-    public void setMenuItems(ArrayList<MenuItems> menuItems) {
-        this.menuItems = menuItems;
     }
 
     public String getNotes() {
