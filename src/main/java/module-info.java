@@ -1,6 +1,7 @@
 module org.store.viarestaurant {
   requires javafx.controls;
   requires javafx.fxml;
+  requires java.sql;
 
   exports org.store.viarestaurant.model.state;
   opens org.store.viarestaurant.model.state to javafx.fxml;
