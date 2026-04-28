@@ -1,4 +1,4 @@
-CREATE TABLE Workers (
+CREATE TABLE IF NOT EXISTS Workers (
     id serial primary key,
     firstName varchar(100) not null ,
     lastName varchar(100) not null ,
@@ -7,13 +7,13 @@ CREATE TABLE Workers (
     password varchar(100) not null
 );
 
-CREATE TABLE RestaurantTable (
+CREATE TABLE IF NOT EXISTS RestaurantTable (
     id serial primary key,
     status varchar(10) not null check ( status in ('Available', 'Seated', 'Reserved') ) DEFAULT 'Available',
     maxSitting int not null
 );
 
-CREATE TABLE MenuItems (
+CREATE TABLE IF NOT EXISTS MenuItems (
     id serial primary key,
     name varchar(100) not null,
     type varchar(100) not null check ( type in ('Starter', 'Main', 'Dessert', 'Beverage', 'Alcoholic beverage') ),
@@ -21,18 +21,18 @@ CREATE TABLE MenuItems (
     isVegetarian boolean not null
 );
 
-CREATE TABLE Allergies (
+CREATE TABLE IF NOT EXISTS Allergies (
     id serial primary key,
     name varchar(100) not null
 );
 
-CREATE TABLE MenuItemsAllergies (
+CREATE TABLE IF NOT EXISTS MenuItemsAllergies (
     id serial primary key,
     menuItemId int not null,
     allergyId int not null
 );
 
-CREATE TABLE Reservations (
+CREATE TABLE IF NOT EXISTS Reservations (
     id serial primary key,
     customer varchar(100) not null,
     date timestamp not null,
@@ -40,7 +40,7 @@ CREATE TABLE Reservations (
     tableId int not null
 );
 
-CREATE TABLE TableOrders (
+CREATE TABLE IF NOT EXISTS TableOrders (
     id serial primary key,
     tableId int not null,
     waiterId int not null,
@@ -50,7 +50,7 @@ CREATE TABLE TableOrders (
     isPaid boolean DEFAULT false
 );
 
-CREATE TABLE Payments (
+CREATE TABLE IF NOT EXISTS Payments (
     id serial primary key,
     amount decimal not null,
     method varchar(100) not null check ( method in ('Card', 'Cash') ),
