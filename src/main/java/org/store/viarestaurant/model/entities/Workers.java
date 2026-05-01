@@ -3,7 +3,7 @@ package org.store.viarestaurant.model.entities;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class Workers {
-    private final int id;
+    private Integer id;
     private String firstName;
     private String lastName;
     private String email;
@@ -11,9 +11,8 @@ public class Workers {
 
     private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public Workers(int id,String fn, String ln, String email, String rawPassword)
+    public Workers(String fn, String ln, String email, String rawPassword)
     {
-        this.id = id;
         this.firstName = fn;
         this.lastName = ln;
         this.email = normlizeEmail(email);
@@ -28,8 +27,12 @@ public class Workers {
         this.firstName = firstName;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getLastName() {
