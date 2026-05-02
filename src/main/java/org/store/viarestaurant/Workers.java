@@ -31,5 +31,9 @@ public class Workers {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+    public WorkerRole getRole() {
+        return null;
+    }
 }
 

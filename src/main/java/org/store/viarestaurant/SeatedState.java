@@ -6,7 +6,6 @@ public class SeatedState implements TableState
     table.setState(new AvailableState());
   }
   public void setSeated(Table table){
-    System.out.println("already seated");
   }
   public void setReserved(Table table){
     table.setState(new ReservedState());

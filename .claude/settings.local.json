@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /c/Users/agusm/OneDrive/Documentos/GitHub/VIARestaurant status)",
+      "Bash(mvn compile *)"
+    ]
+  }
+}

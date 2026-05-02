@@ -9,13 +9,16 @@ public class MenuItems
   private MenuTypes type;
   private boolean isVegetarian;
   private ArrayList<Integer> allergiesId;
+  private double price;
 
-  public MenuItems(int id, String name, MenuTypes type, boolean isVegetarian, ArrayList<Integer> allergiesId){
+  public MenuItems(int id, String name, MenuTypes type, boolean isVegetarian,
+      ArrayList<Integer> allergiesId, double price){
     this.id = id;
     this.name = name;
     this.type = type;
     this.isVegetarian = isVegetarian;
     this.allergiesId = allergiesId;
+    this.price = price;
   }
 
   public int getId()
@@ -41,5 +44,10 @@ public class MenuItems
   public boolean isVegetarian()
   {
     return isVegetarian;
+  }
+
+  public double getPrice()
+  {
+    return price;
   }
 }
