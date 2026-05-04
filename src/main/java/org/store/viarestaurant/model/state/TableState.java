@@ -1,11 +1,11 @@
 package org.store.viarestaurant.model.state;
 
-import org.store.viarestaurant.model.entities.Table;
+import org.store.viarestaurant.model.entities.RestaurantTable;
 
 public interface TableState
 {
-  void setAvailable(Table table);
-  void setSeated(Table table);
-  void setReserved(Table table);
+  void setAvailable(RestaurantTable restaurantTable);
+  void setSeated(RestaurantTable restaurantTable);
+  void setReserved(RestaurantTable restaurantTable);
 
 }

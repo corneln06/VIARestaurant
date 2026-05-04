@@ -4,7 +4,7 @@ package org.store.viarestaurant.model.entities;
 
 public class TableOrder {
     private final int id;
-    private Table table;
+    private RestaurantTable restaurantTable;
     private Waiter waiter;
     private int partySize;
     // To Be Created, put into constructor, and create the methods
@@ -13,9 +13,9 @@ public class TableOrder {
     private double check;
     private boolean isReservation;
 
-    public TableOrder(int id, Table table, Waiter waiter, int partySize, String notes, double check) {
+    public TableOrder(int id, RestaurantTable restaurantTable, Waiter waiter, int partySize, String notes, double check) {
         this.id = id;
-        this.table = table;
+        this.restaurantTable = restaurantTable;
         this.waiter = waiter;
         this.partySize = partySize;
         this.notes = notes;
@@ -26,12 +26,12 @@ public class TableOrder {
         return id;
     }
 
-    public Table getTable() {
-        return table;
+    public RestaurantTable getTable() {
+        return restaurantTable;
     }
 
-    public void setTable(Table table) {
-        this.table = table;
+    public void setTable(RestaurantTable restaurantTable) {
+        this.restaurantTable = restaurantTable;
     }
 
     public Waiter getWaiter() {
