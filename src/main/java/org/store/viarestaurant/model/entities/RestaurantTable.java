@@ -3,7 +3,7 @@ package org.store.viarestaurant.model.entities;
 import org.store.viarestaurant.model.state.AvailableState;
 import org.store.viarestaurant.model.state.TableState;
 
-public class Table
+public class RestaurantTable
 {
   private int id;
   private int maxSitting;
@@ -11,7 +11,7 @@ public class Table
   private InternalSchedule internalSchedule;
 
 
-  public Table(int id, int maxSitting ,TableState status){
+  public RestaurantTable(int id, int maxSitting , TableState status){
     this.id = id;
     this.status = new AvailableState();
     this.maxSitting = maxSitting;

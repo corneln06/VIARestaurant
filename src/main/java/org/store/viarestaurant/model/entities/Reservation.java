@@ -7,22 +7,22 @@ public class Reservation {
     private String name;
     private LocalDateTime dateTime;
     private int partySize;
-    private Table table;
+    private RestaurantTable restaurantTable;
 
-    public Reservation(int id, String name, LocalDateTime dateTime, int partySize, Table table) {
+    public Reservation(int id, String name, LocalDateTime dateTime, int partySize, RestaurantTable restaurantTable) {
         this.id = id;
         this.name = name;
         this.dateTime = dateTime;
         this.partySize = partySize;
-        this.table = table;
+        this.restaurantTable = restaurantTable;
     }
 
-    public Table getTable() {
-        return table;
+    public RestaurantTable getTable() {
+        return restaurantTable;
     }
 
-    public void setTable(Table table) {
-        this.table = table;
+    public void setTable(RestaurantTable restaurantTable) {
+        this.restaurantTable = restaurantTable;
     }
 
     public int getPartySize() {
