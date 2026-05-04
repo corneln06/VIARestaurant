@@ -1,15 +1,22 @@
 package org.store.viarestaurant.model.entities;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 public class Workers {
-    private final int id;
+    private Integer id;
     private String firstName;
     private String lastName;
+    private String email;
+    private String passwordHash;
 
-    public Workers(int id,String fn, String ln)
+    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+    public Workers(String fn, String ln, String email, String rawPassword)
     {
-        this.id = id;
         this.firstName = fn;
         this.lastName = ln;
+        this.email = normlizeEmail(email);
+        this.passwordHash = hashPassword(rawPassword);
     }
 
     public String getFirstName() {
@@ -20,8 +27,12 @@ public class Workers {
         this.firstName = firstName;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getLastName() {
@@ -31,5 +42,33 @@ public class Workers {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+    public String normlizeEmail(String email)
+    {
+        return email == null ? null : email.trim().toLowerCase();
+    }
+    public String hashPassword(String rawPass)
+    {
+        return encoder.encode(rawPass);
+    }
+
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = normlizeEmail(email);
+    }
+
+    public void setPasswordHash(String rawPass) {
+        this.passwordHash = encoder.encode(rawPass);
+    }
+
+    public boolean verifyPassword(String rawPass)
+    {
+        return encoder.matches(rawPass,this.passwordHash);
+    }
+
 }
 
