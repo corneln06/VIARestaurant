@@ -12,6 +12,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import org.store.viarestaurant.model.entities.Manager;
+import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.model.enums.WorkerRole;
+import org.store.viarestaurant.view.HelloApplication;
 
 public class NavigationController
 {
@@ -49,19 +53,18 @@ public class NavigationController
     {
       sidebarRole.setText(worker.getRole().toString());
     }
-
     showDefaultPage(worker);
   }
 
+  private final Workers testWorker = new Manager("Adam", "Adam", "kkkkk", "1234");
+//TESTETSTE NOT FINALLLLL
   @FXML
   private void handleLogin()
   {
-    Workers worker = sessionManager.authenticate(
-        usernameField.getText(),
-        passwordField.getText()
-    );
+    String username = usernameField.getText();
+    String password = passwordField.getText();
 
-    if (worker == null)
+    if (!testWorker.getEmail().equals(username) || !testWorker.verifyPassword(password))
     {
       showError("Invalid credentials.");
       return;
@@ -69,7 +72,7 @@ public class NavigationController
 
     try
     {
-      Parent root = loadDashboard(worker);
+      Parent root = loadDashboard(testWorker);
       Stage stage = (Stage) usernameField.getScene().getWindow();
       stage.getScene().setRoot(root);
     }

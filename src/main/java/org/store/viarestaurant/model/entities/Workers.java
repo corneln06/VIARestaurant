@@ -1,8 +1,9 @@
 package org.store.viarestaurant.model.entities;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.store.viarestaurant.model.enums.WorkerRole;
 
-public class Workers {
+public abstract class Workers {
     private Integer id;
     private String firstName;
     private String lastName;
@@ -70,5 +71,8 @@ public class Workers {
         return encoder.matches(rawPass,this.passwordHash);
     }
 
+    public abstract WorkerRole getRole();
+
+    public abstract void setRole(WorkerRole role);
 }
 

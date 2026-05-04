@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox prefHeight="700.0" prefWidth="1100.0" styleClass="login-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.LoginController">
+<HBox prefHeight="700.0" prefWidth="1100.0" styleClass="login-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
     <children>
         <VBox prefWidth="550.0" spacing="18.0" styleClass="login-panel-left">
             <padding>

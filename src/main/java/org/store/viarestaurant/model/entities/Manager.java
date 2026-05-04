@@ -8,7 +8,7 @@ public class Manager extends Workers
     //    private int id;
     //    private String firstName;
     //    private String lastName;
-    private final WorkerRole role;
+    private WorkerRole role;
 
     public Manager(String firstName, String lastName, String email, String rawPassword)
     {
@@ -36,7 +36,13 @@ public class Manager extends Workers
         return super.getId();
     }
 
+
     public WorkerRole getRole() {
         return role;
     }
+
+  @Override public void setRole(WorkerRole role)
+  {
+    this.role = role;
+  }
 }

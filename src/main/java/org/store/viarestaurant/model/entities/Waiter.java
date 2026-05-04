@@ -34,10 +34,12 @@ public class Waiter extends Workers
         return super.getId();
     }
 
+    @Override
     public WorkerRole getRole() {
         return role;
     }
 
+    @Override
     public void setRole(WorkerRole role) {
         this.role = role;
     }
