@@ -1,9 +1,6 @@
-package org.store.viarestaurant.model.entities;
+package org.store.viarestaurant;
 
-import org.store.viarestaurant.model.enums.WorkerRole;
-
-public class Host extends Workers
-{
+public class Host extends Workers{
     //    private int id;
     //    private String firstName;
     //    private String lastName;

@@ -1,12 +1,12 @@
-package org.store.viarestaurant.model.entities;
+package org.store.viarestaurant;
 
 import java.security.Timestamp;
 
-public class InternalSchedule
+public class internalSchedule
 {
   private Timestamp timestamp;
 
-  public InternalSchedule(Timestamp timestamp){
+  public internalSchedule(Timestamp timestamp){
     this.timestamp = timestamp;
   }
 

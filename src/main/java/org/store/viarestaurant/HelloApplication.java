@@ -1,4 +1,4 @@
-package org.store.viarestaurant.view;
+package org.store.viarestaurant;
 
 import java.io.IOException;
 

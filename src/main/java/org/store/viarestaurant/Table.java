@@ -1,14 +1,13 @@
-package org.store.viarestaurant.model.entities;
+package org.store.viarestaurant;
 
-import org.store.viarestaurant.model.state.AvailableState;
-import org.store.viarestaurant.model.state.TableState;
+
 
 public class Table
 {
   private int id;
   private int maxSitting;
   private TableState status;
-  private InternalSchedule internalSchedule;
+  private internalSchedule internalSchedule;
 
 
   public Table(int id, int maxSitting ,TableState status){

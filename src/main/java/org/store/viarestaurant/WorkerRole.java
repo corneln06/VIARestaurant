@@ -1,4 +1,4 @@
-package org.store.viarestaurant.model.enums;
+package org.store.viarestaurant;
 
 public enum WorkerRole {
     Manager,

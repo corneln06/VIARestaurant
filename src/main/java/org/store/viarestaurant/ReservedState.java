@@ -1,6 +1,4 @@
-package org.store.viarestaurant.model.state;
-
-import org.store.viarestaurant.model.entities.Table;
+package org.store.viarestaurant;
 
 public class ReservedState implements TableState
 {

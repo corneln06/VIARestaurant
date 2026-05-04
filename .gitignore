@@ -37,13 +37,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
-
-# ENV (credenciales locales)
-.env
-
-# Database files (por si alguien usa SQLite o exports)
-*.db
-*.sqlite
-
-# Logs
-*.log

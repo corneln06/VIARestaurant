@@ -1,4 +1,4 @@
-package org.store.viarestaurant.model.entities;
+package org.store.viarestaurant;
 
 public class Allergy
 {

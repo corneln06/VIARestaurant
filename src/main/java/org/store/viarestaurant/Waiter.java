@@ -1,6 +1,4 @@
-package org.store.viarestaurant.model.entities;
-
-import org.store.viarestaurant.model.enums.WorkerRole;
+package org.store.viarestaurant;
 
 public class Waiter extends Workers
 {
