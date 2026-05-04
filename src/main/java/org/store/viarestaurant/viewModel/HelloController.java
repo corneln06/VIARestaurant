@@ -1,4 +1,4 @@
-package org.store.viarestaurant;
+package org.store.viarestaurant.viewModel;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
