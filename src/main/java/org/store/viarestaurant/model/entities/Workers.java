@@ -9,8 +9,10 @@ public abstract class Workers {
     private String lastName;
     private String email;
     private String passwordHash;
+    //tesst
+    private String password;
 
-    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public Workers(String fn, String ln, String email, String rawPassword)
     {
@@ -18,6 +20,8 @@ public abstract class Workers {
         this.lastName = ln;
         this.email = normlizeEmail(email);
         this.passwordHash = hashPassword(rawPassword);
+        //test
+        this.password = rawPassword;
     }
 
     public String getFirstName() {
@@ -50,7 +54,10 @@ public abstract class Workers {
     }
     public String hashPassword(String rawPass)
     {
-        return encoder.encode(rawPass);
+      //tets
+//        return encoder.encode(rawPass);
+
+      return rawPass;
     }
 
 
@@ -63,12 +70,12 @@ public abstract class Workers {
     }
 
     public void setPasswordHash(String rawPass) {
-        this.passwordHash = encoder.encode(rawPass);
+//        this.passwordHash = encoder.encode(rawPass);
     }
 
     public boolean verifyPassword(String rawPass)
     {
-        return encoder.matches(rawPass,this.passwordHash);
+        return password.equals(rawPass);
     }
 
     public abstract WorkerRole getRole();

@@ -86,9 +86,9 @@ public class NavigationController
   {
     String fxml = switch (worker.getRole())
     {
-      case Host -> "HostDashboard.fxml";
-      case Waiter -> "WaiterDashboard.fxml";
-      case Manager -> "ManagerDashboard.fxml";
+      case Host -> "/org/store/viarestaurant/HostDashboard.fxml";
+      case Waiter -> "/org/store/viarestaurant/WaiterDashboard.fxml";
+      case Manager -> "/org/store/viarestaurant/ManagerDashboard.fxml";
     };
 
     FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource(fxml));
