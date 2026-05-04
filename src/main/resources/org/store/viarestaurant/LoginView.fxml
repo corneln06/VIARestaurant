@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox prefHeight="700.0" prefWidth="1100.0" styleClass="login-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.LoginController">
+    <children>
+        <VBox prefWidth="550.0" spacing="18.0" styleClass="login-panel-left">
+            <padding>
+                <Insets bottom="40.0" left="48.0" right="48.0" top="48.0" />
+            </padding>
+            <children>
+                <Label styleClass="login-title" text="Via Restaurant" />
+                <Label styleClass="login-subtitle" text="Front-of-house control for hosts, waiters, and managers." wrapText="true" />
+                <Region VBox.vgrow="ALWAYS" />
+                <Label styleClass="login-footer" text="Demo access: host / waiter / manager" />
+            </children>
+        </VBox>
+        <StackPane prefWidth="550.0" styleClass="login-panel-right">
+            <children>
+                <VBox maxWidth="360.0" spacing="16.0" styleClass="login-card">
+                    <children>
+                        <Label styleClass="card-heading" text="Sign In" />
+                        <Label styleClass="muted-label" text="Use your role credentials to continue." wrapText="true" />
+                        <TextField fx:id="usernameField" onAction="#handleLogin" promptText="Username" styleClass="input-field" />
+                        <PasswordField fx:id="passwordField" onAction="#handleLogin" promptText="Password" styleClass="input-field" />
+                        <Button maxWidth="Infinity" onAction="#handleLogin" styleClass="btn-base btn-primary" text="Sign In" />
+                        <Label fx:id="errorLabel" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+    </children>
+</HBox>

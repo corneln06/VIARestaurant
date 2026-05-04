@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.ManagerController">
+    <left>
+        <VBox prefWidth="220.0" spacing="18.0" styleClass="sidebar">
+            <padding>
+                <Insets bottom="24.0" left="18.0" right="18.0" top="24.0" />
+            </padding>
+            <children>
+                <Label styleClass="brand-title" text="Via Restaurant" />
+                <VBox spacing="4.0" styleClass="sidebar-user-card">
+                    <children>
+                        <Label fx:id="sidebarName" styleClass="sidebar-name" text="Manager User" />
+                        <Label fx:id="sidebarRole" styleClass="sidebar-role" text="Manager" />
+                    </children>
+                </VBox>
+                <Separator />
+                <Button maxWidth="Infinity" styleClass="nav-btn nav-btn-active" text="Edit Menu" />
+                <Region VBox.vgrow="ALWAYS" />
+                <Label styleClass="sidebar-footer" text="Menu Control" />
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <StackPane styleClass="content-area">
+            <children>
+                <AnchorPane styleClass="page-surface">
+                    <children>
+                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="18.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label styleClass="page-title" text="Menu" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Button onAction="#openNewDishModal" styleClass="btn-base btn-primary" text="+ New Dish" />
+                                    </children>
+                                </HBox>
+                                <TableView fx:id="menuTable" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="nameColumn" prefWidth="360.0" text="Name" />
+                                        <TableColumn fx:id="typeColumn" prefWidth="220.0" text="Type" />
+                                        <TableColumn fx:id="priceColumn" prefWidth="160.0" text="Price" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+                <StackPane fx:id="newDishOverlay" managed="false" onMouseClicked="#closeNewDishModal" styleClass="modal-overlay" visible="false">
+                    <children>
+                        <VBox maxWidth="440.0" onMouseClicked="#consumeModalClick" spacing="14.0" styleClass="modal-card modal-card-large">
+                            <children>
+                                <Label styleClass="modal-title" text="New Dish" />
+                                <TextField fx:id="dishNameField" promptText="Dish name" styleClass="input-field" />
+                                <TextField fx:id="dishIngredientsField" promptText="Ingredients" styleClass="input-field" />
+                                <HBox spacing="12.0">
+                                    <children>
+                                        <TextField fx:id="dishPriceField" promptText="Price" styleClass="input-field" HBox.hgrow="ALWAYS" />
+                                        <ComboBox fx:id="dishTypeComboBox" prefWidth="180.0" promptText="Menu type" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                                <Label fx:id="newDishErrorLabel" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <children>
+                                        <Button onAction="#closeNewDishModalAction" styleClass="btn-base btn-secondary" text="Cancel" />
+                                        <Button onAction="#createDish" styleClass="btn-base btn-primary" text="Create" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+            </children>
+        </StackPane>
+    </center>
+</BorderPane>
