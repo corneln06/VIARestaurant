@@ -9,9 +9,9 @@ public class Host extends Workers
     //    private String lastName;
     private WorkerRole role;
 
-    public Host(int id, String fn, String ln)
+    public Host(String firstName, String lastName, String email, String rawPassword)
     {
-        super(id,fn,ln);
+        super(firstName,lastName,email,rawPassword);
         this.role = WorkerRole.Host;
     }
     @Override
@@ -25,7 +25,12 @@ public class Host extends Workers
     }
 
     @Override
-    public int getId() {
+    public String getEmail() {
+        return super.getEmail();
+    }
+
+    @Override
+    public Integer getId() {
         return super.getId();
     }
 
