@@ -10,9 +10,9 @@ public class Manager extends Workers
     //    private String lastName;
     private final WorkerRole role;
 
-    public Manager(int id, String fn, String ln)
+    public Manager(String firstName, String lastName, String email, String rawPassword)
     {
-        super(id,fn,ln);
+        super(firstName,lastName,email,rawPassword);
         this.role = WorkerRole.Manager;
     }
 
@@ -27,7 +27,12 @@ public class Manager extends Workers
     }
 
     @Override
-    public int getId() {
+    public String getEmail() {
+        return super.getEmail();
+    }
+
+    @Override
+    public Integer getId() {
         return super.getId();
     }
 
