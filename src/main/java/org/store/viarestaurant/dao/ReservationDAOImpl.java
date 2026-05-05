@@ -3,6 +3,7 @@ package org.store.viarestaurant.dao;
 import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.model.entities.*;
 import org.store.viarestaurant.model.enums.WorkerRole;
+import org.store.viarestaurant.model.state.AvailableState;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -56,10 +57,12 @@ public class ReservationDAOImpl implements ReservationDAO
     }
   }
 
-  @Override public ArrayList<Reservation> getAllReservations()
-      throws SQLException
+  @Override
+  public ArrayList<Reservation> getAllReservations() throws SQLException
   {
-    String sql = "SELECT id, customer, date, partySize, restauranttable.id FROM reservations, restauranttable ";
+    String sql = "SELECT r.id, r.customer, r.date, r.partySize, t.id AS tableId, t.maxSitting " +
+        "FROM reservations r JOIN restauranttable t ON r.tableId = t.id " +
+        "WHERE CAST(r.date AS DATE) = CURRENT_DATE";
 
     try (Connection connection = getConnection();
         PreparedStatement statement = connection.prepareStatement(sql))
@@ -69,17 +72,29 @@ public class ReservationDAOImpl implements ReservationDAO
 
       while (rs.next())
       {
-        reservations.add(mapRow(rs));
+        RestaurantTable table = new RestaurantTable(
+            rs.getInt("tableId"),
+            rs.getInt("maxSitting"),
+            new AvailableState()
+        );
+        reservations.add(new Reservation(
+            rs.getInt("id"),
+            rs.getString("customer"),
+            rs.getTimestamp("date").toLocalDateTime(),
+            rs.getInt("partySize"),
+            table
+        ));
       }
 
       return reservations;
     }
   }
-
-  @Override public Reservation getReservationById(Integer id)
-      throws SQLException
+  @Override
+  public Reservation getReservationById(int id) throws SQLException
   {
-    String sql = "SELECT id, customer, date, partySize, tableId FROM reservations WHERE id = ?";
+    String sql = "SELECT r.id, r.customer, r.date, r.partySize, t.id AS tableId, t.maxSitting " +
+        "FROM reservations r JOIN restauranttable t ON r.tableId = t.id " +
+        "WHERE r.id = ?";
 
     try (Connection connection = getConnection();
         PreparedStatement statement = connection.prepareStatement(sql))
@@ -89,7 +104,18 @@ public class ReservationDAOImpl implements ReservationDAO
 
       if (rs.next())
       {
-        return mapRow(rs);
+        RestaurantTable table = new RestaurantTable(
+            rs.getInt("tableId"),
+            rs.getInt("maxSitting"),
+            new AvailableState()
+        );
+        return new Reservation(
+            rs.getInt("id"),
+            rs.getString("customer"),
+            rs.getTimestamp("date").toLocalDateTime(),
+            rs.getInt("partySize"),
+            table
+        );
       }
       else
       {
@@ -98,10 +124,12 @@ public class ReservationDAOImpl implements ReservationDAO
     }
   }
 
-  @Override public Reservation getReservationByCustomerName(String name)
-      throws SQLException
+  @Override
+  public Reservation getReservationByCustomerName(String name) throws SQLException
   {
-    String sql = "SELECT id, customer, date, partySize, tableId FROM reservations WHERE customer = ?";
+    String sql = "SELECT r.id, r.customer, r.date, r.partySize, t.id AS tableId, t.maxSitting " +
+        "FROM reservations r JOIN restauranttable t ON r.tableId = t.id " +
+        "WHERE r.customer = ?";
 
     try (Connection connection = getConnection();
         PreparedStatement statement = connection.prepareStatement(sql))
@@ -111,7 +139,18 @@ public class ReservationDAOImpl implements ReservationDAO
 
       if (rs.next())
       {
-        return mapRow(rs);
+        RestaurantTable table = new RestaurantTable(
+            rs.getInt("tableId"),
+            rs.getInt("maxSitting"),
+            new AvailableState()
+        );
+        return new Reservation(
+            rs.getInt("id"),
+            rs.getString("customer"),
+            rs.getTimestamp("date").toLocalDateTime(),
+            rs.getInt("partySize"),
+            table
+        );
       }
       else
       {
@@ -121,7 +160,41 @@ public class ReservationDAOImpl implements ReservationDAO
   }
 
   @Override
-  public Reservation deleteById(Integer id) throws SQLException
+  public ArrayList<Reservation> getReservationByDate(LocalDateTime dateTime) throws SQLException
+  {
+    String sql = "SELECT r.id, r.customer, r.date, r.partySize, t.id AS tableId, t.maxSitting " +
+        "FROM reservations r JOIN restauranttable t ON r.tableId = t.id " +
+        "WHERE CAST(r.date AS DATE) = CAST(? AS DATE)";
+
+    try (Connection connection = getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql))
+    {
+      statement.setTimestamp(1, Timestamp.valueOf(dateTime));
+      ResultSet rs = statement.executeQuery();
+      ArrayList<Reservation> reservations = new ArrayList<>();
+
+      while (rs.next())
+      {
+        RestaurantTable table = new RestaurantTable(
+            rs.getInt("tableId"),
+            rs.getInt("maxSitting"),
+            new AvailableState()
+        );
+        reservations.add(new Reservation(
+            rs.getInt("id"),
+            rs.getString("customer"),
+            rs.getTimestamp("date").toLocalDateTime(),
+            rs.getInt("partySize"),
+            table
+        ));
+      }
+
+      return reservations;
+    }
+  }
+
+  @Override
+  public Reservation deleteById(int id) throws SQLException
   {
     Reservation reservation = getReservationById(id);
 
