@@ -9,9 +9,9 @@ public class Waiter extends Workers
 //    private String lastName;
     private WorkerRole role;
 
-    public Waiter(String firstName, String lastName, String email, String rawPassword)
+    public Waiter(Integer id,String firstName, String lastName, String email, String rawPassword)
     {
-        super(firstName,lastName,email,rawPassword);
+        super(id, firstName,lastName,email,rawPassword);
         this.role = WorkerRole.Waiter;
     }
     @Override

@@ -14,8 +14,9 @@ public abstract class Workers {
 
 //    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public Workers(String fn, String ln, String email, String rawPassword)
+    public Workers(Integer id,String fn, String ln, String email, String rawPassword)
     {
+        this.id = id;
         this.firstName = fn;
         this.lastName = ln;
         this.email = normlizeEmail(email);
