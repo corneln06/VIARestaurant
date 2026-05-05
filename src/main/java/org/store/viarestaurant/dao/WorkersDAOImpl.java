@@ -9,6 +9,8 @@ import org.store.viarestaurant.model.enums.WorkerRole;
 import java.sql.*;
 import java.util.ArrayList;
 
+import static org.store.viarestaurant.config.DatabaseConnection.getConnection;
+
 public class WorkersDAOImpl implements WorkersDAO
 {
   private static WorkersDAOImpl instance;
@@ -62,21 +64,122 @@ public class WorkersDAOImpl implements WorkersDAO
 
   @Override public ArrayList<Workers> getAllWorkers() throws SQLException
   {
-    return null;
+    ArrayList<Workers> workers = new ArrayList<>();
+    try(Connection connection = getConnection()){
+      PreparedStatement statement = connection.prepareStatement(
+          "SELECT id, firstName, lastName, email, rawPassword, role from workers"
+      );
+      ResultSet rs = statement.executeQuery();
+      while(rs.next()){
+
+        int id = rs.getInt("id");
+        String firstName = rs.getString("firstName");
+        String lastName = rs.getString("lastName");
+        String email = rs.getString("email");
+        String rawPassword = rs.getString("rawPassword");
+
+        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("role"));
+        Workers worker;
+        switch (workerRole){
+          case Waiter -> worker = new Waiter(id, firstName, lastName, email, rawPassword);
+          case Host -> worker = new Host(id, firstName, lastName, email, rawPassword);
+          case Manager -> worker = new Manager(id, firstName, lastName, email, rawPassword);
+          default -> throw new SQLException("Unknown role: " + workerRole);
+        }
+        workers.add(worker);
+      }
+    }
+    return workers;
   }
 
-  @Override public Workers getWorkerById(int id) throws SQLException
+  @Override public Workers getWorkerById(Integer id) throws SQLException
   {
-    return null;
+    try (Connection connection = getConnection())
+    {
+      PreparedStatement preparedStatement = connection.prepareStatement(
+          "SELECT * FROM workers where id = ? ");
+      preparedStatement.setInt(1, id);
+
+      ResultSet rs = preparedStatement.executeQuery();
+
+      if (rs.next())
+      {
+        String firstName = rs.getString("firstName");
+        String lastName = rs.getString("lastName");
+        String email = rs.getString("email");
+        String rawPassword = rs.getString("rawPassword");
+
+        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("role"));
+        Workers worker;
+
+        switch (workerRole)
+        {
+          case Waiter ->
+              worker = new Waiter(id, firstName, lastName, email, rawPassword);
+          case Host ->
+              worker = new Host(id, firstName, lastName, email, rawPassword);
+          case Manager ->
+              worker = new Manager(id, firstName, lastName, email, rawPassword);
+          default -> throw new SQLException("Unknown role: " + workerRole);
+        }
+        return worker;
+      }
+    }
+    throw new SQLException("Worker with id " + id + " not found");
   }
 
   @Override public Workers getWorkerByEmail(String email) throws SQLException
   {
-    return null;
+    try (Connection connection = getConnection())
+    {
+      PreparedStatement preparedStatement = connection.prepareStatement(
+          "SELECT * FROM workers where email = ? ");
+      preparedStatement.setString(1, email);
+
+      ResultSet rs = preparedStatement.executeQuery();
+
+      if (rs.next())
+      {
+        int id = rs.getInt("id");
+        String firstName = rs.getString("firstName");
+        String lastName = rs.getString("lastName");
+        String rawPassword = rs.getString("rawPassword");
+
+        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("role"));
+        Workers worker;
+
+        switch (workerRole)
+        {
+          case Waiter ->
+              worker = new Waiter(id, firstName, lastName, email, rawPassword);
+          case Host ->
+              worker = new Host(id, firstName, lastName, email, rawPassword);
+          case Manager ->
+              worker = new Manager(id, firstName, lastName, email, rawPassword);
+          default -> throw new SQLException("Unknown role: " + workerRole);
+        }
+        return worker;
+      }
+    }
+    throw new SQLException("Worker with email " + email + " not found");
   }
 
-  @Override public void deleteWorkerById(int id) throws SQLException
-  {
 
+  @Override public void deleteWorkerById(Integer id) throws SQLException
+  {
+    try (Connection connection = getConnection()) {
+
+      PreparedStatement preparedStatement = connection.prepareStatement(
+          "DELETE FROM workers WHERE id = ?"
+      );
+
+      preparedStatement.setInt(1, id);
+
+      int rowsAffected = preparedStatement.executeUpdate();
+
+      if (rowsAffected == 0) {
+        throw new SQLException("Worker with id " + id + " not found");
+      }
+    }
   }
 }
