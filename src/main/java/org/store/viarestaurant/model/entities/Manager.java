@@ -10,9 +10,9 @@ public class Manager extends Workers
     //    private String lastName;
     private WorkerRole role;
 
-    public Manager(String firstName, String lastName, String email, String rawPassword)
+    public Manager(Integer id, String firstName, String lastName, String email, String rawPassword)
     {
-        super(firstName,lastName,email,rawPassword);
+        super(id ,firstName,lastName,email,rawPassword);
         this.role = WorkerRole.Manager;
     }
 

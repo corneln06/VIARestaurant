@@ -3,6 +3,7 @@ module org.store.viarestaurant {
   requires javafx.fxml;
   requires java.sql;
   requires spring.security.crypto;
+  requires org.postgresql.jdbc;
 
   exports org.store.viarestaurant.model.state;
   opens org.store.viarestaurant.model.state to javafx.fxml;
