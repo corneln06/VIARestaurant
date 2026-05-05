@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.WaiterController">
+    <left>
+        <VBox prefWidth="220.0" spacing="18.0" styleClass="sidebar">
+            <padding>
+                <Insets bottom="24.0" left="18.0" right="18.0" top="24.0" />
+            </padding>
+            <children>
+                <Label styleClass="brand-title" text="Via Restaurant" />
+                <VBox spacing="4.0" styleClass="sidebar-user-card">
+                    <children>
+                        <Label fx:id="sidebarName" styleClass="sidebar-name" text="Waiter User" />
+                        <Label fx:id="sidebarRole" styleClass="sidebar-role" text="Waiter" />
+                    </children>
+                </VBox>
+                <Separator />
+                <VBox spacing="8.0">
+                    <children>
+                        <Button fx:id="btnTables" maxWidth="Infinity" onAction="#showTablesPage" styleClass="nav-btn" text="Tables" />
+                        <Button fx:id="btnOrders" maxWidth="Infinity" onAction="#showOrdersPage" styleClass="nav-btn" text="Orders" />
+                        <Button fx:id="btnBills" maxWidth="Infinity" onAction="#showBillsPage" styleClass="nav-btn" text="Bills" />
+                    </children>
+                </VBox>
+                <Region VBox.vgrow="ALWAYS" />
+                <Label styleClass="sidebar-footer" text="Floor Service" />
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <StackPane styleClass="content-area">
+            <children>
+                <AnchorPane fx:id="tablesPage" styleClass="page-surface">
+                    <children>
+                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="18.0">
+                            <children>
+                                <Label styleClass="page-title" text="Live Tables" />
+                                <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll" VBox.vgrow="ALWAYS">
+                                    <content>
+                                        <FlowPane fx:id="waiterTablesFlow" hgap="16.0" prefWrapLength="800.0" vgap="16.0" />
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+                <AnchorPane fx:id="ordersListPage" managed="false" styleClass="page-surface" visible="false">
+                    <children>
+                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="18.0">
+                            <children>
+                                <Label styleClass="page-title" text="Orders" />
+                                <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll" VBox.vgrow="ALWAYS">
+                                    <content>
+                                        <FlowPane fx:id="ordersListFlow" hgap="16.0" prefWrapLength="800.0" vgap="16.0" />
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+                <AnchorPane fx:id="ordersDetailPage" managed="false" styleClass="page-surface" visible="false">
+                    <children>
+                        <BorderPane AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
+                            <top>
+                                <VBox spacing="16.0">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                            <children>
+                                                <Button onAction="#backToOrdersList" styleClass="btn-base btn-secondary" text="Back" />
+                                                <Label fx:id="selectedOrderTableLabel" styleClass="page-title" text="Table 1" />
+                                            </children>
+                                        </HBox>
+                                        <HBox spacing="8.0">
+                                            <children>
+                                                <ToggleButton fx:id="filterAllButton" styleClass="filter-chip" text="All" />
+                                                <ToggleButton fx:id="filterStartersButton" styleClass="filter-chip" text="Starters" />
+                                                <ToggleButton fx:id="filterMainsButton" styleClass="filter-chip" text="Mains" />
+                                                <ToggleButton fx:id="filterSidesButton" styleClass="filter-chip" text="Desserts" />
+                                                <ToggleButton fx:id="filterDrinksButton" styleClass="filter-chip" text="Drinks" />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </top>
+                            <center>
+                                <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll">
+                                    <content>
+                                        <TilePane fx:id="menuItemsFlow" hgap="16.0" prefColumns="3" prefTileWidth="210.0" prefWrapLength="520.0" vgap="16.0" />
+                                    </content>
+                                </ScrollPane>
+                            </center>
+                            <right>
+                                <VBox prefWidth="300.0" spacing="14.0" styleClass="summary-card">
+                                    <children>
+                                        <Label styleClass="section-title" text="Order Summary" />
+                                        <Label fx:id="roundLabel" styleClass="page-subtitle" text="Round 1" />
+                                        <VBox fx:id="orderSummaryLinesBox" spacing="10.0" VBox.vgrow="ALWAYS" />
+                                        <HBox alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label styleClass="section-title" text="Subtotal" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label fx:id="orderSubtotalLabel" styleClass="section-title" text="$0.00" />
+                                            </children>
+                                        </HBox>
+                                        <Button fx:id="sendToKitchenButton" maxWidth="Infinity" onAction="#sendToKitchen" styleClass="btn-base btn-primary" text="Send to Kitchen" />
+                                    </children>
+                                </VBox>
+                            </right>
+                        </BorderPane>
+                    </children>
+                </AnchorPane>
+                <AnchorPane fx:id="billsListPage" managed="false" styleClass="page-surface" visible="false">
+                    <children>
+                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="18.0">
+                            <children>
+                                <Label styleClass="page-title" text="Bills" />
+                                <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll" VBox.vgrow="ALWAYS">
+                                    <content>
+                                        <FlowPane fx:id="billsListFlow" hgap="16.0" prefWrapLength="800.0" vgap="16.0" />
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+                <AnchorPane fx:id="billDetailPage" managed="false" styleClass="page-surface" visible="false">
+                    <children>
+                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="18.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <Button onAction="#backToBillsList" styleClass="btn-base btn-secondary" text="Back" />
+                                        <Label fx:id="selectedBillTableLabel" styleClass="page-title" text="Table 1" />
+                                    </children>
+                                </HBox>
+                                <TableView fx:id="billTable" prefHeight="360.0" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="itemColumn" prefWidth="260.0" text="ITEM" />
+                                        <TableColumn fx:id="qtyColumn" prefWidth="90.0" text="QTY" />
+                                        <TableColumn fx:id="unitColumn" prefWidth="120.0" text="UNIT" />
+                                        <TableColumn fx:id="totalColumn" prefWidth="140.0" text="TOTAL" />
+                                    </columns>
+                                </TableView>
+                                <HBox spacing="18.0">
+                                    <children>
+                                        <VBox prefWidth="250.0" spacing="10.0" styleClass="summary-card">
+                                            <children>
+                                                <Label styleClass="section-title" text="Totals" />
+                                                <HBox>
+                                                    <children>
+                                                        <Label styleClass="muted-label" text="Subtotal" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <Label fx:id="billSubtotalLabel" text="$0.00" />
+                                                    </children>
+                                                </HBox>
+                                                <HBox>
+                                                    <children>
+                                                        <Label styleClass="muted-label" text="VAT 25%" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <Label fx:id="billVatLabel" text="$0.00" />
+                                                    </children>
+                                                </HBox>
+                                                <HBox>
+                                                    <children>
+                                                        <Label styleClass="section-title" text="Total" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <Label fx:id="billTotalLabel" styleClass="section-title" text="$0.00" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="10.0" styleClass="summary-card">
+                                            <children>
+                                                <Label styleClass="section-title" text="Actions" />
+                                                <Button maxWidth="Infinity" onAction="#splitByGuest" styleClass="btn-base btn-secondary" text="Split by guest" />
+                                                <Button maxWidth="Infinity" onAction="#splitEvenly" styleClass="btn-base btn-secondary" text="Split evenly" />
+                                                <Button maxWidth="Infinity" onAction="#applyDiscount" styleClass="btn-base btn-secondary" text="Apply discount" />
+                                                <Button maxWidth="Infinity" onAction="#addTip" styleClass="btn-base btn-secondary" text="Add tip" />
+                                                <Button maxWidth="Infinity" onAction="#printAndCloseTable" styleClass="btn-base btn-primary" text="Print &amp; close table" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+            </children>
+        </StackPane>
+    </center>
+</BorderPane>
