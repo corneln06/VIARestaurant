@@ -5,22 +5,21 @@ import org.store.viarestaurant.model.state.TableState;
 
 public class RestaurantTable
 {
-  private int id;
+  private Integer id;
   private int maxSitting;
   private TableState status;
   private InternalSchedule internalSchedule;
 
 
-  public RestaurantTable(int id, int maxSitting , TableState status){
+  public RestaurantTable(Integer id, int maxSitting , TableState status){
     this.id = id;
     this.status = new AvailableState();
     this.maxSitting = maxSitting;
-   
   }
   public void setState(TableState status){
     this.status = status;
   }
-  public int getId()
+  public Integer getId()
   {
     return id;
   }
