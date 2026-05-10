@@ -56,7 +56,7 @@ public class NavigationController
     showDefaultPage(worker);
   }
 
-  private final Workers testWorker = new Manager("Adam", "Adam", "kkkkk", "1234");
+  private final Workers testWorker = new Manager(1, "Adam", "Adam", "kkkkk", "1234");
 //TESTETSTE NOT FINALLLLL
   @FXML
   private void handleLogin()
