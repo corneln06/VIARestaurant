@@ -36,8 +36,6 @@ public class WorkersDAOImpl implements WorkersDAO
               "VALUES (?, ?, ?, ?, ?) RETURNING id"
       );
 
-      System.out.println(connection.getCatalog());
-
       statement.setString(1, firstName);
       statement.setString(2, lastName);
       statement.setString(3, String.valueOf(role));
