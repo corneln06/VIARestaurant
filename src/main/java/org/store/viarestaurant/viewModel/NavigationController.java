@@ -75,10 +75,6 @@ public class NavigationController
 
     try
     {
-      WorkersDAOImpl workersDAO = WorkersDAOImpl.getInstance();
-      workersDAO.createWorkers("cornel", "negru", "kornel.negru@gmail.com", "Cornel123",
-          WorkerRole.valueOf("Waiter"));
-      System.out.println("dsad");
       Parent root = loadDashboard(testWorker);
       Stage stage = (Stage) usernameField.getScene().getWindow();
       stage.getScene().setRoot(root);
@@ -86,12 +82,6 @@ public class NavigationController
     catch (IOException exception)
     {
       showError("Unable to open dashboard.");
-    }
-    catch (SQLException e)
-    {
-      showError("Unable to create worker");
-      throw new RuntimeException(e);
-
     }
   }
 
