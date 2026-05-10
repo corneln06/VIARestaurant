@@ -1,5 +1,6 @@
 package org.store.viarestaurant.dao;
 
+import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.model.entities.Host;
 import org.store.viarestaurant.model.entities.Manager;
 import org.store.viarestaurant.model.entities.Waiter;
@@ -24,7 +25,7 @@ public class WorkersDAOImpl implements WorkersDAO
     return instance;
   }
   private Connection getConnection() throws SQLException{
-    return DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "Qetuoadgjl123.");
+    return DatabaseConnection.getConnection();
   }
 
   @Override
@@ -35,6 +36,8 @@ public class WorkersDAOImpl implements WorkersDAO
               "VALUES (?, ?, ?, ?, ?) RETURNING id"
       );
 
+      System.out.println(connection.getCatalog());
+
       statement.setString(1, firstName);
       statement.setString(2, lastName);
       statement.setString(3, String.valueOf(role));
@@ -42,6 +45,7 @@ public class WorkersDAOImpl implements WorkersDAO
       statement.setString(5, rawPassword);
 
       ResultSet rs = statement.executeQuery();
+
 
       if (rs.next()) {
         int id = rs.getInt("id");
