@@ -143,6 +143,7 @@ public class WorkersDAOImpl implements WorkersDAO
         int id = rs.getInt("id");
         String firstName = rs.getString("firstName");
         String lastName = rs.getString("lastName");
+        String password = rs.getString("password");
 
         WorkerRole workerRole = WorkerRole.valueOf(rs.getString("rol"));
         Workers worker;
@@ -150,11 +151,11 @@ public class WorkersDAOImpl implements WorkersDAO
         switch (workerRole)
         {
           case Waiter ->
-              worker = new Waiter(id, firstName, lastName, email);
+              worker = new Waiter(id, firstName, lastName, email, password);
           case Host ->
-              worker = new Host(id, firstName, lastName, email);
+              worker = new Host(id, firstName, lastName, email, password);
           case Manager ->
-              worker = new Manager(id, firstName, lastName, email);
+              worker = new Manager(id, firstName, lastName, email, password);
           default -> throw new SQLException("Unknown role: " + workerRole);
         }
         return worker;
