@@ -11,7 +11,7 @@ public class RestaurantTable
   private InternalSchedule internalSchedule;
 
 
-  public RestaurantTable(int id, int maxSitting , TableState status){
+  public RestaurantTable(int id, int maxSitting){
     this.id = id;
     this.status = new AvailableState();
     this.maxSitting = maxSitting;

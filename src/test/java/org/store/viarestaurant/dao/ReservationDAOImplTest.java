@@ -1,0 +1,113 @@
+package org.store.viarestaurant.dao;
+
+import org.junit.jupiter.api.*;
+import org.store.viarestaurant.model.entities.Reservation;
+import org.store.viarestaurant.model.entities.RestaurantTable;
+
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class ReservationDAOImplTest
+{
+  private ReservationDAOImpl dao;
+  private RestaurantTable testTable;
+  private int createdId;
+
+  @BeforeAll
+  void setup() throws SQLException
+  {
+    dao = ReservationDAOImpl.getInstance();
+    testTable = new RestaurantTable(1, 4);
+  }
+
+  @Test
+  @Order(1)
+  void testCreateReservation() throws SQLException
+  {
+    Reservation r = dao.createReservation(
+        "Jan Novak",
+        LocalDateTime.now().withHour(20).withMinute(0).withSecond(0).withNano(0),
+        4,
+        testTable
+    );
+
+    assertNotNull(r);
+    assertTrue(r.getId() > 0);
+    assertEquals("Jan Novak", r.getName());
+    assertEquals(4, r.getPartySize());
+
+    createdId = r.getId();
+  }
+
+  @Test
+  @Order(2)
+  void testCreateReservationPartySizeExceedsMaxSitting() throws SQLException
+  {
+    assertThrows(SQLException.class, () -> dao.createReservation(
+        "Big Party",
+        LocalDateTime.now(),
+        10,
+        testTable
+    ));
+  }
+
+  @Test
+  @Order(3)
+  void testCreateReservationWithPastDate() throws SQLException
+  {
+    assertThrows(SQLException.class, () -> dao.createReservation(
+        "Past Person",
+        LocalDateTime.of(2020, 1, 1, 12, 0),
+        2,
+        testTable
+    ));
+  }
+
+  @Test
+  @Order(4)
+  void testGetAllReservationsForToday() throws SQLException
+  {
+    ArrayList<Reservation> list = dao.getAllReservationsForToday();
+
+    assertNotNull(list);
+    assertFalse(list.isEmpty());
+  }
+
+  @Test
+  @Order(5)
+  void testGetReservationById() throws SQLException
+  {
+    Reservation r = dao.getReservationById(createdId);
+
+    assertNotNull(r);
+    assertEquals(createdId, r.getId());
+    assertEquals("Jan Novak", r.getName());
+  }
+
+  @Test
+  @Order(6)
+  void testGetReservationByName() throws SQLException
+  {
+    Reservation r = dao.getReservationByCustomerName("Jan Novak");
+
+    assertNotNull(r);
+    assertEquals("Jan Novak", r.getName());
+  }
+
+  @Test
+  @Order(7)
+  void testDeleteById() throws SQLException
+  {
+    Reservation deleted = dao.deleteById(createdId);
+
+    assertNotNull(deleted);
+    assertEquals(createdId, deleted.getId());
+
+    assertThrows(SQLException.class, () -> dao.getReservationById(createdId));
+  }
+}
