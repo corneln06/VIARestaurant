@@ -31,7 +31,7 @@ public class ReservationDAOImplTest
   {
     Reservation r = dao.createReservation(
         "Jan Novak",
-        LocalDateTime.now(),
+        LocalDateTime.now().withHour(20).withMinute(0).withSecond(0).withNano(0),
         4,
         testTable
     );
@@ -46,6 +46,31 @@ public class ReservationDAOImplTest
 
   @Test
   @Order(2)
+  void testCreateReservationPartySizeExceedsMaxSitting() throws SQLException
+  {
+    // testTable has maxSitting = 4, so partySize 10 should fail
+    assertThrows(SQLException.class, () -> dao.createReservation(
+        "Big Party",
+        LocalDateTime.now(),
+        10,
+        testTable
+    ));
+  }
+
+  @Test
+  @Order(3)
+  void testCreateReservationWithPastDate() throws SQLException
+  {
+    assertThrows(SQLException.class, () -> dao.createReservation(
+        "Past Person",
+        LocalDateTime.of(2020, 1, 1, 12, 0),
+        2,
+        testTable
+    ));
+  }
+
+  @Test
+  @Order(4)
   void testGetAllReservationsForToday() throws SQLException
   {
     ArrayList<Reservation> list = dao.getAllReservationsForToday();
@@ -55,7 +80,7 @@ public class ReservationDAOImplTest
   }
 
   @Test
-  @Order(3)
+  @Order(5)
   void testGetReservationById() throws SQLException
   {
     Reservation r = dao.getReservationById(createdId);
@@ -66,7 +91,7 @@ public class ReservationDAOImplTest
   }
 
   @Test
-  @Order(4)
+  @Order(6)
   void testGetReservationByName() throws SQLException
   {
     Reservation r = dao.getReservationByCustomerName("Jan Novak");
@@ -76,7 +101,7 @@ public class ReservationDAOImplTest
   }
 
   @Test
-  @Order(5)
+  @Order(7)
   void testDeleteById() throws SQLException
   {
     Reservation deleted = dao.deleteById(createdId);

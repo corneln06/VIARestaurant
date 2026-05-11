@@ -32,6 +32,15 @@ public class ReservationDAOImpl implements ReservationDAO
   public Reservation createReservation(String name, LocalDateTime dateTime,
       int partySize, RestaurantTable restaurantTable) throws SQLException
   {
+    if (dateTime.isBefore(LocalDateTime.now()))
+    {
+      throw new SQLException("Reservation cannot be created for the past!");
+    }
+    if (restaurantTable.getMaxSitting() < partySize)
+    {
+      throw new SQLException("The party size exceeds max sitting!");
+    }
+
     String sql = "INSERT INTO reservations (customer, date, partySize, tableId) " +
         "VALUES (?, ?, ?, ?) RETURNING id";
 
@@ -43,9 +52,6 @@ public class ReservationDAOImpl implements ReservationDAO
       statement.setInt(3, partySize);
       statement.setInt(4, restaurantTable.getId());
 
-      if (restaurantTable.getMaxSitting() < partySize){
-        throw new Exception("The party size exceeds max sitting");
-      }
       ResultSet rs = statement.executeQuery();
 
       if (rs.next())
@@ -57,10 +63,6 @@ public class ReservationDAOImpl implements ReservationDAO
       {
         throw new SQLException("No ID returned from reservation insert");
       }
-    }
-    catch (Exception e)
-    {
-      throw new RuntimeException(e);
     }
   }
 
