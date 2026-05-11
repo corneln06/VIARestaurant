@@ -42,6 +42,10 @@ public class MenuItems
     return type;
   }
 
+  public Double getPrice(){
+      return price;
+  }
+
   public void addAllergy(String allergyName){
       allergies.add(allergyName);
   }

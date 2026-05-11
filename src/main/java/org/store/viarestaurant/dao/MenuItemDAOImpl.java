@@ -128,30 +128,46 @@ public class MenuItemDAOImpl implements MenuItemDAO {
     @Override
     public MenuItems getMenuItemById(Integer id) throws SQLException {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM menuitems WHERE id = ? LEFT JOIN menuitemsallergies ma ON m.id = ma.menuitemid\n" + " LEFT JOIN allergies a ON ma.allergyid = a.id");
+            PreparedStatement statement = connection.prepareStatement("""
+            SELECT 
+                m.id,
+                m.name,
+                m.type,
+                m.price,
+                m.isvegetarian,
+                a.name AS allergyname
+            FROM menuitems m
+            LEFT JOIN menuitemsallergies ma ON m.id = ma.menuitemid
+            LEFT JOIN allergies a ON ma.allergyid = a.id
+            WHERE m.id = ?
+        """);
+
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                String name = resultSet.getString("name");
-                MenuTypes type = MenuTypes.valueOf(resultSet.getString("type"));
-                Double price = resultSet.getDouble("price");
-                boolean isVegetarian = resultSet.getBoolean("isVegetarian");
-                ArrayList<String> allergies = new ArrayList<>();
+
+            MenuItems menuItem = null;
+            ArrayList<String> allergies = new ArrayList<>();
+
+            while (resultSet.next()) {
+                if (menuItem == null) {
+                    String name = resultSet.getString("name");
+                    MenuTypes type = MenuTypes.valueOf(resultSet.getString("type"));
+                    Double price = resultSet.getDouble("price");
+                    boolean isVegetarian = resultSet.getBoolean("isvegetarian");
+
+                    menuItem = new MenuItems(id, name, type, price, isVegetarian, allergies);
+                }
 
                 String allergyName = resultSet.getString("allergyname");
 
                 if (allergyName != null) {
                     allergies.add(allergyName);
                 }
-
-                return new MenuItems(id, name, type, price, isVegetarian, allergies);
-            } else {
-                return null;
             }
+
+            return menuItem;
         }
     }
-
-    ;
 
     @Override
     public void delete(Integer id) throws SQLException {
