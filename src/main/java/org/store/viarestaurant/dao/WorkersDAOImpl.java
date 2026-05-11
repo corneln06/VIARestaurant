@@ -78,9 +78,9 @@ public class WorkersDAOImpl implements WorkersDAO
         String firstName = rs.getString("firstName");
         String lastName = rs.getString("lastName");
         String email = rs.getString("email");
-        String rawPassword = rs.getString("rawPassword");
+        String rawPassword = rs.getString("password");
 
-        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("role"));
+        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("rol"));
         Workers worker;
         switch (workerRole){
           case Waiter -> worker = new Waiter(id, firstName, lastName, email, rawPassword);
@@ -109,9 +109,9 @@ public class WorkersDAOImpl implements WorkersDAO
         String firstName = rs.getString("firstName");
         String lastName = rs.getString("lastName");
         String email = rs.getString("email");
-        String rawPassword = rs.getString("rawPassword");
+        String rawPassword = rs.getString("password");
 
-        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("role"));
+        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("rol"));
         Workers worker;
 
         switch (workerRole)
@@ -145,9 +145,9 @@ public class WorkersDAOImpl implements WorkersDAO
         int id = rs.getInt("id");
         String firstName = rs.getString("firstName");
         String lastName = rs.getString("lastName");
-        String rawPassword = rs.getString("rawPassword");
+        String rawPassword = rs.getString("password");
 
-        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("role"));
+        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("rol"));
         Workers worker;
 
         switch (workerRole)

@@ -2,24 +2,25 @@ package org.store.viarestaurant.model.entities;
 
 // import java.util.ArrayList;
 
+import javafx.concurrent.Worker;
+
 public class TableOrder {
     private final int id;
     private RestaurantTable restaurantTable;
-    private Waiter waiter;
-    private int partySize;
-    // To Be Created, put into constructor, and create the methods
-    // private ArrayList<> menuItemsRelationship;
+    private Workers waiter;
     private String notes;
-    private double check;
+    private double bill;
     private boolean isReservation;
+    private boolean isPaid;
 
-    public TableOrder(int id, RestaurantTable restaurantTable, Waiter waiter, int partySize, String notes, double check) {
+    public TableOrder(int id, RestaurantTable restaurantTable, Workers waiter, String notes, double bill, boolean isReservation) {
         this.id = id;
         this.restaurantTable = restaurantTable;
         this.waiter = waiter;
-        this.partySize = partySize;
         this.notes = notes;
-        this.check = check;
+        this.bill = bill;
+        this.isReservation = isReservation;
+        this.isPaid = false;
     }
 
     public int getId() {
@@ -34,20 +35,12 @@ public class TableOrder {
         this.restaurantTable = restaurantTable;
     }
 
-    public Waiter getWaiter() {
+    public Workers getWaiter() {
         return waiter;
     }
 
-    public void setWaiter(Waiter waiter) {
+    public void setWaiter(Workers waiter) {
         this.waiter = waiter;
-    }
-
-    public int getPartySize() {
-        return partySize;
-    }
-
-    public void setPartySize(int partySize) {
-        this.partySize = partySize;
     }
 
     public String getNotes() {
@@ -58,15 +51,23 @@ public class TableOrder {
         this.notes = notes;
     }
 
-    public double getCheck() {
-        return check;
+    public double getBill() {
+        return bill;
     }
 
-    public void setCheck(double check) {
-        this.check = check;
+    public void setBill(double check) {
+        this.bill = check;
     }
 
     public boolean isReservation() {
         return isReservation;
+    }
+
+    public boolean isPaid() {
+        return isPaid;
+    }
+
+    public void setPaid(boolean paid) {
+        isPaid = paid;
     }
 }
