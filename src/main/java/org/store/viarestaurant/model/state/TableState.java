@@ -7,5 +7,6 @@ public interface TableState
   void setAvailable(RestaurantTable restaurantTable);
   void setSeated(RestaurantTable restaurantTable);
   void setReserved(RestaurantTable restaurantTable);
+  String getName();
 
 }

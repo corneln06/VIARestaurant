@@ -13,4 +13,9 @@ public class ReservedState implements TableState
   public void setReserved(RestaurantTable restaurantTable){
     System.out.println("Already reserved");
   }
+
+  @Override
+  public String getName() {
+    return "Reserved";
+  }
 }

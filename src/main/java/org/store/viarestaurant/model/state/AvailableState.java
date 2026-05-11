@@ -13,4 +13,9 @@ public class AvailableState implements TableState
   public void setReserved(RestaurantTable restaurantTable){
     restaurantTable.setState(new ReservedState());
   }
+
+  @Override
+  public String getName() {
+    return "Available";
+  }
 }
