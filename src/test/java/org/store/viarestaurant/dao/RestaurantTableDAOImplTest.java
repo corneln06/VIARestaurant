@@ -1,7 +1,6 @@
-package org.store.viarestaurant;
+package org.store.viarestaurant.dao;
 
 import org.junit.jupiter.api.*;
-import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 
 import java.sql.SQLException;
