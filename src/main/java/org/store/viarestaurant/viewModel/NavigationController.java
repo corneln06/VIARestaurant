@@ -2,6 +2,7 @@ package org.store.viarestaurant.viewModel;
 
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,7 +13,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import org.store.viarestaurant.dao.WorkersDAOImpl;
 import org.store.viarestaurant.model.entities.Manager;
+import org.store.viarestaurant.model.entities.Waiter;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.view.HelloApplication;
@@ -56,7 +59,7 @@ public class NavigationController
     showDefaultPage(worker);
   }
 
-  private final Workers testWorker = new Manager(1, "Adam", "Adam", "kkkkk", "1234");
+  private final Workers testWorker = new Manager(1,"Adam", "Adam", "kkkkk", "1234");
 //TESTETSTE NOT FINALLLLL
   @FXML
   private void handleLogin()
