@@ -22,7 +22,7 @@ public class ReservationDAOImplTest
   void setup() throws SQLException
   {
     dao = ReservationDAOImpl.getInstance();
-    testTable = new RestaurantTable(1, 4, null);
+    testTable = new RestaurantTable(1, 4);
   }
 
   @Test

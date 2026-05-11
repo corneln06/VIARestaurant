@@ -43,6 +43,9 @@ public class ReservationDAOImpl implements ReservationDAO
       statement.setInt(3, partySize);
       statement.setInt(4, restaurantTable.getId());
 
+      if (restaurantTable.getMaxSitting() < partySize){
+        throw new Exception("The party size exceeds max sitting");
+      }
       ResultSet rs = statement.executeQuery();
 
       if (rs.next())
@@ -54,6 +57,10 @@ public class ReservationDAOImpl implements ReservationDAO
       {
         throw new SQLException("No ID returned from reservation insert");
       }
+    }
+    catch (Exception e)
+    {
+      throw new RuntimeException(e);
     }
   }
 
@@ -73,8 +80,7 @@ public class ReservationDAOImpl implements ReservationDAO
       {
         RestaurantTable table = new RestaurantTable(
             rs.getInt("tableId"),
-            rs.getInt("maxSitting"),
-            new AvailableState()
+            rs.getInt("maxSitting")
         );
         reservations.add(new Reservation(
             rs.getInt("id"),
@@ -105,8 +111,7 @@ public class ReservationDAOImpl implements ReservationDAO
       {
         RestaurantTable table = new RestaurantTable(
             rs.getInt("tableId"),
-            rs.getInt("maxSitting"),
-            new AvailableState()
+            rs.getInt("maxSitting")
         );
         return new Reservation(
             rs.getInt("id"),
@@ -140,8 +145,7 @@ public class ReservationDAOImpl implements ReservationDAO
       {
         RestaurantTable table = new RestaurantTable(
             rs.getInt("tableId"),
-            rs.getInt("maxSitting"),
-            new AvailableState()
+            rs.getInt("maxSitting")
         );
         return new Reservation(
             rs.getInt("id"),
@@ -176,8 +180,7 @@ public class ReservationDAOImpl implements ReservationDAO
       {
         RestaurantTable table = new RestaurantTable(
             rs.getInt("tableId"),
-            rs.getInt("maxSitting"),
-            new AvailableState()
+            rs.getInt("maxSitting")
         );
         reservations.add(new Reservation(
             rs.getInt("id"),
