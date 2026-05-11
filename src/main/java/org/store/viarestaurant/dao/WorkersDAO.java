@@ -10,7 +10,7 @@ public interface WorkersDAO
 {
   Workers createWorkers( String firstName, String lastName, String email, String rawPassword, WorkerRole role) throws SQLException;
   ArrayList<Workers> getAllWorkers() throws SQLException;
-  Workers getWorkerById(int id) throws SQLException;
+  Workers getWorkerById(Integer id) throws SQLException;
   Workers getWorkerByEmail(String email) throws SQLException;
-  void deleteWorkerById(int id) throws SQLException;
+  void deleteWorkerById(Integer id) throws SQLException;
 }
