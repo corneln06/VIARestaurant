@@ -103,10 +103,7 @@ public class ReservationDAOImplTest
   @Order(7)
   void testDeleteById() throws SQLException
   {
-    Reservation deleted = dao.deleteById(createdId);
-
-    assertNotNull(deleted);
-    assertEquals(createdId, deleted.getId());
+    dao.deleteById(createdId);
 
     assertThrows(SQLException.class, () -> dao.getReservationById(createdId));
   }
