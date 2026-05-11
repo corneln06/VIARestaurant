@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public interface RestaurantTableDAO {
-    RestaurantTable createRestaurantTable(int maxSitting , TableState status)throws SQLException;
+    RestaurantTable createRestaurantTable(int maxSitting)throws SQLException;
     ArrayList<RestaurantTable> getAllRestaurantTables() throws SQLException;
     RestaurantTable getRestaurantTableByID(Integer id) throws SQLException;
     void deleteRestaurantTableByID(Integer id) throws SQLException;

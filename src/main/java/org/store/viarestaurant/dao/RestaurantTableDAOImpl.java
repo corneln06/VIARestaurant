@@ -18,8 +18,8 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
 
     public static synchronized RestaurantTableDAOImpl getInstance() throws SQLException{
 
-            if (instance != null) {
-                RestaurantTableDAOImpl restaurantTableDAO = (RestaurantTableDAOImpl) instance;
+            if (instance == null) {
+                instance = new RestaurantTableDAOImpl();
             }
         return instance;
     }
@@ -28,21 +28,20 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
     }
 
     @Override
-    public RestaurantTable createRestaurantTable(int maxSitting, TableState status) throws SQLException {
+    public RestaurantTable createRestaurantTable(int maxSitting) throws SQLException {
         try(Connection connection = getConnection()){
             PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO restauranttable (status, maxSitting)" +
-                            "VALUES (?,?) RETURNING id"
+                    "INSERT INTO restauranttable (status, maxSitting) VALUES (?, ?) RETURNING id"
             );
 
-            statement.setString(1,status.getName());
-            statement.setInt(2,maxSitting);
+            statement.setString(1, "Available");
+            statement.setInt(2, maxSitting);
 
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {
                 int id = rs.getInt("id");
-                return new RestaurantTable(id,maxSitting,status);
+                return new RestaurantTable(id, maxSitting);
             } else {
                 throw new SQLException("No ID returned");
             }
@@ -58,18 +57,15 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
 
             ResultSet rs = statement.executeQuery();
             ArrayList<RestaurantTable> finalList= new ArrayList<>();
-            RestaurantTable restaurantTable = null;
-            while(rs.next())
-            {
-                Integer id = rs.getInt("id");
-                if (restaurantTable == null || id != restaurantTable.getId())
-                {
-                    int maxSitting = rs.getInt("maxSitting");
-                    TableState status = TableStateFactory.fromString(rs.getString("status"));
+            while(rs.next()) {
 
-                    restaurantTable = new RestaurantTable(id,maxSitting, status);
-                    finalList.add(restaurantTable);
-                }
+                Integer id = rs.getInt("id");
+                int maxSitting = rs.getInt("maxSitting");
+
+                RestaurantTable restaurantTable =
+                        new RestaurantTable(id, maxSitting);
+
+                finalList.add(restaurantTable);
             }
             return finalList;
         }
@@ -89,9 +85,8 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
             if (rs.next()) {
                 int tableID = rs.getInt("id");
                 int maxSitting = rs.getInt("maxSitting");
-                TableState status = TableStateFactory.fromString(rs.getString("status"));
 
-                return new RestaurantTable(tableID, maxSitting, status);
+                return new RestaurantTable(tableID, maxSitting);
             }
             throw new NoSuchElementException("RestaurantTable not found with id: " + id);
         }
@@ -101,14 +96,16 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
         public void deleteRestaurantTableByID (Integer id) throws SQLException {
             try (Connection connection = getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(
-                        "DELETE * FROM restauranttable WHERE id=?"
+                        "DELETE FROM restauranttable WHERE id=?"
                 );
 
                 statement.setInt(1, id);
 
                 int rowsAffected = statement.executeUpdate();
 
-                throw new IllegalArgumentException("No Table with id: " + id);
+                if (rowsAffected == 0) {
+                    throw new SQLException("Table with id " + id + " not found");
+                }
             }
         }
     }

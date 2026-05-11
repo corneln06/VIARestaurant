@@ -16,6 +16,6 @@ public class AvailableState implements TableState
 
   @Override
   public String getName() {
-    return "AVAILABLE";
+    return "Available";
   }
 }

@@ -16,6 +16,6 @@ public class SeatedState implements TableState
 
   @Override
   public String getName() {
-      return "OCCUPIED";
+      return "Seated";
   }
 }

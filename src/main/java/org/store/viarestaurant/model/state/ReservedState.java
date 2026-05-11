@@ -16,6 +16,6 @@ public class ReservedState implements TableState
 
   @Override
   public String getName() {
-    return "RESERVED";
+    return "Reserved";
   }
 }

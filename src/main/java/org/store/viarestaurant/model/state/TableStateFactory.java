@@ -7,15 +7,11 @@ public class TableStateFactory {
             throw new IllegalArgumentException("State cannot be null");
         }
 
-        switch (value.toUpperCase()) {
-            case "AVAILABLE":
-                return new AvailableState();
-            case "RESERVED":
-                return new ReservedState();
-            case "OCCUPIED":
-                return new SeatedState();
-            default:
-                throw new IllegalArgumentException("Unknown state: " + value);
-        }
+        return switch (value) {
+            case "Available" -> new AvailableState();
+            case "Reserved" -> new ReservedState();
+            case "Seated" -> new SeatedState();
+            default -> throw new IllegalArgumentException("Unknown state: " + value);
+        };
     }
 }
