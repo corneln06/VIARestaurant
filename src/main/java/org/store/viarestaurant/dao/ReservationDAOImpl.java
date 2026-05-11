@@ -58,10 +58,10 @@ public class ReservationDAOImpl implements ReservationDAO
   }
 
   @Override
-  public ArrayList<Reservation> getAllReservations() throws SQLException
+  public ArrayList<Reservation> getAllReservationsForToday() throws SQLException
   {
     String sql = "SELECT r.id, r.customer, r.date, r.partySize, t.id AS tableId, t.maxSitting " +
-        "FROM reservations r JOIN restauranttable t ON r.tableId = t.id";
+        "FROM reservations r JOIN restauranttable t ON r.tableId = t.id WHERE CAST(r.date AS DATE) = CURRENT_DATE";
 
     try (Connection connection = getConnection();
         PreparedStatement statement = connection.prepareStatement(sql))

@@ -46,9 +46,9 @@ public class ReservationDAOImplTest
 
   @Test
   @Order(2)
-  void testGetAllReservations() throws SQLException
+  void testGetAllReservationsForToday() throws SQLException
   {
-    ArrayList<Reservation> list = dao.getAllReservations();
+    ArrayList<Reservation> list = dao.getAllReservationsForToday();
 
     assertNotNull(list);
     assertFalse(list.isEmpty());

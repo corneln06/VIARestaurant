@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public interface ReservationDAO
 {
   Reservation createReservation(String name, LocalDateTime dateTime, int partySize, RestaurantTable restaurantTable) throws SQLException;
-  ArrayList<Reservation> getAllReservations() throws SQLException;
+  ArrayList<Reservation> getAllReservationsForToday() throws SQLException;
   Reservation getReservationById(int id) throws SQLException;
   Reservation getReservationByCustomerName(String name) throws SQLException;
   ArrayList<Reservation> getReservationByDate(LocalDateTime dateTime) throws SQLException;
