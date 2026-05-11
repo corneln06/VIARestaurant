@@ -24,7 +24,6 @@ import org.store.viarestaurant.view.HelloApplication;
 
 public class NavigationController
 {
-  
 
   @FXML private TextField usernameField;
   @FXML private PasswordField passwordField;
