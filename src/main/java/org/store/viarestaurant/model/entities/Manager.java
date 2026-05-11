@@ -16,6 +16,12 @@ public class Manager extends Workers
         this.role = WorkerRole.Manager;
     }
 
+    public Manager(Integer id, String firstName, String lastName, String email)
+    {
+        super(id ,firstName,lastName,email);
+        this.role = WorkerRole.Manager;
+    }
+
     @Override
     public String getFirstName() {
         return super.getFirstName();

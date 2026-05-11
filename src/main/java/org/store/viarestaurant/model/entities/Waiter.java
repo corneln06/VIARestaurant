@@ -14,6 +14,11 @@ public class Waiter extends Workers
         super(id, firstName,lastName,email,rawPassword);
         this.role = WorkerRole.Waiter;
     }
+    public Waiter(Integer id,String firstName, String lastName, String email)
+    {
+        super(id, firstName,lastName,email);
+        this.role = WorkerRole.Waiter;
+    }
     @Override
     public String getFirstName() {
         return super.getFirstName();

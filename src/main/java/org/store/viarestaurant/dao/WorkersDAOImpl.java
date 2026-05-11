@@ -29,7 +29,7 @@ public class WorkersDAOImpl implements WorkersDAO
   }
 
   @Override
-  public Workers createWorkers( String firstName, String lastName, String email, String rawPassword, WorkerRole role) throws SQLException {
+  public Workers createWorkers( String firstName, String lastName, String email, String password, WorkerRole role) throws SQLException {
     try (Connection connection = getConnection()) {
       PreparedStatement statement = connection.prepareStatement(
           "INSERT INTO workers (firstName, lastName, rol, email, password) " +
@@ -40,7 +40,7 @@ public class WorkersDAOImpl implements WorkersDAO
       statement.setString(2, lastName);
       statement.setString(3, String.valueOf(role));
       statement.setString(4, email);
-      statement.setString(5, rawPassword);
+      statement.setString(5, password);
 
       ResultSet rs = statement.executeQuery();
 
@@ -50,11 +50,11 @@ public class WorkersDAOImpl implements WorkersDAO
 
         switch (role) {
           case Waiter:
-            return new Waiter(id, firstName, lastName, email, rawPassword);
+            return new Waiter(id, firstName, lastName, email, password);
           case Manager:
-            return new Manager(id, firstName, lastName, email, rawPassword);
+            return new Manager(id, firstName, lastName, email, password);
           case Host:
-            return new Host(id, firstName, lastName, email, rawPassword);
+            return new Host(id, firstName, lastName, email, password);
           default:
             throw new SQLException("Unknown worker type: " + role);
       }
@@ -69,7 +69,7 @@ public class WorkersDAOImpl implements WorkersDAO
     ArrayList<Workers> workers = new ArrayList<>();
     try(Connection connection = getConnection()){
       PreparedStatement statement = connection.prepareStatement(
-          "SELECT id, firstName, lastName, email, role from workers"
+          "SELECT id, firstName, lastName, email, rol, password from workers"
       );
       ResultSet rs = statement.executeQuery();
       while(rs.next()){
@@ -78,14 +78,13 @@ public class WorkersDAOImpl implements WorkersDAO
         String firstName = rs.getString("firstName");
         String lastName = rs.getString("lastName");
         String email = rs.getString("email");
-        String rawPassword = rs.getString("rawPassword");
 
-        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("role"));
+        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("rol"));
         Workers worker;
         switch (workerRole){
-          case Waiter -> worker = new Waiter(id, firstName, lastName, email, rawPassword);
-          case Host -> worker = new Host(id, firstName, lastName, email, rawPassword);
-          case Manager -> worker = new Manager(id, firstName, lastName, email, rawPassword);
+          case Waiter -> worker = new Waiter(id, firstName, lastName, email);
+          case Host -> worker = new Host(id, firstName, lastName, email);
+          case Manager -> worker = new Manager(id, firstName, lastName, email);
           default -> throw new SQLException("Unknown role: " + workerRole);
         }
         workers.add(worker);
@@ -109,19 +108,19 @@ public class WorkersDAOImpl implements WorkersDAO
         String firstName = rs.getString("firstName");
         String lastName = rs.getString("lastName");
         String email = rs.getString("email");
-        String rawPassword = rs.getString("rawPassword");
+        String password = rs.getString("password");
 
-        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("role"));
+        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("rol"));
         Workers worker;
 
         switch (workerRole)
         {
           case Waiter ->
-              worker = new Waiter(id, firstName, lastName, email, rawPassword);
+              worker = new Waiter(id, firstName, lastName, email, password);
           case Host ->
-              worker = new Host(id, firstName, lastName, email, rawPassword);
+              worker = new Host(id, firstName, lastName, email, password);
           case Manager ->
-              worker = new Manager(id, firstName, lastName, email, rawPassword);
+              worker = new Manager(id, firstName, lastName, email, password);
           default -> throw new SQLException("Unknown role: " + workerRole);
         }
         return worker;
@@ -145,19 +144,19 @@ public class WorkersDAOImpl implements WorkersDAO
         int id = rs.getInt("id");
         String firstName = rs.getString("firstName");
         String lastName = rs.getString("lastName");
-        String rawPassword = rs.getString("rawPassword");
+        String password = rs.getString("password");
 
-        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("role"));
+        WorkerRole workerRole = WorkerRole.valueOf(rs.getString("rol"));
         Workers worker;
 
         switch (workerRole)
         {
           case Waiter ->
-              worker = new Waiter(id, firstName, lastName, email, rawPassword);
+              worker = new Waiter(id, firstName, lastName, email, password);
           case Host ->
-              worker = new Host(id, firstName, lastName, email, rawPassword);
+              worker = new Host(id, firstName, lastName, email, password);
           case Manager ->
-              worker = new Manager(id, firstName, lastName, email, rawPassword);
+              worker = new Manager(id, firstName, lastName, email, password);
           default -> throw new SQLException("Unknown role: " + workerRole);
         }
         return worker;

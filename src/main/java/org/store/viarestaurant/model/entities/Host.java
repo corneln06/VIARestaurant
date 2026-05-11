@@ -14,6 +14,11 @@ public class Host extends Workers
         super(id ,firstName,lastName,email,rawPassword);
         this.role = WorkerRole.Host;
     }
+    public Host(Integer id, String firstName, String lastName, String email)
+    {
+        super(id ,firstName,lastName,email);
+        this.role = WorkerRole.Host;
+    }
     @Override
     public String getFirstName() {
         return super.getFirstName();
