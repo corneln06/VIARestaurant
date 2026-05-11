@@ -41,14 +41,13 @@ public class ReservationDAOImplTest
     assertEquals("Jan Novak", r.getName());
     assertEquals(4, r.getPartySize());
 
-    createdId = r.getId(); // now this is saved on the same instance
+    createdId = r.getId();
   }
 
   @Test
   @Order(2)
   void testCreateReservationPartySizeExceedsMaxSitting() throws SQLException
   {
-    // testTable has maxSitting = 4, so partySize 10 should fail
     assertThrows(SQLException.class, () -> dao.createReservation(
         "Big Party",
         LocalDateTime.now(),
