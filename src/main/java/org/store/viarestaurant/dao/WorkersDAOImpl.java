@@ -69,7 +69,7 @@ public class WorkersDAOImpl implements WorkersDAO
     ArrayList<Workers> workers = new ArrayList<>();
     try(Connection connection = getConnection()){
       PreparedStatement statement = connection.prepareStatement(
-          "SELECT id, firstName, lastName, email, rol, password from workers"
+          "SELECT id, firstName, lastName, email, rol from workers"
       );
       ResultSet rs = statement.executeQuery();
       while(rs.next()){
