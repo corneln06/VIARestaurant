@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
+<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
     <left>
         <VBox prefWidth="220.0" spacing="18.0" styleClass="sidebar">
             <padding>
@@ -33,6 +33,7 @@
                 <Button maxWidth="Infinity" styleClass="nav-btn nav-btn-active" text="Edit Menu" />
                 <Region VBox.vgrow="ALWAYS" />
                 <Label styleClass="sidebar-footer" text="Menu Control" />
+            <Button fx:id="logOutButton" mnemonicParsing="false" prefHeight="25.0" onAction="#handleLogOut" prefWidth="184.0" style="-fx-background-color: red;" text="Log Out" textFill="WHITE" />
             </children>
         </VBox>
     </left>
@@ -41,13 +42,13 @@
             <children>
                 <AnchorPane styleClass="page-surface">
                     <children>
-                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="18.0">
+                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
                                 <HBox alignment="CENTER_LEFT">
                                     <children>
                                         <Label styleClass="page-title" text="Menu" />
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Button  styleClass="btn-base btn-primary" text="+ New Dish" />
+                                        <Button styleClass="btn-base btn-primary" text="+ New Dish" />
                                     </children>
                                 </HBox>
                                 <TableView fx:id="menuTable" VBox.vgrow="ALWAYS">
@@ -61,9 +62,9 @@
                         </VBox>
                     </children>
                 </AnchorPane>
-                <StackPane fx:id="newDishOverlay" managed="false"  styleClass="modal-overlay" visible="false">
+                <StackPane fx:id="newDishOverlay" managed="false" styleClass="modal-overlay" visible="false">
                     <children>
-                        <VBox maxWidth="440.0"  spacing="14.0" styleClass="modal-card modal-card-large">
+                        <VBox maxWidth="440.0" spacing="14.0" styleClass="modal-card modal-card-large">
                             <children>
                                 <Label styleClass="modal-title" text="New Dish" />
                                 <TextField fx:id="dishNameField" promptText="Dish name" styleClass="input-field" />
@@ -77,8 +78,8 @@
                                 <Label fx:id="newDishErrorLabel" managed="false" styleClass="error-label" visible="false" wrapText="true" />
                                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
                                     <children>
-                                        <Button  styleClass="btn-base btn-secondary" text="Cancel" />
-                                        <Button  styleClass="btn-base btn-primary" text="Create" />
+                                        <Button styleClass="btn-base btn-secondary" text="Cancel" />
+                                        <Button styleClass="btn-base btn-primary" text="Create" />
                                     </children>
                                 </HBox>
                             </children>

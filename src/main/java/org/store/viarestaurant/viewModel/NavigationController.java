@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -14,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.store.viarestaurant.dao.WorkersDAOImpl;
+import org.store.viarestaurant.model.entities.Host;
 import org.store.viarestaurant.model.entities.Manager;
 import org.store.viarestaurant.model.entities.Waiter;
 import org.store.viarestaurant.model.entities.Workers;
@@ -37,6 +39,7 @@ public class NavigationController
   @FXML private Button btnBills;
   @FXML private Button btnMenu;
 
+  @FXML private Button logOutButton;
   @FXML private AnchorPane tablesPage;
   @FXML private AnchorPane reservationsPage;
   @FXML private AnchorPane ordersListPage;
@@ -59,28 +62,53 @@ public class NavigationController
     showDefaultPage(worker);
   }
 
-  private final Workers testWorker = new Manager(1,"Adam", "Adam", "kkkkk", "1234");
-//TESTETSTE NOT FINALLLLL
+  private final Workers testWorker =
+    new Manager(1, "Adam", "Adam", "manager", "1234");
+
+  private final Workers testWorker1 =
+      new Waiter(2, "Adam", "Adam", "waiter", "1234");
+
+  private final Workers testWorker2 =
+      new Host(3, "Adam", "Adam", "host", "1234");
+
   @FXML
-  private void handleLogin()
-  {
+  private void handleLogin() {
+
     String username = usernameField.getText();
     String password = passwordField.getText();
 
-    if (!testWorker.getEmail().equals(username) || !testWorker.verifyPassword(password))
-    {
+    Workers loggedInWorker;
+
+    // Test manager
+    if (testWorker.getEmail().equals(username)
+        && testWorker.verifyPassword(password)) {
+      loggedInWorker = testWorker;
+    }
+    // Test waiter
+    else if (testWorker1.getEmail().equals(username)
+        && testWorker1.verifyPassword(password)) {
+      loggedInWorker = testWorker1;
+      System.out.println(loggedInWorker);
+    }
+    // Test host
+    else if (testWorker2.getEmail().equals(username)
+        && testWorker2.verifyPassword(password)) {
+      loggedInWorker = testWorker2;
+      System.out.println(loggedInWorker);
+    }
+    else {
       showError("Invalid credentials.");
       return;
     }
+    try {
+      Parent root = loadDashboard(loggedInWorker);
 
-    try
-    {
-      Parent root = loadDashboard(testWorker);
-      Stage stage = (Stage) usernameField.getScene().getWindow();
+      Stage stage =
+          (Stage) usernameField.getScene().getWindow();
+
       stage.getScene().setRoot(root);
-    }
-    catch (IOException exception)
-    {
+
+    } catch (IOException exception) {
       showError("Unable to open dashboard.");
     }
   }
@@ -160,6 +188,25 @@ public class NavigationController
   {
     showOnly(billDetailPage);
     setActive(btnBills, btnTables, btnOrders);
+  }
+  @FXML
+  private void handleLogOut() throws IOException
+  {
+    FXMLLoader fxmlLoader = new FXMLLoader(
+        HelloApplication.class.getResource("/org/store/viarestaurant/LoginView.fxml"));
+
+    Scene scene = new Scene(fxmlLoader.load(), 1100, 700);
+
+    scene.getStylesheets().add(
+        getClass()
+            .getResource("/org/store/viarestaurant/Stylesheet.css")
+            .toExternalForm()
+    );
+    Stage stage = (Stage) logOutButton.getScene().getWindow();
+
+    stage.setScene(scene);
+    stage.show();
+
   }
 
   @FXML

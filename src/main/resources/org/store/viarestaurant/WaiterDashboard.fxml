@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.WaiterController">
+<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
     <left>
         <VBox prefWidth="220.0" spacing="18.0" styleClass="sidebar">
             <padding>
@@ -34,13 +34,14 @@
                 <Separator />
                 <VBox spacing="8.0">
                     <children>
-                        <Button fx:id="btnTables" maxWidth="Infinity" onAction="#showTablesPage" styleClass="nav-btn" text="Tables" />
-                        <Button fx:id="btnOrders" maxWidth="Infinity" onAction="#showOrdersPage" styleClass="nav-btn" text="Orders" />
-                        <Button fx:id="btnBills" maxWidth="Infinity" onAction="#showBillsPage" styleClass="nav-btn" text="Bills" />
+                        <Button fx:id="btnTables" maxWidth="Infinity" styleClass="nav-btn" text="Tables" />
+                        <Button fx:id="btnOrders" maxWidth="Infinity" styleClass="nav-btn" text="Orders" />
+                        <Button fx:id="btnBills" maxWidth="Infinity" styleClass="nav-btn" text="Bills" />
                     </children>
                 </VBox>
                 <Region VBox.vgrow="ALWAYS" />
                 <Label styleClass="sidebar-footer" text="Floor Service" />
+                <Button fx:id="logOutButton" mnemonicParsing="false" onAction="#handleLogOut" prefHeight="25.0" prefWidth="184.0" style="-fx-background-color: red;" text="Log Out" textFill="WHITE" />
             </children>
         </VBox>
     </left>
@@ -49,7 +50,7 @@
             <children>
                 <AnchorPane fx:id="tablesPage" styleClass="page-surface">
                     <children>
-                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="18.0">
+                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
                                 <Label styleClass="page-title" text="Live Tables" />
                                 <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll" VBox.vgrow="ALWAYS">
@@ -63,7 +64,7 @@
                 </AnchorPane>
                 <AnchorPane fx:id="ordersListPage" managed="false" styleClass="page-surface" visible="false">
                     <children>
-                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="18.0">
+                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
                                 <Label styleClass="page-title" text="Orders" />
                                 <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll" VBox.vgrow="ALWAYS">
@@ -83,7 +84,7 @@
                                     <children>
                                         <HBox alignment="CENTER_LEFT" spacing="12.0">
                                             <children>
-                                                <Button onAction="#backToOrdersList" styleClass="btn-base btn-secondary" text="Back" />
+                                                <Button  styleClass="btn-base btn-secondary" text="Back" />
                                                 <Label fx:id="selectedOrderTableLabel" styleClass="page-title" text="Table 1" />
                                             </children>
                                         </HBox>
@@ -102,7 +103,7 @@
                             <center>
                                 <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll">
                                     <content>
-                                        <TilePane fx:id="menuItemsFlow" hgap="16.0" prefColumns="3" prefTileWidth="210.0" prefWrapLength="520.0" vgap="16.0" />
+                                        <TilePane fx:id="menuItemsFlow" hgap="16.0" prefColumns="3" prefTileWidth="210.0" vgap="16.0" />
                                     </content>
                                 </ScrollPane>
                             </center>
@@ -116,10 +117,10 @@
                                             <children>
                                                 <Label styleClass="section-title" text="Subtotal" />
                                                 <Region HBox.hgrow="ALWAYS" />
-                                                <Label fx:id="orderSubtotalLabel" styleClass="section-title" text="$0.00" />
+                                                <Label fx:id="orderSubtotalLabel" styleClass="section-title" />
                                             </children>
                                         </HBox>
-                                        <Button fx:id="sendToKitchenButton" maxWidth="Infinity" onAction="#sendToKitchen" styleClass="btn-base btn-primary" text="Send to Kitchen" />
+                                        <Button fx:id="sendToKitchenButton" maxWidth="Infinity" styleClass="btn-base btn-primary" text="Send to Kitchen" />
                                     </children>
                                 </VBox>
                             </right>
@@ -128,7 +129,7 @@
                 </AnchorPane>
                 <AnchorPane fx:id="billsListPage" managed="false" styleClass="page-surface" visible="false">
                     <children>
-                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="18.0">
+                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
                                 <Label styleClass="page-title" text="Bills" />
                                 <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll" VBox.vgrow="ALWAYS">
@@ -142,11 +143,11 @@
                 </AnchorPane>
                 <AnchorPane fx:id="billDetailPage" managed="false" styleClass="page-surface" visible="false">
                     <children>
-                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="18.0">
+                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
                                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                                     <children>
-                                        <Button onAction="#backToBillsList" styleClass="btn-base btn-secondary" text="Back" />
+                                        <Button styleClass="btn-base btn-secondary" text="Back" />
                                         <Label fx:id="selectedBillTableLabel" styleClass="page-title" text="Table 1" />
                                     </children>
                                 </HBox>
@@ -167,21 +168,21 @@
                                                     <children>
                                                         <Label styleClass="muted-label" text="Subtotal" />
                                                         <Region HBox.hgrow="ALWAYS" />
-                                                        <Label fx:id="billSubtotalLabel" text="$0.00" />
+                                                        <Label fx:id="billSubtotalLabel" text="0.00" />
                                                     </children>
                                                 </HBox>
                                                 <HBox>
                                                     <children>
                                                         <Label styleClass="muted-label" text="VAT 25%" />
                                                         <Region HBox.hgrow="ALWAYS" />
-                                                        <Label fx:id="billVatLabel" text="$0.00" />
+                                                        <Label fx:id="billVatLabel" text="0.00" />
                                                     </children>
                                                 </HBox>
                                                 <HBox>
                                                     <children>
                                                         <Label styleClass="section-title" text="Total" />
                                                         <Region HBox.hgrow="ALWAYS" />
-                                                        <Label fx:id="billTotalLabel" styleClass="section-title" text="$0.00" />
+                                                        <Label fx:id="billTotalLabel" styleClass="section-title" text="0.00" />
                                                     </children>
                                                 </HBox>
                                             </children>
@@ -189,11 +190,11 @@
                                         <VBox spacing="10.0" styleClass="summary-card">
                                             <children>
                                                 <Label styleClass="section-title" text="Actions" />
-                                                <Button maxWidth="Infinity" onAction="#splitByGuest" styleClass="btn-base btn-secondary" text="Split by guest" />
-                                                <Button maxWidth="Infinity" onAction="#splitEvenly" styleClass="btn-base btn-secondary" text="Split evenly" />
-                                                <Button maxWidth="Infinity" onAction="#applyDiscount" styleClass="btn-base btn-secondary" text="Apply discount" />
-                                                <Button maxWidth="Infinity" onAction="#addTip" styleClass="btn-base btn-secondary" text="Add tip" />
-                                                <Button maxWidth="Infinity" onAction="#printAndCloseTable" styleClass="btn-base btn-primary" text="Print &amp; close table" />
+                                                <Button maxWidth="Infinity"  styleClass="btn-base btn-secondary" text="Split by guest" />
+                                                <Button maxWidth="Infinity"  styleClass="btn-base btn-secondary" text="Split evenly" />
+                                                <Button maxWidth="Infinity"  styleClass="btn-base btn-secondary" text="Apply discount" />
+                                                <Button maxWidth="Infinity"  styleClass="btn-base btn-secondary" text="Add tip" />
+                                                <Button maxWidth="Infinity"  styleClass="btn-base btn-primary" text="Print &amp; close table" />
                                             </children>
                                         </VBox>
                                     </children>

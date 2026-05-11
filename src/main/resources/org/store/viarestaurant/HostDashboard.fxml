@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
+<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
     <left>
         <VBox prefWidth="220.0" spacing="18.0" styleClass="sidebar">
             <padding>
@@ -40,6 +40,7 @@
                 </VBox>
                 <Region VBox.vgrow="ALWAYS" />
                 <Label styleClass="sidebar-footer" text="Host Desk" />
+                <Button fx:id="logOutButton" mnemonicParsing="false" onAction="#handleLogOut" prefHeight="25.0" prefWidth="184.0" style="-fx-background-color: red;" text="Log Out" textFill="WHITE" />
             </children>
         </VBox>
     </left>
@@ -48,13 +49,13 @@
             <children>
                 <AnchorPane fx:id="tablesPage" styleClass="page-surface">
                     <children>
-                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="20.0">
+                        <VBox spacing="20.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
                                 <HBox alignment="CENTER_LEFT">
                                     <children>
                                         <Label styleClass="page-title" text="Tables" />
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Button  styleClass="btn-base btn-primary" text="+ New Reservation" />
+                                        <Button styleClass="btn-base btn-primary" text="+ New Reservation" />
                                     </children>
                                 </HBox>
                                 <GridPane fx:id="tableGrid" hgap="18.0" vgap="18.0" />
@@ -64,7 +65,7 @@
                 </AnchorPane>
                 <AnchorPane fx:id="reservationsPage" managed="false" styleClass="page-surface" visible="false">
                     <children>
-                        <VBox AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" spacing="16.0">
+                        <VBox spacing="16.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
                                 <HBox alignment="CENTER_LEFT">
                                     <children>
@@ -87,9 +88,9 @@
                         </VBox>
                     </children>
                 </AnchorPane>
-                <StackPane fx:id="tableModalOverlay" managed="false"  styleClass="modal-overlay" visible="false">
+                <StackPane fx:id="tableModalOverlay" managed="false" styleClass="modal-overlay" visible="false">
                     <children>
-                        <VBox maxWidth="380.0"  spacing="16.0" styleClass="modal-card modal-card-medium">
+                        <VBox maxWidth="380.0" spacing="16.0" styleClass="modal-card modal-card-medium">
                             <children>
                                 <Label fx:id="tableModalTitle" styleClass="modal-title" text="Table 1" />
                                 <VBox spacing="10.0" styleClass="modal-info-box">
@@ -100,18 +101,18 @@
                                 </VBox>
                                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
                                     <children>
-                                        <Button  styleClass="btn-base btn-secondary" text="Close" />
-                                        <Button fx:id="tableModalPrimaryButton"  styleClass="btn-base btn-danger" text="Unavailable" />
-                                        <Button fx:id="tableModalSecondaryButton"  styleClass="btn-base btn-warning" text="Reserved" />
+                                        <Button styleClass="btn-base btn-secondary" text="Close" />
+                                        <Button fx:id="tableModalPrimaryButton" styleClass="btn-base btn-danger" text="Unavailable" />
+                                        <Button fx:id="tableModalSecondaryButton" styleClass="btn-base btn-warning" text="Reserved" />
                                     </children>
                                 </HBox>
                             </children>
                         </VBox>
                     </children>
                 </StackPane>
-                <StackPane fx:id="newReservationOverlay" managed="false"  styleClass="modal-overlay" visible="false">
+                <StackPane fx:id="newReservationOverlay" managed="false" styleClass="modal-overlay" visible="false">
                     <children>
-                        <VBox maxWidth="440.0"  spacing="14.0" styleClass="modal-card modal-card-large">
+                        <VBox maxWidth="440.0" spacing="14.0" styleClass="modal-card modal-card-large">
                             <children>
                                 <Label styleClass="modal-title" text="New Reservation" />
                                 <TextField fx:id="guestNameField" promptText="Guest name" styleClass="input-field" />
@@ -130,8 +131,8 @@
                                 <Label fx:id="newReservationErrorLabel" managed="false" styleClass="error-label" visible="false" wrapText="true" />
                                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
                                     <children>
-                                        <Button  styleClass="btn-base btn-secondary" text="Cancel" />
-                                        <Button  styleClass="btn-base btn-primary" text="Create" />
+                                        <Button styleClass="btn-base btn-secondary" text="Cancel" />
+                                        <Button styleClass="btn-base btn-primary" text="Create" />
                                     </children>
                                 </HBox>
                             </children>
