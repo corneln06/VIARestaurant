@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS RestaurantTable (
 CREATE TABLE IF NOT EXISTS MenuItems (
     id serial primary key,
     name varchar(100) not null,
-    type varchar(100) not null check ( type in ('Starter', 'Main', 'Dessert', 'Beverage', 'Alcoholic beverage') ),
+    type varchar(100) not null check ( type in ('Starter', 'Main', 'Dessert', 'Beverage', 'AlcoholicBeverage') ),
     price decimal not null,
     isVegetarian boolean not null
 );
@@ -29,7 +29,17 @@ CREATE TABLE IF NOT EXISTS Allergies (
 CREATE TABLE IF NOT EXISTS MenuItemsAllergies (
     id serial primary key,
     menuItemId int not null,
-    allergyId int not null
+    allergyId int not null,
+
+    CONSTRAINT fk_menuitem
+    FOREIGN KEY (menuItemId)
+    REFERENCES MenuItems(id)
+    ON DELETE CASCADE,
+
+    CONSTRAINT fk_allergy
+    FOREIGN KEY (allergyId)
+    REFERENCES Allergies(id)
+    ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Reservations (

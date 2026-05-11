@@ -196,12 +196,9 @@ public class ReservationDAOImpl implements ReservationDAO
       return reservations;
     }
   }
-
   @Override
-  public Reservation deleteById(int id) throws SQLException
+  public void deleteById(int id) throws SQLException
   {
-    Reservation reservation = getReservationById(id);
-
     String sql = "DELETE FROM reservations WHERE id = ?";
 
     try (Connection connection = getConnection();
@@ -214,8 +211,6 @@ public class ReservationDAOImpl implements ReservationDAO
       {
         throw new SQLException("Delete failed, no reservation found with id: " + id);
       }
-
-      return reservation;
     }
   }
 }

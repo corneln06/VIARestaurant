@@ -24,6 +24,14 @@ public abstract class Workers {
         //test
         this.password = rawPassword;
     }
+    public Workers(Integer id,String fn, String ln, String email)
+    {
+        this.id = id;
+        this.firstName = fn;
+        this.lastName = ln;
+        this.email = normlizeEmail(email);
+
+    }
 
     public String getFirstName() {
         return firstName;

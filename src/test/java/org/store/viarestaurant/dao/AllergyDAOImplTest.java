@@ -1,0 +1,61 @@
+package org.store.viarestaurant.dao;
+
+import org.junit.jupiter.api.*;
+import org.store.viarestaurant.model.entities.Allergy;
+import org.store.viarestaurant.model.entities.Reservation;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class AllergyDAOImplTest {
+    private AllergyDAOImpl dao;
+    private int createdId;
+
+    @BeforeAll
+    void setup() throws SQLException {
+        dao = AllergyDAOImpl.getInstance();
+    }
+
+    @Test
+    @Order(1)
+    void testCreateAllergy() throws SQLException
+    {
+        Allergy allergy = dao.createAllergy("Peanuts");
+
+        assertNotNull(allergy);
+        assertTrue(allergy.getId() > 0);
+        assertEquals("Peanuts", allergy.getName());
+
+        createdId = allergy.getId();
+    }
+
+    @Test
+    @Order(2)
+    void testGetAllergyByID() throws SQLException {
+        Allergy allergy = dao.getAllergyById(createdId);
+
+        assertNotNull(allergy);
+        assertEquals("Peanuts", allergy.getName());
+    }
+
+    @Test
+    @Order(3)
+    void testGetAllergyByName() throws SQLException {
+        Allergy allergy = dao.getAllergyByName("Peanuts");
+
+        assertNotNull(allergy);
+        assertEquals("Peanuts", allergy.getName());
+    }
+
+    @Test
+    @Order(4)
+    void testDeleteById() throws SQLException
+    {
+        dao.delete(createdId);
+        assertNull(dao.getAllergyById(createdId));
+    }
+}
