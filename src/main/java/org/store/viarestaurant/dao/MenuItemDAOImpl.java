@@ -221,4 +221,71 @@ public class MenuItemDAOImpl implements MenuItemDAO {
             return menuItem;
         }
     }
-}
+
+    @Override
+    public MenuItems updateMenuItem(MenuItems item) throws SQLException {
+        try (Connection connection = getConnection()) {
+            connection.setAutoCommit(false);
+            PreparedStatement statement = connection.prepareStatement(
+                    "update menuitems set name=?, " +
+                            "type=?, " +
+                            "price=?, " +
+                            "isvegetarian=?" +
+                            " WHERE id = ?"
+            );
+            statement.setString(1, item.getName());
+            statement.setObject(2, item.getType().name()); /// IDK MAN MAYBE THIS SHI DOESNT WORK
+            statement.setDouble(3, item.getPrice());
+            statement.setBoolean(4,item.isVegetarian());
+            statement.setInt(5, item.getId());
+            int rowsAffected = statement.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new SQLException(
+                        "Menu item with id " + item.getId() + " not found"
+                );
+            }
+
+            /// Removing the old allergies in case we change them idk...
+            PreparedStatement deleteAllergies = connection.prepareStatement(
+                    "DELETE FROM menuitemsallergies WHERE menuitemid = ?"
+            );
+
+            deleteAllergies.setInt(1, item.getId());
+            deleteAllergies.executeUpdate();
+
+            /// and insert the 'new' ones
+            if (item.getAllergies() != null &&
+                    !item.getAllergies().isEmpty()) {
+
+                PreparedStatement insertAllergy = connection.prepareStatement(
+                        " INSERT INTO menuitemsallergies " +
+                                " (menuitemid, allergyid) " +
+                                " VALUES (?, ?)"
+                );
+
+                for (String allergyName : item.getAllergies()) {
+
+                    Allergy allergy =
+                            allergyDAO.getAllergyByName(allergyName);
+
+                    if (allergy != null) {
+
+                        insertAllergy.setInt(1, item.getId());
+                        insertAllergy.setInt(2, allergy.getId());
+
+                        insertAllergy.executeUpdate();
+                    }
+                }
+            }
+
+            connection.commit();
+
+            return item;
+
+        }
+
+
+        }
+    }
+
