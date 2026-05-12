@@ -1,11 +1,14 @@
 package org.store.viarestaurant.dao;
 
 import org.junit.jupiter.api.*;
+import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.model.enums.MenuTypes;
 import org.store.viarestaurant.model.enums.WorkerRole;
 
+import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -15,9 +18,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TableOrderDAOImplTest {
 
-    private TableOrderDAOImpl dao;
+    private TableOrderDAO dao;
     private RestaurantTable testTable;
     private Workers testWorker;
+    private MenuItemDAO menuItemDAO;
+    private AllergyDAO allergyDAO;
+    ArrayList<String> allergiesList = new ArrayList<>();
+    ArrayList<String> menuItemList = new ArrayList<>();
     private int createdId;
     private int createdWaiterId ;
     private int createdTableId;
@@ -25,8 +32,13 @@ public class TableOrderDAOImplTest {
     @BeforeAll
     void setup() throws SQLException {
         dao = TableOrderDAOImpl.getInstance();
+        menuItemDAO = MenuItemDAOImpl.getInstance();
+        allergyDAO = AllergyDAOImpl.getInstance();
         testTable = RestaurantTableDAOImpl.getInstance().createRestaurantTable(4);
         testWorker = WorkersDAOImpl.getInstance().createWorkers("adam","adam","email@gmail.com","pass", WorkerRole.Waiter);
+        allergiesList.add("Peanuts");
+        MenuItems newItem = menuItemDAO.createMenuItem("Asado", MenuTypes.Main, 33.33, false, allergiesList);
+        menuItemList.add(newItem.getName());
         createdTableId = testTable.getId();
         createdWaiterId = testWorker.getId();
     }
@@ -34,12 +46,12 @@ public class TableOrderDAOImplTest {
     @Test
     @Order(1)
     void create() throws SQLException {
-
         TableOrder order = dao.createTableOrder(
                 testTable.getId(),
                 testWorker.getId(),
                 "No onions",
                 25.50,
+                menuItemList,
                 false
         );
 
@@ -47,8 +59,10 @@ public class TableOrderDAOImplTest {
         assertTrue(order.getId() > 0);
 
         assertEquals(testTable.getId(), order.getTable().getId());
+        assertEquals(testWorker.getId(), order.getWaiter().getId());
         assertEquals("No onions", order.getNotes());
         assertEquals(25.50, order.getBill());
+        assertEquals(menuItemList, order.getMenuItems());
         assertFalse(order.isReservation());
 
         createdId = order.getId();
@@ -73,8 +87,11 @@ public class TableOrderDAOImplTest {
 
         assertNotNull(order);
         assertEquals(createdId, order.getId());
+        assertEquals(testTable.getId(), order.getTable().getId());
+        assertEquals(testWorker.getId(), order.getWaiter().getId());
         assertEquals("No onions", order.getNotes());
         assertEquals(25.50, order.getBill());
+        assertEquals(menuItemList, order.getMenuItems());
         assertFalse(order.isReservation());
     }
 
@@ -109,7 +126,7 @@ public class TableOrderDAOImplTest {
 
         dao.deleteTableOrderByID(createdId);
 
-        assertThrows(Exception.class, () ->
+        assertThrows(SQLException.class, () ->
                 dao.getTableOrderByID(createdId)
         );
     }

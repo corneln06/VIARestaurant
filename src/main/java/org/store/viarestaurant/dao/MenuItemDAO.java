@@ -13,4 +13,5 @@ public interface MenuItemDAO {
     List<MenuItems> getAllMenuItems() throws SQLException;
     MenuItems getMenuItemById(Integer id) throws SQLException;
     void delete(Integer id) throws SQLException;
+    MenuItems getMenuItemByName(String name) throws SQLException;
 }

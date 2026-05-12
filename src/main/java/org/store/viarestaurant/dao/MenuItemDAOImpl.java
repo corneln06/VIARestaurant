@@ -178,4 +178,47 @@ public class MenuItemDAOImpl implements MenuItemDAO {
         }
     }
 
+    @Override
+    public MenuItems getMenuItemByName(String name) throws SQLException {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("""
+            SELECT 
+                m.id,
+                m.name,
+                m.type,
+                m.price,
+                m.isvegetarian,
+                a.name AS allergyname
+            FROM menuitems m
+            LEFT JOIN menuitemsallergies ma ON m.id = ma.menuitemid
+            LEFT JOIN allergies a ON ma.allergyid = a.id
+            WHERE m.name = ?
+        """);
+
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+
+            MenuItems menuItem = null;
+            ArrayList<String> allergies = new ArrayList<>();
+
+            while (resultSet.next()) {
+                if (menuItem == null) {
+                    int id = resultSet.getInt("id");
+                    MenuTypes type = MenuTypes.valueOf(resultSet.getString("type"));
+                    Double price = resultSet.getDouble("price");
+                    boolean isVegetarian = resultSet.getBoolean("isvegetarian");
+
+                    menuItem = new MenuItems(id, name, type, price, isVegetarian, allergies);
+                }
+
+                String allergyName = resultSet.getString("allergyname");
+
+                if (allergyName != null) {
+                    allergies.add(allergyName);
+                }
+            }
+
+            return menuItem;
+        }
+    }
 }

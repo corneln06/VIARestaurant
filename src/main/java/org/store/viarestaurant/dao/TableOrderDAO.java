@@ -1,5 +1,6 @@
 package org.store.viarestaurant.dao;
 
+import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.TableOrder;
 
 import java.sql.SQLException;
@@ -12,6 +13,7 @@ public interface TableOrderDAO {
             Integer waiterId,
             String notes,
             double bill,
+            ArrayList<String> menuItems,
             boolean isReservation
     ) throws SQLException;
 

@@ -67,3 +67,20 @@ CREATE TABLE IF NOT EXISTS Payments (
     orderId int not null
 );
 
+CREATE TABLE IF NOT EXISTS MenuItemsTableOrder (
+    id serial primary key,
+    menuItemId int not null,
+    tableOrderId int not null,
+
+    CONSTRAINT fk_menuitem
+    FOREIGN KEY (menuItemId)
+    REFERENCES MenuItems(id)
+    ON DELETE CASCADE,
+
+    CONSTRAINT fk_tableOrder
+    FOREIGN KEY (tableOrderId)
+    REFERENCES TableOrders(id)
+    ON DELETE CASCADE
+    );
+
+

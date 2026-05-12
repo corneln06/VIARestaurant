@@ -4,21 +4,25 @@ package org.store.viarestaurant.model.entities;
 
 import javafx.concurrent.Worker;
 
+import java.util.ArrayList;
+
 public class TableOrder {
     private final int id;
     private RestaurantTable restaurantTable;
     private Workers waiter;
     private String notes;
     private double bill;
+    private ArrayList<String> menuItems;
     private boolean isReservation;
     private boolean isPaid;
 
-    public TableOrder(int id, RestaurantTable restaurantTable, Workers waiter, String notes, double bill, boolean isReservation) {
+    public TableOrder(int id, RestaurantTable restaurantTable, Workers waiter, String notes, ArrayList<String> menuItems, double bill, boolean isReservation) {
         this.id = id;
         this.restaurantTable = restaurantTable;
         this.waiter = waiter;
         this.notes = notes;
         this.bill = bill;
+        this.menuItems = menuItems;
         this.isReservation = isReservation;
         this.isPaid = false;
     }
@@ -69,5 +73,13 @@ public class TableOrder {
 
     public void setPaid(boolean paid) {
         isPaid = paid;
+    }
+
+    public ArrayList<String> getMenuItems() {
+        return menuItems;
+    }
+
+    public void addMenuItems(String menuItemsName) {
+        menuItems.add(menuItemsName);
     }
 }
