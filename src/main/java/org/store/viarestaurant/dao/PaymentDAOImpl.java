@@ -1,5 +1,6 @@
 package org.store.viarestaurant.dao;
 
+import javafx.scene.control.Tab;
 import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.model.entities.Payment;
 import org.store.viarestaurant.model.entities.Reservation;
@@ -28,22 +29,33 @@ public class PaymentDAOImpl implements PaymentDAO
   }
 
   @Override public Payment createPayment(double amount, String method,
-      TableOrder orderId) throws SQLException
+      TableOrder order) throws SQLException
   {
+
+    if (amount <= 0){
+      throw new SQLException("Amount has to be greater than 0!");
+    }
+    if (!method.equals("Card") && !method.equals("Cash")){
+      throw new SQLException("Method must be Card or Cash!");
+    }
+    if (order == null)
+    {
+      throw new SQLException("Order cannot be null!");
+    }
     try(Connection connection = getConnection()){
       PreparedStatement statement = connection.prepareStatement(
-          "INSERT INTO payment (amount, method, orderId) VALUES (?, ?, ?) RETURNING id"
+          "INSERT INTO payments (amount, method, orderId) VALUES (?, ?, ?) RETURNING id"
       );
 
       statement.setDouble(1, amount);
-      statement.setString(2, String.valueOf(method));
-      //statement.setInt(3, orderId); waiting for TableOrderDAO
+      statement.setString(2, method);
+      statement.setInt(3, order.getId());
 
       ResultSet rs = statement.executeQuery();
 
       if (rs.next()) {
         int id = rs.getInt("id");
-        return new Payment(id, amount, method, orderId);
+        return new Payment(id, amount, method, order);
       } else {
         throw new SQLException("No ID returned");
       }
@@ -62,11 +74,14 @@ public class PaymentDAOImpl implements PaymentDAO
 
       if (rs.next())
       {
+        int orderId = rs.getInt("orderId");
+        TableOrderDAO tableOrderDAO = TableOrderDAOImpl.getInstance();
+        TableOrder order = tableOrderDAO.getTableOrderByID(orderId);
         return new Payment(
             rs.getInt("id"),
             rs.getDouble("amount"),
             rs.getString("method"),
-            null
+            order
         );
       }
       else
