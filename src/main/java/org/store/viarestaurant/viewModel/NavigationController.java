@@ -1,34 +1,19 @@
 package org.store.viarestaurant.viewModel;
 
-
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import org.store.viarestaurant.dao.WorkersDAOImpl;
-import org.store.viarestaurant.model.entities.Host;
-import org.store.viarestaurant.model.entities.Manager;
-import org.store.viarestaurant.model.entities.Waiter;
 import org.store.viarestaurant.model.entities.Workers;
-import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.view.HelloApplication;
 
 public class NavigationController
 {
-  
-
-  @FXML private TextField usernameField;
-  @FXML private PasswordField passwordField;
-  @FXML private Label errorLabel;
 
   @FXML private Label sidebarName;
   @FXML private Label sidebarRole;
@@ -60,75 +45,6 @@ public class NavigationController
       sidebarRole.setText(worker.getRole().toString());
     }
     showDefaultPage(worker);
-  }
-
-  private final Workers testWorker =
-    new Manager(1, "Adam", "Adam", "manager", "1234");
-
-  private final Workers testWorker1 =
-      new Waiter(2, "Adam", "Adam", "waiter", "1234");
-
-  private final Workers testWorker2 =
-      new Host(3, "Adam", "Adam", "host", "1234");
-
-  @FXML
-  private void handleLogin() {
-
-    String username = usernameField.getText();
-    String password = passwordField.getText();
-
-    Workers loggedInWorker;
-
-    // Test manager
-    if (testWorker.getEmail().equals(username)
-        && testWorker.verifyPassword(password)) {
-      loggedInWorker = testWorker;
-    }
-    // Test waiter
-    else if (testWorker1.getEmail().equals(username)
-        && testWorker1.verifyPassword(password)) {
-      loggedInWorker = testWorker1;
-      System.out.println(loggedInWorker);
-    }
-    // Test host
-    else if (testWorker2.getEmail().equals(username)
-        && testWorker2.verifyPassword(password)) {
-      loggedInWorker = testWorker2;
-      System.out.println(loggedInWorker);
-    }
-    else {
-      showError("Invalid credentials.");
-      return;
-    }
-    try {
-      Parent root = loadDashboard(loggedInWorker);
-
-      Stage stage =
-          (Stage) usernameField.getScene().getWindow();
-
-      stage.getScene().setRoot(root);
-
-    } catch (IOException exception) {
-      showError("Unable to open dashboard.");
-    }
-  }
-
-  private Parent loadDashboard(Workers worker) throws IOException
-  {
-    String fxml = switch (worker.getRole())
-    {
-      case Host -> "/org/store/viarestaurant/HostDashboard.fxml";
-      case Waiter -> "/org/store/viarestaurant/WaiterDashboard.fxml";
-      case Manager -> "/org/store/viarestaurant/ManagerDashboard.fxml";
-    };
-
-    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource(fxml));
-    Parent root = loader.load();
-
-    NavigationController controller = loader.getController();
-    controller.initData(worker);
-
-    return root;
   }
 
   private void showDefaultPage(Workers worker)
@@ -266,15 +182,4 @@ public class NavigationController
     }
   }
 
-  private void showError(String message)
-  {
-    errorLabel.setText(message);
-    errorLabel.setVisible(true);
-    errorLabel.setManaged(true);
-
-    if (passwordField != null)
-    {
-      passwordField.clear();
-    }
-  }
 }
