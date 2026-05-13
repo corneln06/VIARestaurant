@@ -13,4 +13,5 @@ public interface WorkersDAO
   Workers getWorkerById(Integer id) throws SQLException;
   Workers getWorkerByEmail(String email) throws SQLException;
   void deleteWorkerById(Integer id) throws SQLException;
+  Workers updateWorker(Workers worker) throws SQLException;
 }

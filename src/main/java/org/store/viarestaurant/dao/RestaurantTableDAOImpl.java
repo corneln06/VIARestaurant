@@ -108,4 +108,26 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
                 }
             }
         }
+
+    @Override
+    public RestaurantTable updateRestaurantTable(RestaurantTable restaurantTable) throws SQLException {
+        try(Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE restauranttable set status=?,maxsitting=? where id=?"
+            );
+            statement.setString(1, restaurantTable.getStatus().getName());
+            statement.setInt(2, restaurantTable.getMaxSitting());
+            statement.setInt(3, restaurantTable.getId());
+            int rowsAffected = statement.executeUpdate();
+
+
+            if (rowsAffected == 0) {
+                throw new SQLException(
+                        "Table with id " + restaurantTable.getId() + " not found"
+                );
+            }
+
+            return restaurantTable;
+        }
     }
+}

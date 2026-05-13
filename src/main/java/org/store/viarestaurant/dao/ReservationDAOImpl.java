@@ -216,25 +216,28 @@ public class ReservationDAOImpl implements ReservationDAO
 
   @Override
   public Reservation updateReservation(Reservation reservation) throws SQLException {
-    try (Connection connection = getConnection();
+    try (Connection connection = getConnection())
+    {
          PreparedStatement statement = connection.prepareStatement(
                  "update reservations set customer=?, " +
                          "date=?," +
                          "partySize=?," +
                          "tableId=?" +
                          " where id=?"
-         ))
-    {
+         );
+
       statement.setString(1, reservation.getName());
-      statement.setDate(2, reservation.getDateTime());
+      statement.setTimestamp(2, Timestamp.valueOf(reservation.getDateTime()));
       statement.setInt(3,reservation.getPartySize());
-      statement.setInt(5, id);
+      statement.setInt(4, reservation.getTable().getId());
+      statement.setInt(5, reservation.getId());
       int affected = statement.executeUpdate();
 
       if (affected == 0)
       {
-        throw new SQLException("Delete failed, no reservation found with id: " + id);
+        throw new SQLException("Update failed, no reservation found with id: " + reservation.getId());
       }
+      return reservation;
     }
   }
 }

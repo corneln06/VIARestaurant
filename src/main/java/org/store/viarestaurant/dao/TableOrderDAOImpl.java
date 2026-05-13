@@ -387,4 +387,72 @@ public class TableOrderDAOImpl implements TableOrderDAO {
             return finalList;
         }
     }
+
+    @Override
+    public TableOrder updateTableOrder(TableOrder tableOrder) throws SQLException {
+        try (Connection connection = getConnection()) {
+            connection.setAutoCommit(false);
+            PreparedStatement statement = connection.prepareStatement(
+                    "update tableorders set tableId=?, " +
+                            "waiterId=?, " +
+                            "notes=?, " +
+                            "bill=?, " +
+                            "isReservation=?, " +
+                            "isPaid=? " +
+                            "WHERE id = ?"
+            );
+            statement.setInt(1, tableOrder.getTable().getId());
+            statement.setInt(2, tableOrder.getWaiter().getId());
+            statement.setString(3, tableOrder.getNotes());
+            statement.setDouble(4, tableOrder.getBill());
+            statement.setBoolean(5, tableOrder.isReservation());
+            statement.setBoolean(6, tableOrder.isPaid());
+            statement.setInt(7, tableOrder.getId());
+            int rowsAffected = statement.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new SQLException(
+                        "Table Order with id " + tableOrder.getId() + " not found"
+                );
+            }
+
+            /// Removing the old allergies in case we change them idk...
+            PreparedStatement deleteAllergies = connection.prepareStatement(
+                    "DELETE FROM MenuItemsTableOrder WHERE tableOrderId = ?"
+            );
+
+            deleteAllergies.setInt(1, tableOrder.getId());
+            deleteAllergies.executeUpdate();
+
+            /// and insert the 'new' ones
+            if (tableOrder.getMenuItems() != null &&
+                    !tableOrder.getMenuItems().isEmpty()) {
+
+                PreparedStatement insertMenuItems = connection.prepareStatement(
+                        " INSERT INTO MenuItemsTableOrder " +
+                                " (menuitemid, allergyid) " +
+                                " VALUES (?, ?)"
+                );
+                /// For Reference
+//                for (String allergyName : item.getAllergies()) {
+//
+//                    Allergy allergy =
+//                            allergyDAO.getAllergyByName(allergyName);
+//
+//                    if (allergy != null) {
+//
+//                        insertAllergy.setInt(1, item.getId());
+//                        insertAllergy.setInt(2, allergy.getId());
+//
+//                        insertAllergy.executeUpdate();
+//                    }
+//                }
+//            }
+//
+//            connection.commit();
+//
+//            return item;
+
+        }
+    }
 }
