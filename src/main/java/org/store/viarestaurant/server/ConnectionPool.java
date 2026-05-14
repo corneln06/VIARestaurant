@@ -1,15 +1,16 @@
 package org.store.viarestaurant.server;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionPool
 {
   private final List<ServerConnection> connections;
 
-  public ConnectionPool(List<ServerConnection> connections)
+  public ConnectionPool()
   {
-    this.connections = connections;
+    this.connections = new ArrayList<>();
   }
   public void add(ServerConnection serverConnection){
     connections.add(serverConnection);
@@ -17,7 +18,7 @@ public class ConnectionPool
   public void broadcast(String message) throws IOException
   {
     for (ServerConnection connection : connections){
-      connections.add(connection);
+      connection.send(message);
     }
   }
 }
