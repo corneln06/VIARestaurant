@@ -190,8 +190,8 @@ public class WorkersDAOImpl implements WorkersDAO
                 "UPDATE workers set firstName=?," +
                         "lastName=?," +
                         "rol=?," +
-                        "email=?," +
-                        "where id=?"
+                        "email=? " +
+                        " where id=?"
         );
         statement.setString(1, worker.getFirstName());
         statement.setString(2, worker.getLastName());

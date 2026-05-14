@@ -6,7 +6,6 @@ import org.store.viarestaurant.model.entities.*;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 public class TableOrderDAOImpl implements TableOrderDAO {
 
@@ -416,13 +415,13 @@ public class TableOrderDAOImpl implements TableOrderDAO {
                 );
             }
 
-            /// Removing the old allergies in case we change them idk...
-            PreparedStatement deleteAllergies = connection.prepareStatement(
+            /// Removing the old menu items in case we change them idk...
+            PreparedStatement deleteMenuItems = connection.prepareStatement(
                     "DELETE FROM MenuItemsTableOrder WHERE tableOrderId = ?"
             );
 
-            deleteAllergies.setInt(1, tableOrder.getId());
-            deleteAllergies.executeUpdate();
+            deleteMenuItems.setInt(1, tableOrder.getId());
+            deleteMenuItems.executeUpdate();
 
             /// and insert the 'new' ones
             if (tableOrder.getMenuItems() != null &&
@@ -430,28 +429,28 @@ public class TableOrderDAOImpl implements TableOrderDAO {
 
                 PreparedStatement insertMenuItems = connection.prepareStatement(
                         " INSERT INTO MenuItemsTableOrder " +
-                                " (menuitemid, allergyid) " +
+                                " (menuitemid, tableorderid) " +
                                 " VALUES (?, ?)"
                 );
-                /// For Reference
-//                for (String allergyName : item.getAllergies()) {
-//
-//                    Allergy allergy =
-//                            allergyDAO.getAllergyByName(allergyName);
-//
-//                    if (allergy != null) {
-//
-//                        insertAllergy.setInt(1, item.getId());
-//                        insertAllergy.setInt(2, allergy.getId());
-//
-//                        insertAllergy.executeUpdate();
-//                    }
-//                }
-//            }
-//
-//            connection.commit();
-//
-//            return item;
+
+                for (String itemName : tableOrder.getMenuItems()) {
+
+                    MenuItems item =
+                            menuItemDAO.getMenuItemByName(itemName);
+
+                    if (item != null) {
+
+                        insertMenuItems.setInt(1, item.getId());
+                        insertMenuItems.setInt(2, tableOrder.getId());
+
+                        insertMenuItems.executeUpdate();
+                    }
+                }
+            }
+
+            connection.commit();
+
+            return tableOrder;
 
         }
     }

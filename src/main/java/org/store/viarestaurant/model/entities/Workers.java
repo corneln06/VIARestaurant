@@ -9,7 +9,6 @@ public abstract class Workers {
     private String lastName;
     private String email;
     private String passwordHash;
-    //tesst
     private String password;
 
 //    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -63,8 +62,8 @@ public abstract class Workers {
     }
     public String hashPassword(String rawPass)
     {
-      //tets
-//        return encoder.encode(rawPass);
+        //test
+        //return encoder.encode(rawPass);
 
       return rawPass;
     }

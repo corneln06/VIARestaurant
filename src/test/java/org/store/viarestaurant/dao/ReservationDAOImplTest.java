@@ -15,14 +15,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ReservationDAOImplTest
 {
   private ReservationDAOImpl dao;
-  private RestaurantTable testTable;
+  private RestaurantTable testTable, testTable2;
   private int createdId;
 
   @BeforeAll
   void setup() throws SQLException
   {
     dao = ReservationDAOImpl.getInstance();
-    testTable = new RestaurantTable(1, 4);
+    testTable = RestaurantTableDAOImpl.getInstance().createRestaurantTable(4);
+    testTable2 = RestaurantTableDAOImpl.getInstance().createRestaurantTable(5);
+
+
   }
 
   @Test
@@ -40,6 +43,7 @@ public class ReservationDAOImplTest
     assertTrue(r.getId() > 0);
     assertEquals("Jan Novak", r.getName());
     assertEquals(4, r.getPartySize());
+    assertEquals(testTable, r.getTable());
 
     createdId = r.getId();
   }
@@ -98,9 +102,28 @@ public class ReservationDAOImplTest
     assertNotNull(r);
     assertEquals("Jan Novak", r.getName());
   }
-
   @Test
   @Order(7)
+  void testUpdateReservation() throws SQLException
+  {
+    Reservation r = dao.getReservationById(createdId);
+    r.setName("James Bond");
+    r.setTable(testTable2);
+    dao.updateReservation(r);
+
+    Reservation r2 = dao.getReservationById(createdId);
+
+
+    assertNotNull(r2);
+    assertTrue(r2.getId() > 0);
+    assertEquals("James Bond", r2.getName());
+    assertEquals(4, r2.getPartySize());
+    assertEquals(testTable2, r2.getTable());
+
+
+  }
+  @Test
+  @Order(8)
   void testDeleteById() throws SQLException
   {
     dao.deleteById(createdId);

@@ -55,7 +55,28 @@ public class MenuItems
     return isVegetarian;
   }
 
-    @Override
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setPrice(Double price) {
+    this.price = price;
+  }
+
+  public void setType(MenuTypes type) {
+    this.type = type;
+  }
+
+  public void setVegetarian(boolean vegetarian) {
+    isVegetarian = vegetarian;
+  }
+
+  public void removeAllergy(String allergy) {
+    if (allergy != null )
+      allergies.remove(allergy);
+  }
+
+  @Override
     public String toString() {
         return "MenuItem{" +
                 "id=" + id +

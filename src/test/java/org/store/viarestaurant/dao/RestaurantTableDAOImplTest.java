@@ -2,6 +2,8 @@ package org.store.viarestaurant.dao;
 
 import org.junit.jupiter.api.*;
 import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.model.state.TableState;
+import org.store.viarestaurant.model.state.TableStateFactory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -51,9 +53,25 @@ public class RestaurantTableDAOImplTest {
         assertEquals("Available", r.getStatus().getName());
 
     }
+    @Test
+    @Order(4) void testUpdateTable() throws SQLException {
+
+        RestaurantTable r = dao.getRestaurantTableByID(createdId);
+        r.setState(TableStateFactory.fromString("Reserved"));
+        r.setMaxSitting(6);
+
+        RestaurantTable r2 = dao.updateRestaurantTable(r);
+
+
+        assertNotNull(r2);
+        assertEquals(createdId, r2.getId());
+        assertEquals(6, r2.getMaxSitting());
+        assertEquals("Reserved", r2.getStatus().getName());
+
+    }
 
     @Test
-    @Order(4) void deleteTable() throws SQLException {
+    @Order(5) void deleteTable() throws SQLException {
         dao.deleteRestaurantTableByID(createdId);
         assertThrows(NoSuchElementException.class,
                 () -> dao.getRestaurantTableByID(createdId));

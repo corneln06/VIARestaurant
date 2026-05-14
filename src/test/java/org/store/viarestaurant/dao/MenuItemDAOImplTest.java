@@ -15,18 +15,21 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MenuItemDAOImplTest {
     private MenuItemDAOImpl dao;
     private int createdId;
+    ArrayList<String> allergiesList = new ArrayList<>();
 
     @BeforeAll
     void setup() throws SQLException {
         dao = MenuItemDAOImpl.getInstance();
+        AllergyDAOImpl.getInstance().createAllergy("Peanuts");
+
+        allergiesList.add(AllergyDAOImpl.getInstance().getAllergyByName("Peanuts").getName());
     }
 
     @Test
     @Order(1)
     void testCreateMenuItem() throws SQLException
     {
-        ArrayList<String> allergiesList = new ArrayList<>();
-        allergiesList.add("Peanuts");
+
         MenuItems newItem = dao.createMenuItem("Asado", MenuTypes.Main, 33.33, false, allergiesList);
 
         assertNotNull(newItem);
@@ -66,6 +69,30 @@ public class MenuItemDAOImplTest {
 
     @Test
     @Order(4)
+    void testUpdateMenuItem() throws SQLException
+    {
+        MenuItems menuItem = dao.getMenuItemById(createdId);
+
+        menuItem.setName("NotAsado");
+        menuItem.setPrice(menuItem.getPrice()+10.1);
+
+        dao.updateMenuItem(menuItem);
+
+        MenuItems menuItem1 = dao.getMenuItemById(createdId);
+
+        menuItem.setType(MenuTypes.Beverage); /// Intentional
+
+                assertNotNull(menuItem1);
+        assertTrue(menuItem1.getId() > 0);
+        assertEquals("NotAsado", menuItem1.getName());
+        assertEquals(MenuTypes.Main, menuItem1.getType());
+        assertEquals(43.43, menuItem1.getPrice());
+        assertFalse(menuItem1.isVegetarian());
+        assertFalse(menuItem1.getAllergies().isEmpty());
+    }
+
+    @Test
+    @Order(6)
     void testDeleteById() throws SQLException
     {
         dao.delete(createdId);
