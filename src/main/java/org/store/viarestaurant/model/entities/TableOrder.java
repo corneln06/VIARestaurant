@@ -83,20 +83,12 @@ public class TableOrder {
 
         for(OrderItem item : menuItems) {
 
-            if(item.getMenuItem().getId()
-                    == menuItem.getId()) {
-
+            if(item.getMenuItem().getId() == menuItem.getId()) {
                 item.incrementQuantity();
                 return;
             }
         }
 
-        menuItems.add(
-                new OrderItem(
-                        0, /// idk if i like it always being 0
-                        menuItem,
-                        1
-                )
-        );
+        menuItems.add(new OrderItem(0, menuItem, 1));
     }
 }

@@ -264,56 +264,23 @@ public class TableOrderDAOImplTest {
     @Order(6)
     void update() throws SQLException {
 
-        TableOrder order =
-                dao.getTableOrderByID(createdId);
-
+        TableOrder order = dao.getTableOrderByID(createdId);
         order.setTable(testTable2);
-
         order.setWaiter(testWorker2);
+        order.getMenuItems().add(new OrderItem(0, item2, 2));
 
-        order.getMenuItems().add(
-                new OrderItem(
-                        0,
-                        item2,
-                        2
-                )
-        );
+        order.setBill(order.getBill() + (item2.getPrice() * 2));
 
-        order.setBill(
-                order.getBill() +
-                        (item2.getPrice() * 2)
-        );
-
-        TableOrder updated =
-                dao.updateTableOrder(order);
+        TableOrder updated = dao.updateTableOrder(order);
 
         assertNotNull(updated);
+        assertEquals(createdId,updated.getId());
+        assertEquals(testTable2.getId(), updated.getTable().getId());
+        assertEquals(testWorker2.getId(), updated.getWaiter().getId());
 
-        assertEquals(
-                createdId,
-                updated.getId()
-        );
+        assertEquals(2, updated.getMenuItems().size());
 
-        assertEquals(
-                testTable2.getId(),
-                updated.getTable().getId()
-        );
-
-        assertEquals(
-                testWorker2.getId(),
-                updated.getWaiter().getId()
-        );
-
-        assertEquals(
-                2,
-                updated.getMenuItems().size()
-        );
-
-        assertEquals(
-                92.16,
-                updated.getBill(),
-                0.01
-        );
+        assertEquals(92.16, updated.getBill());
     }
 
     @Test

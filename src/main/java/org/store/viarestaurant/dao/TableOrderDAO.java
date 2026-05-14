@@ -1,6 +1,5 @@
 package org.store.viarestaurant.dao;
 
-import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.OrderItem;
 import org.store.viarestaurant.model.entities.TableOrder;
 
