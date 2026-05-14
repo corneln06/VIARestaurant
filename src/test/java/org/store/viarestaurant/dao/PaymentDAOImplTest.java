@@ -69,7 +69,7 @@ public class PaymentDAOImplTest
     assertTrue(p.getId() > 0);
     assertEquals(50.00, p.getAmount());
     assertEquals(PaymentMethod.Card, p.getMethod());
-    assertNotNull(p.getOrderId());
+    assertNotNull(p.getOrderLinked());
 
     createdPaymentId = p.getId();
   }
@@ -121,7 +121,7 @@ public class PaymentDAOImplTest
     assertEquals(createdPaymentId, p.getId());
     assertEquals(50.00, p.getAmount());
     assertEquals(PaymentMethod.Card, p.getMethod());
-    assertNotNull(p.getOrderId());
+    assertNotNull(p.getOrderLinked());
   }
 
   @Test

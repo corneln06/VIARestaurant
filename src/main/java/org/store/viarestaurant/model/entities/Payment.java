@@ -8,13 +8,13 @@ public class Payment
   private int id;
   private double amount;
   private PaymentMethod method;
-  private TableOrder orderId;
+  private TableOrder order;
 
-  public Payment(int id, double amount, PaymentMethod method, TableOrder orderId){
+  public Payment(int id, double amount, PaymentMethod method, TableOrder order){
     this.id = id;
     this.amount = amount;
     this.method = method;
-    this.orderId = orderId;
+    this.order = order;
   }
 
   public int getId()
@@ -27,9 +27,9 @@ public class Payment
     return amount;
   }
 
-  public TableOrder getOrderId()
+  public TableOrder getOrderLinked()
   {
-    return orderId;
+    return order;
   }
 
   public PaymentMethod getMethod()

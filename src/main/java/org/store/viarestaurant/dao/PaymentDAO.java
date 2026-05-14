@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public interface PaymentDAO
 {
 
-  Payment createPayment(double amount, PaymentMethod method, TableOrder orderId) throws
+  Payment createPayment(double amount, PaymentMethod method, TableOrder order) throws
       SQLException;
   Payment getPaymentById(int id) throws SQLException;
   void deleteById(int id) throws SQLException;
