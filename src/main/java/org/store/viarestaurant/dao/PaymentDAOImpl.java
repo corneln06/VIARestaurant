@@ -1,11 +1,9 @@
 package org.store.viarestaurant.dao;
 
-import javafx.scene.control.Tab;
 import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.model.entities.Payment;
-import org.store.viarestaurant.model.entities.Reservation;
-import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.TableOrder;
+import org.store.viarestaurant.model.enums.PaymentMethod;
 
 import java.sql.*;
 
@@ -28,15 +26,12 @@ public class PaymentDAOImpl implements PaymentDAO
     return DatabaseConnection.getConnection();
   }
 
-  @Override public Payment createPayment(double amount, String method,
+  @Override public Payment createPayment(double amount, PaymentMethod method,
       TableOrder order) throws SQLException
   {
 
     if (amount <= 0){
       throw new SQLException("Amount has to be greater than 0!");
-    }
-    if (!method.equals("Card") && !method.equals("Cash")){
-      throw new SQLException("Method must be Card or Cash!");
     }
     if (order == null)
     {
@@ -48,7 +43,7 @@ public class PaymentDAOImpl implements PaymentDAO
       );
 
       statement.setDouble(1, amount);
-      statement.setString(2, method);
+      statement.setString(2, method.name());
       statement.setInt(3, order.getId());
 
       ResultSet rs = statement.executeQuery();
@@ -77,10 +72,11 @@ public class PaymentDAOImpl implements PaymentDAO
         int orderId = rs.getInt("orderId");
         TableOrderDAO tableOrderDAO = TableOrderDAOImpl.getInstance();
         TableOrder order = tableOrderDAO.getTableOrderByID(orderId);
+        PaymentMethod method = PaymentMethod.valueOf(rs.getString("method"));
         return new Payment(
             rs.getInt("id"),
             rs.getDouble("amount"),
-            rs.getString("method"),
+            method,
             order
         );
       }

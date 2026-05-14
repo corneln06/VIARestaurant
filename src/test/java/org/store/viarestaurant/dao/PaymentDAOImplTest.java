@@ -5,6 +5,7 @@ import org.store.viarestaurant.model.entities.Payment;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.model.enums.PaymentMethod;
 import org.store.viarestaurant.model.enums.WorkerRole;
 
 import java.sql.SQLException;
@@ -62,12 +63,12 @@ public class PaymentDAOImplTest
   @Order(1)
   void testCreatePayment() throws SQLException
   {
-    Payment p = dao.createPayment(50.00, "Card", testOrder);
+    Payment p = dao.createPayment(50.00, PaymentMethod.Card, testOrder);
 
     assertNotNull(p);
     assertTrue(p.getId() > 0);
     assertEquals(50.00, p.getAmount());
-    assertEquals("Card", p.getMethod());
+    assertEquals(PaymentMethod.Card, p.getMethod());
     assertNotNull(p.getOrderId());
 
     createdPaymentId = p.getId();
@@ -77,10 +78,10 @@ public class PaymentDAOImplTest
   @Order(2)
   void testCreatePaymentWithCash() throws SQLException
   {
-    Payment p = dao.createPayment(30.00, "Cash", testOrder);
+    Payment p = dao.createPayment(30.00, PaymentMethod.Cash, testOrder);
 
     assertNotNull(p);
-    assertEquals("Cash", p.getMethod());
+    assertEquals(PaymentMethod.Cash, p.getMethod());
     assertEquals(30.00, p.getAmount());
 
     dao.deleteById(p.getId());
@@ -91,7 +92,7 @@ public class PaymentDAOImplTest
   void testCreatePaymentInvalidAmount() throws SQLException
   {
     assertThrows(SQLException.class, () ->
-        dao.createPayment(-10.00, "Card", testOrder));
+        dao.createPayment(-10.00, PaymentMethod.Card, testOrder));
   }
 
   @Test
@@ -99,27 +100,19 @@ public class PaymentDAOImplTest
   void testCreatePaymentZeroAmount() throws SQLException
   {
     assertThrows(SQLException.class, () ->
-        dao.createPayment(0.00, "Card", testOrder));
+        dao.createPayment(0.00, PaymentMethod.Card, testOrder));
   }
 
   @Test
   @Order(5)
-  void testCreatePaymentInvalidMethod() throws SQLException
+  void testCreatePaymentNullOrder() throws SQLException
   {
     assertThrows(SQLException.class, () ->
-        dao.createPayment(50.00, "Bitcoin", testOrder));
+        dao.createPayment(50.00, PaymentMethod.Card, null));
   }
 
   @Test
   @Order(6)
-  void testCreatePaymentNullOrder() throws SQLException
-  {
-    assertThrows(SQLException.class, () ->
-        dao.createPayment(50.00, "Card", null));
-  }
-
-  @Test
-  @Order(7)
   void testGetPaymentById() throws SQLException
   {
     Payment p = dao.getPaymentById(createdPaymentId);
@@ -127,12 +120,12 @@ public class PaymentDAOImplTest
     assertNotNull(p);
     assertEquals(createdPaymentId, p.getId());
     assertEquals(50.00, p.getAmount());
-    assertEquals("Card", p.getMethod());
+    assertEquals(PaymentMethod.Card, p.getMethod());
     assertNotNull(p.getOrderId());
   }
 
   @Test
-  @Order(8)
+  @Order(7)
   void testGetPaymentByIdNotFound() throws SQLException
   {
     assertThrows(SQLException.class, () ->
@@ -140,7 +133,7 @@ public class PaymentDAOImplTest
   }
 
   @Test
-  @Order(9)
+  @Order(8)
   void testDeleteById() throws SQLException
   {
     dao.deleteById(createdPaymentId);
@@ -150,7 +143,7 @@ public class PaymentDAOImplTest
   }
 
   @Test
-  @Order(10)
+  @Order(9)
   void testDeleteByIdNotFound() throws SQLException
   {
     assertThrows(SQLException.class, () ->
