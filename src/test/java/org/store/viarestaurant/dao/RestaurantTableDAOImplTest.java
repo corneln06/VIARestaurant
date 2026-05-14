@@ -57,7 +57,6 @@ public class RestaurantTableDAOImplTest {
     @Order(4) void testUpdateTable() throws SQLException {
 
         RestaurantTable r = dao.getRestaurantTableByID(createdId);
-        r.setState(TableStateFactory.fromString("Reserved"));
         r.setMaxSitting(6);
 
         RestaurantTable r2 = dao.updateRestaurantTable(r);
@@ -66,7 +65,6 @@ public class RestaurantTableDAOImplTest {
         assertNotNull(r2);
         assertEquals(createdId, r2.getId());
         assertEquals(6, r2.getMaxSitting());
-        assertEquals("Reserved", r2.getStatus().getName());
 
     }
 

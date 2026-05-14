@@ -234,7 +234,7 @@ public class MenuItemDAOImpl implements MenuItemDAO {
                             " WHERE id = ?"
             );
             statement.setString(1, item.getName());
-            statement.setObject(2, item.getType().name()); /// IDK MAN MAYBE THIS SHI DOESNT WORK
+            statement.setObject(2, item.getType().name());
             statement.setDouble(3, item.getPrice());
             statement.setBoolean(4,item.isVegetarian());
             statement.setInt(5, item.getId());

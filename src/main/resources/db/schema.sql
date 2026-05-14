@@ -71,6 +71,10 @@ CREATE TABLE IF NOT EXISTS MenuItemsTableOrder (
     id serial primary key,
     menuItemId int not null,
     tableOrderId int not null,
+    quantity int not null default 1,
+
+    CONSTRAINT uq_order_menuitem
+    UNIQUE(menuItemId, tableOrderId),
 
     CONSTRAINT fk_menuitem
     FOREIGN KEY (menuItemId)

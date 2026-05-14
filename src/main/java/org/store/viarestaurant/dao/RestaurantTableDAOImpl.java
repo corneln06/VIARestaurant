@@ -113,11 +113,11 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
     public RestaurantTable updateRestaurantTable(RestaurantTable restaurantTable) throws SQLException {
         try(Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
-                    "UPDATE restauranttable set status=?,maxsitting=? where id=?"
+                    "UPDATE restauranttable set maxsitting=? where id=?"
             );
-            statement.setString(1, restaurantTable.getStatus().getName());
-            statement.setInt(2, restaurantTable.getMaxSitting());
-            statement.setInt(3, restaurantTable.getId());
+
+            statement.setInt(1, restaurantTable.getMaxSitting());
+            statement.setInt(2, restaurantTable.getId());
             int rowsAffected = statement.executeUpdate();
 
 

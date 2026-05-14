@@ -12,11 +12,11 @@ public class TableOrder {
     private Workers waiter;
     private String notes;
     private double bill;
-    private ArrayList<String> menuItems;
+    private ArrayList<OrderItem> menuItems;
     private boolean isReservation;
     private boolean isPaid;
 
-    public TableOrder(int id, RestaurantTable restaurantTable, Workers waiter, String notes, ArrayList<String> menuItems, double bill, boolean isReservation) {
+    public TableOrder(int id, RestaurantTable restaurantTable, Workers waiter, String notes, ArrayList<OrderItem> menuItems, double bill, boolean isReservation) {
         this.id = id;
         this.restaurantTable = restaurantTable;
         this.waiter = waiter;
@@ -75,11 +75,28 @@ public class TableOrder {
         isPaid = paid;
     }
 
-    public ArrayList<String> getMenuItems() {
+    public ArrayList<OrderItem> getMenuItems() {
         return menuItems;
     }
 
-    public void addMenuItems(String menuItemsName) {
-        menuItems.add(menuItemsName);
+    public void addMenuItem(MenuItems menuItem) {
+
+        for(OrderItem item : menuItems) {
+
+            if(item.getMenuItem().getId()
+                    == menuItem.getId()) {
+
+                item.incrementQuantity();
+                return;
+            }
+        }
+
+        menuItems.add(
+                new OrderItem(
+                        0, /// idk if i like it always being 0
+                        menuItem,
+                        1
+                )
+        );
     }
 }
