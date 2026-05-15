@@ -1,6 +1,8 @@
 package org.store.viarestaurant.viewModel;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,10 +13,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
@@ -23,7 +22,8 @@ import org.store.viarestaurant.view.HelloApplication;
 public class NavigationController
 {
 
-  @FXML private Label sidebarName;
+    public Label reservationsDateLabel;
+    @FXML private Label sidebarName;
   @FXML private Label sidebarRole;
 
   @FXML private Button btnTables;
@@ -67,6 +67,11 @@ public class NavigationController
       sidebarRole.setText(worker.getRole().toString());
     }
     showDefaultPage(worker);
+    if(hostController != null){
+    reservationsDateLabel.setText(
+            LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    );
+    }
   }
   public void initClient(Client client)
   {
@@ -113,6 +118,7 @@ public class NavigationController
   {
     showOnly(reservationsPage);
     setActive(btnReservations, btnTables);
+    hostController.closeNewReservationModal();
     if (hostController != null)
     {
       hostController.refreshSchedule();
