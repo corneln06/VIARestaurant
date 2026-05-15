@@ -1,22 +1,18 @@
 package org.store.viarestaurant.server;
 
-import org.store.viarestaurant.dao.ReservationDAO;
-import org.store.viarestaurant.dao.ReservationDAOImpl;
-import org.store.viarestaurant.dao.WorkersDAO;
-import org.store.viarestaurant.dao.WorkersDAOImpl;
+import org.store.viarestaurant.dao.*;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.dto.LoginRequest;
 import org.store.viarestaurant.server.dto.LoginResponse;
-import org.store.viarestaurant.server.dto.ReservationDto.CreateReservationResponse;
-import org.store.viarestaurant.server.dto.ReservationDto.ReservationCreatedMessage;
-import org.store.viarestaurant.server.dto.ReservationDto.TableBookingRequest;
+import org.store.viarestaurant.server.dto.ReservationDto.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class ServerConnection implements Runnable
 {
@@ -25,6 +21,7 @@ public class ServerConnection implements Runnable
   private final ObjectInputStream inFromClient;
   private final ConnectionPool connectionPool;
   private final WorkersDAO workersDAO;
+  private final RestaurantTableDAO restaurantTableDAO;
   private final ReservationDAO reservationDAO;
 
   public ServerConnection(
@@ -39,6 +36,7 @@ public class ServerConnection implements Runnable
     try
     {
       this.reservationDAO = ReservationDAOImpl.getInstance();
+      this.restaurantTableDAO = RestaurantTableDAOImpl.getInstance();
     }
     catch(SQLException e)
     {
@@ -90,6 +88,13 @@ public class ServerConnection implements Runnable
         {
           System.out.println("[SERVER] TableBookingRequest detected");
           handleTableBooking(request);
+        } else if(object instanceof GetTablesRequest)
+        {
+          handleGetTables();
+        }
+        else if(object instanceof GetReservationsRequest)
+        {
+          handleGetReservations();
         }
         else
         {
@@ -130,6 +135,31 @@ public class ServerConnection implements Runnable
       {
         e.printStackTrace();
       }
+    }
+  }
+  private void handleGetTables() throws IOException{
+    try
+    {
+      send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
+    }
+    catch (SQLException e)
+    {
+      send(new GetReservationResponse(new ArrayList<>()));
+      throw new RuntimeException(e);
+    }
+  }
+  private void handleGetReservations() throws IOException
+  {
+    try
+    {
+      send(new GetReservationResponse(
+          reservationDAO.getAllReservationsForToday()
+      ));
+    }
+    catch(SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetReservationResponse(new ArrayList<>()));
     }
   }
   private void handleLogin(LoginRequest request)
