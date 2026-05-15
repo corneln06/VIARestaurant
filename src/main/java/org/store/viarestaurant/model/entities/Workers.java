@@ -12,7 +12,6 @@ public abstract class Workers implements Serializable
     private String lastName;
     private String email;
     private String passwordHash;
-    //tesst
     private String password;
 
 //    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -66,8 +65,8 @@ public abstract class Workers implements Serializable
     }
     public String hashPassword(String rawPass)
     {
-      //tets
-//        return encoder.encode(rawPass);
+        //test
+        //return encoder.encode(rawPass);
 
       return rawPass;
     }

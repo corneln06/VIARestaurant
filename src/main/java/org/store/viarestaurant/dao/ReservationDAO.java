@@ -16,4 +16,5 @@ public interface ReservationDAO
   Reservation getReservationByCustomerName(String name) throws SQLException;
   ArrayList<Reservation> getReservationByDate(LocalDateTime dateTime) throws SQLException;
   void deleteById(int id) throws SQLException;
+  Reservation updateReservation(Reservation reservation) throws SQLException;
 }

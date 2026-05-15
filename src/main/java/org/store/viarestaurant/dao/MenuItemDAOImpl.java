@@ -8,6 +8,7 @@ import org.store.viarestaurant.model.enums.MenuTypes;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MenuItemDAOImpl implements MenuItemDAO {
 
@@ -221,4 +222,83 @@ public class MenuItemDAOImpl implements MenuItemDAO {
             return menuItem;
         }
     }
-}
+
+    @Override
+    public MenuItems updateMenuItem(MenuItems item) throws SQLException {
+
+        try (Connection connection = getConnection()) {
+
+            connection.setAutoCommit(false);
+
+            try {
+                MenuItems existing = getMenuItemById(item.getId());
+
+                PreparedStatement statement = connection.prepareStatement(
+                        "UPDATE menuitems SET " +
+                                "name=?, " +
+                                "type=?, " +
+                                "price=?, " +
+                                "isvegetarian=? " +
+                                "WHERE id=?"
+                );
+
+                statement.setString(1, item.getName());
+                statement.setObject(2, item.getType().name());
+                statement.setDouble(3, item.getPrice());
+                statement.setBoolean(4, item.isVegetarian());
+                statement.setInt(5, item.getId());
+
+                int rowsAffected = statement.executeUpdate();
+
+                if (rowsAffected == 0) {
+                    throw new SQLException(
+                            "Menu item with id " + item.getId() + " not found"
+                    );
+                }
+                /// check if the array actually changed
+                if( !Objects.equals(item.getAllergies(), existing.getAllergies()))
+                {  /// Delete old allergies
+                    PreparedStatement deleteAllergies = connection.prepareStatement(
+                                "DELETE FROM menuitemsallergies WHERE menuitemid=?"
+                        );
+
+                    deleteAllergies.setInt(1, item.getId());
+                    deleteAllergies.executeUpdate();
+
+                /// insert new allergies
+                    if (item.getAllergies() != null && !item.getAllergies().isEmpty()) {
+
+                    PreparedStatement insertAllergy =
+                            connection.prepareStatement(
+                                    "INSERT INTO menuitemsallergies (menuitemid, allergyid) VALUES (?, ?)"
+                            );
+
+                    for (String allergyName : item.getAllergies()) {
+
+                        Allergy allergy =
+                                allergyDAO.getAllergyByName(allergyName);
+
+                        if (allergy != null) {
+
+                            insertAllergy.setInt(1, item.getId());
+                            insertAllergy.setInt(2, allergy.getId());
+
+                            insertAllergy.addBatch();
+                        }
+                    }
+
+                    insertAllergy.executeBatch();
+                }
+            }
+
+                connection.commit();
+                return item;
+
+            } catch (SQLException ex) {
+                connection.rollback();
+                throw ex;
+            }
+        }
+    }
+    }
+

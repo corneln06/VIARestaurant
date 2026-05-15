@@ -182,4 +182,32 @@ public class WorkersDAOImpl implements WorkersDAO
       }
     }
   }
+
+    @Override
+    public Workers updateWorker(Workers worker) throws SQLException {
+      try(Connection connection = getConnection()) {
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE workers set firstName=?," +
+                        "lastName=?," +
+                        "rol=?," +
+                        "email=? " +
+                        " where id=?"
+        );
+        statement.setString(1, worker.getFirstName());
+        statement.setString(2, worker.getLastName());
+        statement.setString(3, worker.getRole().name());
+        statement.setString(4, worker.getEmail());
+        statement.setInt(5, worker.getId());
+        int rowsAffected = statement.executeUpdate();
+
+
+        if (rowsAffected == 0) {
+          throw new SQLException(
+                  "Worker with id " + worker.getId() + " not found"
+          );
+        }
+
+        return worker;
+      }
+    }
 }

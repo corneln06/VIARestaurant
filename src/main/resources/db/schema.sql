@@ -77,6 +77,9 @@ CREATE TABLE IF NOT EXISTS MenuItemsTableOrder (
     REFERENCES MenuItems(id)
     ON DELETE CASCADE,
 
+    CONSTRAINT uq_menu_order
+    UNIQUE (menuItemId, tableOrderId);
+
     CONSTRAINT fk_tableOrder
     FOREIGN KEY (tableOrderId)
     REFERENCES TableOrders(id)

@@ -123,23 +123,43 @@ class WorkersDAOImplTest
 
   @Test
   @Order(7)
+  void testUpdateWorkers() throws SQLException
+  {
+    Workers worker =
+            workersDAO.getWorkerById(waiterWorker.getId());
+
+    worker.setFirstName("Negru");
+    worker.setLastName("Cornel");
+
+    worker = workersDAO.updateWorker(worker);
+
+
+    assertNotNull(worker);
+
+    assertEquals("Negru", worker.getFirstName());
+    assertEquals("Cornel", worker.getLastName());
+    assertEquals("waiter@test.com", worker.getEmail());
+    assertEquals(WorkerRole.Waiter, worker.getRole());
+  }
+  @Test
+  @Order(8)
   void deleteWorkers() throws SQLException
   {
     assertDoesNotThrow(() ->
-        workersDAO.deleteWorkerById(waiterWorker.getId())
+            workersDAO.deleteWorkerById(waiterWorker.getId())
     );
 
     assertDoesNotThrow(() ->
-        workersDAO.deleteWorkerById(hostWorker.getId())
+            workersDAO.deleteWorkerById(hostWorker.getId())
     );
 
     assertDoesNotThrow(() ->
-        workersDAO.deleteWorkerById(managerWorker.getId())
+            workersDAO.deleteWorkerById(managerWorker.getId())
     );
   }
 
   @Test
-  @Order(8)
+  @Order(9)
   void deletedWorkersShouldNotExist()
   {
     assertThrows(SQLException.class, () ->

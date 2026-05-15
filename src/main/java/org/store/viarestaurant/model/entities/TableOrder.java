@@ -79,7 +79,10 @@ public class TableOrder {
         return menuItems;
     }
 
-    public void addMenuItems(String menuItemsName) {
-        menuItems.add(menuItemsName);
+    public void addMenuItems(String menuItem) {
+        menuItems.add(menuItem);
+    }
+    public void removeMenuItems(String menuItem){
+        menuItems.remove(menuItem);
     }
 }

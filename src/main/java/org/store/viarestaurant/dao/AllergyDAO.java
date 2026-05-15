@@ -10,4 +10,5 @@ public interface AllergyDAO {
     Allergy getAllergyById(Integer id) throws SQLException;
     Allergy getAllergyByName(String name) throws SQLException;
     void delete(Integer id) throws SQLException;
+    Allergy updateAllergy(Allergy allergy) throws SQLException;
 }

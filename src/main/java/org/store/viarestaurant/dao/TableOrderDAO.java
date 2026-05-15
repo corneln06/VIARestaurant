@@ -1,6 +1,5 @@
 package org.store.viarestaurant.dao;
 
-import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.TableOrder;
 
 import java.sql.SQLException;
@@ -18,12 +17,9 @@ public interface TableOrderDAO {
     ) throws SQLException;
 
     ArrayList<TableOrder> getAllTableOrders() throws SQLException;
-
     TableOrder getTableOrderByID(Integer id) throws SQLException;
-
     void deleteTableOrderByID(Integer id) throws SQLException;
-
     ArrayList<TableOrder> getTableOrdersByWaiterId(Integer id) throws SQLException;
-
     ArrayList<TableOrder> getTableOrdersByTableId(Integer id) throws SQLException;
+    TableOrder updateTableOrder(TableOrder tableOrder) throws SQLException;
 }

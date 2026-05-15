@@ -90,6 +90,26 @@ public class AllergyDAOImpl implements AllergyDAO{
         }
     }
 
+    @Override
+    public Allergy updateAllergy(Allergy allergy) throws SQLException {
+        try(Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE allergies set name=? where id=?"
+            );
+            statement.setString(1, allergy.getName());
+            statement.setInt(2, allergy.getId());
+            int rowsAffected = statement.executeUpdate();
+
+
+            if (rowsAffected == 0) {
+                throw new SQLException(
+                        "Allergy with id " + allergy.getId() + " not found"
+                );
+            }
+
+            return allergy;
+        }
+    }
 
 
 }

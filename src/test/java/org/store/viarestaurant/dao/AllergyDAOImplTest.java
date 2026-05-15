@@ -50,9 +50,23 @@ public class AllergyDAOImplTest {
         assertNotNull(allergy);
         assertEquals("Peanuts", allergy.getName());
     }
-
     @Test
     @Order(4)
+    void testUpdateAllergy() throws SQLException {
+        Allergy allergy = dao.getAllergyById(createdId);
+        allergy.setName("Nuts");
+        dao.updateAllergy(allergy);
+
+        Allergy allergy1 = dao.getAllergyById(createdId);
+
+        assertNotNull(allergy);
+        assertEquals("Nuts", allergy1.getName());
+    }
+
+
+
+    @Test
+    @Order(5)
     void testDeleteById() throws SQLException
     {
         dao.delete(createdId);

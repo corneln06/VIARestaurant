@@ -8,7 +8,7 @@ public class RestaurantTable
   private Integer id;
   private int maxSitting;
   private TableState status;
-  private InternalSchedule internalSchedule;
+  private InternalSchedule internalSchedule; /// No clue what this does here, but imma leave it
 
 
   public RestaurantTable(Integer id, int maxSitting){
@@ -32,5 +32,26 @@ public class RestaurantTable
   public TableState getStatus()
   {
     return status;
+  }
+
+  public void setMaxSitting(int maxSitting) {
+    this.maxSitting = maxSitting;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass())
+      return false;
+
+    RestaurantTable that = (RestaurantTable) o;
+
+    return id == that.id;
+  }
+  @Override
+  public int hashCode() {
+    return Integer.hashCode(id);
   }
 }
