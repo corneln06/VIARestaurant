@@ -68,6 +68,7 @@ public class LoginController extends NavigationController
                 showError("Invalid credentials.");
                 return;
             }
+            client.startListening();
 
             Workers worker =
                 response.getRole();
@@ -113,7 +114,9 @@ public class LoginController extends NavigationController
         NavigationController controller =
             loader.getController();
 
+        controller.initClient(client);
         controller.initData(worker);
+
 
         return root;
     }

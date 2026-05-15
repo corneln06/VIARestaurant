@@ -1,5 +1,6 @@
 package org.store.viarestaurant.viewModel;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,6 +28,8 @@ import org.store.viarestaurant.dao.ReservationDAOImpl;
 import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.ReservationDto.TableBookingRequest;
 
 public class HostController
 {
@@ -35,6 +38,7 @@ public class HostController
   private static final int SLOT_WIDTH = 80;
   private static final int LABEL_WIDTH = 80;
   private static final int ROW_HEIGHT = 56;
+  protected Client client;
 
   private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
   private final Map<String, Integer> reservableTables = new LinkedHashMap<>();
@@ -78,6 +82,14 @@ public class HostController
     this.partySizeField = partySize;
     this.tableComboBox = tableCombo;
     this.newReservationErrorLabel = errorLabel;
+  }
+  public void initClient(Client client){
+    this.client = client;
+
+    client.setReservationCreatedListener(message ->
+    {
+      refreshSchedule();
+    });
   }
 
   public void openNewReservationModal()
@@ -147,11 +159,12 @@ public class HostController
     try
     {
       RestaurantTable table = tableDAO.getRestaurantTableByID(tableId);
-      reservationDAO.createReservation(guestName, LocalDateTime.of(date, time), partySize, table);
+
+      TableBookingRequest request = new TableBookingRequest(guestName,LocalDateTime.of(date, time), partySize, table);
+      client.send(request);
       closeNewReservationModal();
-      refreshSchedule();
     }
-    catch (SQLException e)
+    catch (SQLException | IOException e)
     {
       showReservationError(e.getMessage());
     }
