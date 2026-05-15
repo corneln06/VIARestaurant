@@ -18,7 +18,7 @@ public class Client
 
   private Consumer<LoginResponse> loginListener;
   private Consumer<GetTablesResponse> tablesListener;
-  private Consumer<GetReservationResponse> reservationsListener;
+  private Consumer<GetReservationsResponse> reservationsListener;
   private Consumer<CreateReservationResponse> createReservationListener;
   private Consumer<ReservationCreatedMessage> reservationCreatedListener;
 
@@ -60,7 +60,7 @@ public class Client
             {
               tablesListener.accept(response);
             }
-            else if(object instanceof GetReservationResponse response && reservationsListener != null)
+            else if(object instanceof GetReservationsResponse response && reservationsListener != null)
             {
               reservationsListener.accept(response);
             }
@@ -95,7 +95,7 @@ public class Client
     this.tablesListener = listener;
   }
 
-  public void setReservationsListener(Consumer<GetReservationResponse> listener)
+  public void setReservationsListener(Consumer<GetReservationsResponse> listener)
   {
     this.reservationsListener = listener;
   }

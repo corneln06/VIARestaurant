@@ -31,10 +31,9 @@ public class ServerConnection implements Runnable
   {
     this.socket = connectionSocket;
     this.connectionPool = connectionPool;
-    this.workersDAO =
-        WorkersDAOImpl.getInstance();
     try
     {
+      this.workersDAO = WorkersDAOImpl.getInstance();
       this.reservationDAO = ReservationDAOImpl.getInstance();
       this.restaurantTableDAO = RestaurantTableDAOImpl.getInstance();
     }
@@ -144,22 +143,22 @@ public class ServerConnection implements Runnable
     }
     catch (SQLException e)
     {
-      send(new GetReservationResponse(new ArrayList<>()));
-      throw new RuntimeException(e);
+      e.printStackTrace();
+      send(new GetTablesResponse((new ArrayList<>())));
     }
   }
   private void handleGetReservations() throws IOException
   {
     try
     {
-      send(new GetReservationResponse(
+      send(new GetReservationsResponse(
           reservationDAO.getAllReservationsForToday()
       ));
     }
     catch(SQLException e)
     {
       e.printStackTrace();
-      send(new GetReservationResponse(new ArrayList<>()));
+      send(new GetReservationsResponse(new ArrayList<>()));
     }
   }
   private void handleLogin(LoginRequest request)

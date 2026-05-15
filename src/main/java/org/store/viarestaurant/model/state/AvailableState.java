@@ -2,7 +2,9 @@ package org.store.viarestaurant.model.state;
 
 import org.store.viarestaurant.model.entities.RestaurantTable;
 
-public class AvailableState implements TableState
+import java.io.Serializable;
+
+public class AvailableState implements TableState, Serializable
 {
   public void setAvailable(RestaurantTable restaurantTable) {
     System.out.print("already available");
