@@ -139,7 +139,7 @@
                                 <String fx:value="modal-card-large"/>
                             </styleClass>
                             <children>
-                                <Label styleClass="modal-title" text="New Reservation"/>
+                                <Label fx:id="modalTitle" styleClass="modal-title" text="New Reservation"/>
                                 <TextField fx:id="guestNameField" promptText="Guest name" styleClass="input-field"/>
                                 <HBox spacing="12.0">
                                     <children>
@@ -160,20 +160,35 @@
                                        visible="false" wrapText="true"/>
                                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
                                     <children>
+
                                         <Button onAction="#closeNewReservationModalAction"
                                                 text="Cancel">
-                                        <styleClass>
-                                            <String fx:value="btn-base"/>
-                                            <String fx:value="btn-danger"/>
-                                        </styleClass>
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-secondary"/>
+                                            </styleClass>
                                         </Button>
-                                        <Button onAction="#createReservation"
+
+                                        <Button fx:id="deleteReservationButton"
+                                                onAction="#deleteReservation"
+                                                text="Delete"
+                                                visible="false"
+                                                managed="false">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-danger"/>
+                                            </styleClass>
+                                        </Button>
+
+                                        <Button fx:id="submitReservationButton"
+                                                onAction="#createReservation"
                                                 text="Create">
-                                        <styleClass>
-                                            <String fx:value="btn-base"/>
-                                            <String fx:value="btn-primary"/>
-                                        </styleClass>
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
                                         </Button>
+
                                     </children>
                                 </HBox>
                             </children>

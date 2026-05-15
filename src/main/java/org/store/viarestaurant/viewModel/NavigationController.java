@@ -18,6 +18,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.view.HelloApplication;
 
@@ -54,6 +55,12 @@ public class NavigationController
   @FXML private ComboBox<String> tableComboBox;
   @FXML private Label newReservationErrorLabel;
 
+  @FXML private Button submitReservationButton;
+  @FXML private Button deleteReservationButton;
+
+  @FXML private Label modalTitle;
+
+
   private HostController hostController;
 
   public void initData(Workers worker)
@@ -81,7 +88,7 @@ public class NavigationController
         hostController = new HostController();
         hostController.init(reservationGrid, reservationOverlayPane);
         hostController.initModal(newReservationOverlay, guestNameField, reservationDatePicker,
-            reservationTimeField, partySizeField, tableComboBox, newReservationErrorLabel);
+            reservationTimeField, partySizeField, tableComboBox, newReservationErrorLabel,submitReservationButton,deleteReservationButton,modalTitle);
         hostController.refreshSchedule();
         showTablesPage();
       }
@@ -246,6 +253,14 @@ public class NavigationController
       {
         button.getStyleClass().remove("nav-btn-active");
       }
+    }
+  }
+  @FXML
+  private void deleteReservation()
+  {
+    if (hostController != null)
+    {
+      hostController.deleteReservation();
     }
   }
 

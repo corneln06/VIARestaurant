@@ -11,11 +11,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import javafx.fxml.FXML;
 import javafx.geometry.HPos;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -31,6 +29,10 @@ import org.store.viarestaurant.model.entities.RestaurantTable;
 
 public class HostController
 {
+  private Button submitReservationButton;
+  private Button deleteReservationButton;
+  private Label Modaltitle;
+
   private static final LocalTime SERVICE_START = LocalTime.of(17, 0);
   private static final int SLOT_COUNT = 12;
   private static final int SLOT_WIDTH = 80;
@@ -53,6 +55,8 @@ public class HostController
 
   private ReservationDAOImpl reservationDAO;
   private RestaurantTableDAOImpl tableDAO;
+  private boolean isEditMode = false;
+  private Reservation editingReservation;
 
   public void init(GridPane scheduleGrid, Pane scheduleOverlayPane)
   {
@@ -70,19 +74,25 @@ public class HostController
   }
 
   public void initModal(StackPane overlay, TextField guestName, DatePicker datePicker,
-      TextField timeField, TextField partySize, ComboBox<String> tableCombo, Label errorLabel)
+      TextField timeField, TextField partySize, ComboBox<String> tableCombo, Label errorLabel, Button submit, Button delete, Label title)
   {
     this.newReservationOverlay = overlay;
+
     this.guestNameField = guestName;
     this.reservationDatePicker = datePicker;
     this.reservationTimeField = timeField;
     this.partySizeField = partySize;
     this.tableComboBox = tableCombo;
     this.newReservationErrorLabel = errorLabel;
+    this.submitReservationButton = submit;
+    this.deleteReservationButton = delete;
+    this.Modaltitle = title;
   }
 
   public void openNewReservationModal()
   {
+    setEditMode(false);
+    Modaltitle.setText("New Reservation");
     guestNameField.clear();
     partySizeField.clear();
     reservationDatePicker.setValue(LocalDate.now());
@@ -95,6 +105,8 @@ public class HostController
 
   public void closeNewReservationModal()
   {
+    setEditMode(false);
+    editingReservation = null;
     hideOverlay(newReservationOverlay);
   }
 
@@ -103,69 +115,79 @@ public class HostController
     hideReservationError();
 
     String guestName = guestNameField.getText() == null ? "" : guestNameField.getText().trim();
-    if (guestName.isBlank())
-    {
+    if (guestName.isBlank()) {
       showReservationError("Guest name is required.");
       return;
     }
 
     LocalDate date = reservationDatePicker.getValue();
-    if (date == null)
-    {
+    if (date == null) {
       showReservationError("Select a reservation date.");
       return;
     }
 
     LocalTime time;
-    try
-    {
+    try {
       time = LocalTime.parse(reservationTimeField.getText().trim(), timeFormatter);
-    }
-    catch (DateTimeParseException e)
-    {
+    } catch (DateTimeParseException e) {
       showReservationError("Time must use 24-hour HH:mm format.");
       return;
     }
 
     int partySize;
-    try
-    {
+    try {
       partySize = Integer.parseInt(partySizeField.getText().trim());
-    }
-    catch (NumberFormatException e)
-    {
+    } catch (NumberFormatException e) {
       showReservationError("Party size must be a whole number.");
       return;
     }
 
     Integer tableId = reservableTables.get(tableComboBox.getValue());
-    if (tableId == null)
-    {
+    if (tableId == null) {
       showReservationError("Select a table.");
       return;
     }
 
-    try
-    {
+    try {
       RestaurantTable table = tableDAO.getRestaurantTableByID(tableId);
-      ArrayList<Reservation> sameTimeReservations = reservationDAO.getReservationByDate(LocalDateTime.of(date, time));
-        Reservation repeatedReservation = sameTimeReservations.stream()
-                .filter(reservation ->
-                        Objects.equals(reservation.getTable().getId(), tableId)
-                )
-                .findFirst()
-                .orElse(null);
+      LocalDateTime dt = LocalDateTime.of(date, time);
 
-        if (repeatedReservation == null) {
-            reservationDAO.createReservation(guestName, LocalDateTime.of(date, time), partySize, table);
-            closeNewReservationModal();
-            refreshSchedule();
-        }else {
-            showReservationError("That table is already reserved for that time, please select another one.");
-        }
-    }
-    catch (SQLException e)
-    {
+      // EDIT MODE
+      if (isEditMode) {
+
+        editingReservation.setName(guestName);
+        editingReservation.setPartySize(partySize);
+        editingReservation.setDateTime(dt);
+        editingReservation.setTable(table);
+
+        reservationDAO.updateReservation(editingReservation);
+
+        isEditMode = false;
+        editingReservation = null;
+
+        closeNewReservationModal();
+        refreshSchedule();
+        return;
+      }
+
+      // CREATE MODE
+      ArrayList<Reservation> sameTimeReservations =
+              reservationDAO.getReservationByDate(dt);
+
+      boolean conflict = sameTimeReservations.stream()
+              .anyMatch(reservation ->
+                      Objects.equals(reservation.getTable().getId(), tableId)
+              );
+
+      if (!conflict) {
+        reservationDAO.createReservation(guestName, dt, partySize, table);
+        closeNewReservationModal();
+        refreshSchedule();
+      } else {
+        showReservationError("That table is already reserved for that time, please select another one.");
+      }
+
+    } catch (SQLException e) {
       showReservationError(e.getMessage());
     }
   }
@@ -233,12 +255,22 @@ public class HostController
     for (Reservation r : reservations)
     {
       int minutesFromStart = r.getDateTime().getHour() * 60
-          + r.getDateTime().getMinute()
-          - SERVICE_START.getHour() * 60;
+              + r.getDateTime().getMinute()
+              - SERVICE_START.getHour() * 60;
+
       int startCol = Math.max(0, Math.min(SLOT_COUNT - 1, minutesFromStart / 30));
+
       Label block = new Label(r.getName() + " • " + r.getPartySize() + " guests");
       block.getStyleClass().add("reservation-block");
       block.setMaxWidth(Double.MAX_VALUE);
+      block.setUserData(r);
+
+      block.setOnMouseClicked(e -> {
+        Reservation reservation = (Reservation) block.getUserData();
+
+        openReservationAsForm(reservation);
+      });
+
       scheduleGrid.add(block, startCol + 1, r.getTable().getId());
       GridPane.setColumnSpan(block, 2);
     }
@@ -304,5 +336,69 @@ public class HostController
   {
     newReservationErrorLabel.setVisible(false);
     newReservationErrorLabel.setManaged(false);
+  }
+
+  public void openReservationAsForm(Reservation r)
+  {
+    setEditMode(true);
+    Modaltitle.setText("Reservation " + r.getId() + " details");
+    editingReservation = r;
+
+    guestNameField.setText(r.getName());
+    partySizeField.setText(String.valueOf(r.getPartySize()));
+
+    reservationDatePicker.setValue(r.getDateTime().toLocalDate());
+    reservationTimeField.setText(
+            r.getDateTime().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+    );
+
+    hideReservationError();
+    populateTableCombo();
+
+    String selected = reservableTables.entrySet().stream()
+            .filter(e -> e.getValue().equals(r.getTable().getId()))
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElse(null);
+
+    tableComboBox.setValue(selected);
+
+    showOverlay(newReservationOverlay);
+  }
+
+  public void deleteReservation()
+  {
+    if (editingReservation == null) return;
+
+    try {
+      reservationDAO.deleteById(editingReservation.getId());
+
+      isEditMode = false;
+      editingReservation = null;
+
+      closeNewReservationModal();
+      refreshSchedule();
+
+    } catch (SQLException e) {
+      showReservationError(e.getMessage());
+    }
+  }
+  private void setEditMode(boolean edit)
+  {
+    isEditMode = edit;
+
+    if (edit)
+    {
+      submitReservationButton.setText("Apply");
+      deleteReservationButton.setVisible(true);
+      deleteReservationButton.setManaged(true);
+    }
+    else
+    {
+      submitReservationButton.setText("Create");
+      deleteReservationButton.setVisible(false);
+      deleteReservationButton.setManaged(false);
+      editingReservation = null;
+    }
   }
 }
