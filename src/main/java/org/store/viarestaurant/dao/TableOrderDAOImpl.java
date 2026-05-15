@@ -71,25 +71,8 @@ public class TableOrderDAOImpl implements TableOrderDAO {
             if (rs.next()) {
 
                 Integer id = rs.getInt("id");
-                ////////////////////////////////////////
-                /// Maybe changing this part to use the
-                /// newly created MenuItemTableOrderDAO ??
-                ////////////////////////////////////////
-                if (menuItems != null && !menuItems.isEmpty()) {
-                    try (PreparedStatement menuItemStatement = connection.prepareStatement("INSERT INTO MenuItemsTableOrder (menuItemId, tableOrderId) VALUES (?, ?)")) {
 
-                        for (String itemName : menuItems) {
-                            MenuItems items = menuItemDAO.getMenuItemByName(itemName);
-
-                            if (items != null) {
-                                menuItemStatement.setInt(1, items.getId());
-                                menuItemStatement.setInt(2, id);
-                                menuItemStatement.executeUpdate();
-                            }
-                        }
-                    }
-                }
-                /////////////////////////////////////////////////
+                MenuItemTableOrderDAOImpl.getInstance().addMenuItemsInTableOrder(connection ,id, menuItems);
 
                 RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
 

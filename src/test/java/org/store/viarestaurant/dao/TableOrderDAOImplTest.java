@@ -1,6 +1,7 @@
 package org.store.viarestaurant.dao;
 
 import org.junit.jupiter.api.*;
+import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.TableOrder;
@@ -9,6 +10,7 @@ import org.store.viarestaurant.model.enums.MenuTypes;
 import org.store.viarestaurant.model.enums.WorkerRole;
 
 import java.awt.*;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -134,7 +136,7 @@ public class TableOrderDAOImplTest {
         order.setWaiter(testWorker2);
 
         order.addMenuItems(newItem2.getName());
-        menuItemTableOrderDAO.addMenuItemsInTableOrder(order.getId(), order.getMenuItems());
+        menuItemTableOrderDAO.addMenuItemsInTableOrder(DatabaseConnection.getConnection() ,order.getId(), order.getMenuItems());
         menuItemList.add(newItem2.getName());
 
         order.setBill(order.getBill()+ newItem2.getPrice());

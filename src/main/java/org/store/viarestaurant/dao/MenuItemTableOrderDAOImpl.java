@@ -67,41 +67,36 @@ public class MenuItemTableOrderDAOImpl implements MenuItemTableOrderDAO {
     }
 
     @Override
-    public void addMenuItemsInTableOrder(
-            Integer tableOrderId,
-            ArrayList<String> menuItems
-    ) throws SQLException {
+    public void addMenuItemsInTableOrder(Connection connection, Integer tableOrderId, ArrayList<String> menuItems) throws SQLException {
 
-        try (Connection connection = getConnection()) {
+                PreparedStatement findItemStmt =
+                        connection.prepareStatement(
+                                "SELECT id FROM MenuItems WHERE name = ?"
+                        );
 
-            PreparedStatement findItemStmt =
-                    connection.prepareStatement(
-                            "SELECT id FROM MenuItems WHERE name = ?"
-                    );
+                PreparedStatement insertStmt =
+                        connection.prepareStatement(
+                                "INSERT INTO MenuItemsTableOrder (menuItemId, tableOrderId) " +
+                                        "VALUES (?, ?) " +
+                                        "ON CONFLICT (menuItemId, tableOrderId) DO NOTHING"
+                        );
 
-            PreparedStatement insertStmt =
-                    connection.prepareStatement(
-                            "INSERT INTO MenuItemsTableOrder (menuItemId, tableOrderId) " +
-                                    "VALUES (?, ?) " +
-                                    "ON CONFLICT (menuItemId, tableOrderId) DO NOTHING"
-                    );
+                for (String itemName : menuItems) {
 
-            for (String itemName : menuItems) {
+                    findItemStmt.setString(1, itemName);
 
-                findItemStmt.setString(1, itemName);
+                    ResultSet rs = findItemStmt.executeQuery();
 
-                ResultSet rs = findItemStmt.executeQuery();
+                    if (!rs.next()) continue;
 
-                if (!rs.next()) continue;
+                    int menuItemId = rs.getInt("id");
 
-                int menuItemId = rs.getInt("id");
+                    insertStmt.setInt(1, menuItemId);
+                    insertStmt.setInt(2, tableOrderId);
 
-                insertStmt.setInt(1, menuItemId);
-                insertStmt.setInt(2, tableOrderId);
+                    insertStmt.executeUpdate();
+                }
 
-                insertStmt.executeUpdate();
-            }
-        }
     }
 
     @Override
@@ -127,7 +122,6 @@ public class MenuItemTableOrderDAOImpl implements MenuItemTableOrderDAO {
             statement.setInt(1, tableOrderId);
 
             ResultSet rs = statement.executeQuery();
-            ArrayList<MenuItems> items = new ArrayList<>();
 
             Map<Integer, MenuItems> map = new HashMap<>();
 
