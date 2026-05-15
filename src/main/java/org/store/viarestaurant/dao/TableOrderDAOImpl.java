@@ -71,7 +71,10 @@ public class TableOrderDAOImpl implements TableOrderDAO {
             if (rs.next()) {
 
                 Integer id = rs.getInt("id");
-
+                ////////////////////////////////////////
+                /// Maybe changing this part to use the
+                /// newly created MenuItemTableOrderDAO ??
+                ////////////////////////////////////////
                 if (menuItems != null && !menuItems.isEmpty()) {
                     try (PreparedStatement menuItemStatement = connection.prepareStatement("INSERT INTO MenuItemsTableOrder (menuItemId, tableOrderId) VALUES (?, ?)")) {
 
@@ -86,6 +89,8 @@ public class TableOrderDAOImpl implements TableOrderDAO {
                         }
                     }
                 }
+                /////////////////////////////////////////////////
+
                 RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
 
                 Workers waiter = workersDAO.getWorkerById(waiterId);
@@ -144,7 +149,6 @@ public class TableOrderDAOImpl implements TableOrderDAO {
                 String itemName = rs.getString("ItemName");
 
                 RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
-                // TEMPORARY
                 Workers waiter = workersDAO.getWorkerById(waiterId);
 
                 TableOrder tableOrder =
@@ -206,9 +210,8 @@ public class TableOrderDAOImpl implements TableOrderDAO {
                     String itemName = rs.getString("ItemName");
 
                     RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
-
-                    // TEMPORARY
                     Workers waiter = workersDAO.getWorkerById(waiterId);
+
                     tableOrder =
                             new TableOrder(
                                     id,

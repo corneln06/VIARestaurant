@@ -22,6 +22,7 @@ public class TableOrderDAOImplTest {
     private RestaurantTable testTable, testTable2;
     private Workers testWorker, testWorker2;
     private MenuItemDAO menuItemDAO;
+    private MenuItemTableOrderDAO menuItemTableOrderDAO;
     private AllergyDAO allergyDAO;
     ArrayList<String> allergiesList = new ArrayList<>();
     ArrayList<String> menuItemList = new ArrayList<>();
@@ -34,6 +35,7 @@ public class TableOrderDAOImplTest {
     void setup() throws SQLException {
         dao = TableOrderDAOImpl.getInstance();
         menuItemDAO = MenuItemDAOImpl.getInstance();
+        menuItemTableOrderDAO = MenuItemTableOrderDAOImpl.getInstance();
         allergyDAO = AllergyDAOImpl.getInstance();
         testTable = RestaurantTableDAOImpl.getInstance().createRestaurantTable(4);
         testTable2 = RestaurantTableDAOImpl.getInstance().createRestaurantTable(6);
@@ -130,6 +132,11 @@ public class TableOrderDAOImplTest {
         TableOrder order = dao.getTableOrderByID(createdId);
         order.setTable(testTable2);
         order.setWaiter(testWorker2);
+
+        order.addMenuItems(newItem2.getName());
+        menuItemTableOrderDAO.addMenuItemsInTableOrder(order.getId(), order.getMenuItems());
+        menuItemList.add(newItem2.getName());
+
         order.setBill(order.getBill()+ newItem2.getPrice());
 
         order = dao.updateTableOrder(order);

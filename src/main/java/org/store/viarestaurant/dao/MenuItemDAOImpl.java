@@ -8,6 +8,7 @@ import org.store.viarestaurant.model.enums.MenuTypes;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MenuItemDAOImpl implements MenuItemDAO {
 
@@ -230,6 +231,7 @@ public class MenuItemDAOImpl implements MenuItemDAO {
             connection.setAutoCommit(false);
 
             try {
+                MenuItems existing = getMenuItemById(item.getId());
 
                 PreparedStatement statement = connection.prepareStatement(
                         "UPDATE menuitems SET " +
@@ -253,18 +255,18 @@ public class MenuItemDAOImpl implements MenuItemDAO {
                             "Menu item with id " + item.getId() + " not found"
                     );
                 }
-                /// Ask professor about it and the right approach.
-                /// delete old allergies
-                PreparedStatement deleteAllergies =
-                        connection.prepareStatement(
+                /// check if the array actually changed
+                if( !Objects.equals(item.getAllergies(), existing.getAllergies()))
+                {  /// Delete old allergies
+                    PreparedStatement deleteAllergies = connection.prepareStatement(
                                 "DELETE FROM menuitemsallergies WHERE menuitemid=?"
                         );
 
-                deleteAllergies.setInt(1, item.getId());
-                deleteAllergies.executeUpdate();
+                    deleteAllergies.setInt(1, item.getId());
+                    deleteAllergies.executeUpdate();
 
                 /// insert new allergies
-                if (item.getAllergies() != null && !item.getAllergies().isEmpty()) {
+                    if (item.getAllergies() != null && !item.getAllergies().isEmpty()) {
 
                     PreparedStatement insertAllergy =
                             connection.prepareStatement(
@@ -287,6 +289,7 @@ public class MenuItemDAOImpl implements MenuItemDAO {
 
                     insertAllergy.executeBatch();
                 }
+            }
 
                 connection.commit();
                 return item;
