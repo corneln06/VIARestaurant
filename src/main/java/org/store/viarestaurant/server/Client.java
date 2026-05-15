@@ -13,7 +13,6 @@ public class Client
     public void connect() throws IOException
     {
 
-      //Socket socket = new Socket("10.154.198.16", 2910);
       Socket socket = new Socket("localhost", 2910);
 
       outputStream = new ObjectOutputStream(socket.getOutputStream());
