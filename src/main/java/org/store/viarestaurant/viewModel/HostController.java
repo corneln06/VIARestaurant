@@ -9,7 +9,6 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import javafx.geometry.HPos;
 import javafx.scene.control.ComboBox;
@@ -64,8 +63,14 @@ public class HostController
     this.scheduleOverlayPane = scheduleOverlayPane;
   }
 
-  public void initModal(StackPane overlay, TextField guestName, DatePicker datePicker,
-      TextField timeField, TextField partySize, ComboBox<String> tableCombo, Label errorLabel)
+  public void initModal(
+      StackPane overlay,
+      TextField guestName,
+      DatePicker datePicker,
+      TextField timeField,
+      TextField partySize,
+      ComboBox<String> tableCombo,
+      Label errorLabel)
   {
     this.newReservationOverlay = overlay;
     this.guestNameField = guestName;
@@ -118,8 +123,10 @@ public class HostController
     partySizeField.clear();
     reservationDatePicker.setValue(LocalDate.now());
     reservationTimeField.setText("19:00");
+
     hideReservationError();
     populateTableCombo();
+
     tableComboBox.getSelectionModel().clearSelection();
     showOverlay(newReservationOverlay);
   }
@@ -133,7 +140,10 @@ public class HostController
   {
     hideReservationError();
 
-    String guestName = guestNameField.getText() == null ? "" : guestNameField.getText().trim();
+    String guestName =
+        guestNameField.getText() == null
+            ? ""
+            : guestNameField.getText().trim();
 
     if(guestName.isBlank())
     {
@@ -153,7 +163,10 @@ public class HostController
 
     try
     {
-      time = LocalTime.parse(reservationTimeField.getText().trim(), timeFormatter);
+      time = LocalTime.parse(
+          reservationTimeField.getText().trim(),
+          timeFormatter
+      );
     }
     catch(DateTimeParseException e)
     {
@@ -165,7 +178,9 @@ public class HostController
 
     try
     {
-      partySize = Integer.parseInt(partySizeField.getText().trim());
+      partySize = Integer.parseInt(
+          partySizeField.getText().trim()
+      );
     }
     catch(NumberFormatException e)
     {
@@ -173,7 +188,8 @@ public class HostController
       return;
     }
 
-    RestaurantTable table = reservableTables.get(tableComboBox.getValue());
+    RestaurantTable table =
+        reservableTables.get(tableComboBox.getValue());
 
     if(table == null)
     {
@@ -183,22 +199,15 @@ public class HostController
 
     try
     {
-      RestaurantTable table = tableDAO.getRestaurantTableByID(tableId);
-      ArrayList<Reservation> sameTimeReservations = reservationDAO.getReservationByDate(LocalDateTime.of(date, time));
-        Reservation repeatedReservation = sameTimeReservations.stream()
-                .filter(reservation ->
-                        Objects.equals(reservation.getTable().getId(), tableId)
-                )
-                .findFirst()
-                .orElse(null);
+      TableBookingRequest request =
+          new TableBookingRequest(
+              guestName,
+              LocalDateTime.of(date, time),
+              partySize,
+              table
+          );
 
-        if (repeatedReservation == null) {
-            reservationDAO.createReservation(guestName, LocalDateTime.of(date, time), partySize, table);
-            closeNewReservationModal();
-            refreshSchedule();
-        }else {
-            showReservationError("That table is already reserved for that time, please select another one.");
-        }
+      client.send(request);
     }
     catch(IOException e)
     {
@@ -226,7 +235,7 @@ public class HostController
 
   private void drawSchedule()
   {
-    if(scheduleGrid == null)
+    if(scheduleGrid == null || scheduleOverlayPane == null)
     {
       return;
     }
@@ -264,7 +273,13 @@ public class HostController
 
     for(int s = 0; s < SLOT_COUNT; s++)
     {
-      Label timeLabel = new Label(SERVICE_START.plusMinutes(s * 30L).format(timeFormatter));
+      Label timeLabel =
+          new Label(
+              SERVICE_START
+                  .plusMinutes(s * 30L)
+                  .format(timeFormatter)
+          );
+
       timeLabel.getStyleClass().add("gantt-header");
       GridPane.setHalignment(timeLabel, HPos.CENTER);
       scheduleGrid.add(timeLabel, s + 1, 0);
@@ -279,32 +294,49 @@ public class HostController
 
       Label lbl = new Label("T" + table.getId());
       lbl.getStyleClass().add("gantt-table-label");
+
       scheduleGrid.add(lbl, 0, rowIndex);
 
       rowIndex++;
     }
 
-    for(Reservation r : reservations)
+    for(Reservation reservation : reservations)
     {
-      if(r.getTable() == null)
+      if(reservation.getTable() == null)
       {
         continue;
       }
 
-      Integer row = tableRows.get(r.getTable().getId());
+      Integer row =
+          tableRows.get(reservation.getTable().getId());
 
       if(row == null)
       {
         continue;
       }
 
-      int minutesFromStart = r.getDateTime().getHour() * 60
-          + r.getDateTime().getMinute()
-          - SERVICE_START.getHour() * 60;
+      int minutesFromStart =
+          reservation.getDateTime().getHour() * 60
+              + reservation.getDateTime().getMinute()
+              - SERVICE_START.getHour() * 60;
 
-      int startCol = Math.max(0, Math.min(SLOT_COUNT - 1, minutesFromStart / 30));
+      int startCol =
+          Math.max(
+              0,
+              Math.min(
+                  SLOT_COUNT - 1,
+                  minutesFromStart / 30
+              )
+          );
 
-      Label block = new Label(r.getName() + " • " + r.getPartySize() + " guests");
+      Label block =
+          new Label(
+              reservation.getName()
+                  + " • "
+                  + reservation.getPartySize()
+                  + " guests"
+          );
+
       block.getStyleClass().add("reservation-block");
       block.setMaxWidth(Double.MAX_VALUE);
 
@@ -312,21 +344,35 @@ public class HostController
       GridPane.setColumnSpan(block, 2);
     }
 
-    double totalWidth = LABEL_WIDTH + SLOT_COUNT * SLOT_WIDTH;
-    double totalHeight = 40 + tables.size() * ROW_HEIGHT;
+    double totalWidth =
+        LABEL_WIDTH + SLOT_COUNT * SLOT_WIDTH;
+
+    double totalHeight =
+        40 + tables.size() * ROW_HEIGHT;
 
     scheduleGrid.setPrefSize(totalWidth, totalHeight);
     scheduleOverlayPane.setPrefSize(totalWidth, totalHeight);
 
-    long minutesNow = LocalTime.now().getHour() * 60L + LocalTime.now().getMinute();
-    long minutesStart = SERVICE_START.getHour() * 60L;
-    long minutesEnd = LocalTime.of(23, 0).getHour() * 60L;
+    long minutesNow =
+        LocalTime.now().getHour() * 60L
+            + LocalTime.now().getMinute();
+
+    long minutesStart =
+        SERVICE_START.getHour() * 60L;
+
+    long minutesEnd =
+        LocalTime.of(23, 0).getHour() * 60L;
 
     if(minutesNow >= minutesStart && minutesNow <= minutesEnd)
     {
-      double offset = (minutesNow - minutesStart) / 30.0 * SLOT_WIDTH;
+      double offset =
+          (minutesNow - minutesStart)
+              / 30.0
+              * SLOT_WIDTH;
 
-      Rectangle nowLine = new Rectangle(2, totalHeight);
+      Rectangle nowLine =
+          new Rectangle(2, totalHeight);
+
       nowLine.setFill(Color.RED);
       nowLine.setLayoutX(LABEL_WIDTH + offset);
       nowLine.setLayoutY(0);
@@ -347,7 +393,13 @@ public class HostController
 
     for(RestaurantTable table : tables)
     {
-      String label = "Table " + table.getId() + " • " + table.getMaxSitting() + " seats";
+      String label =
+          "Table "
+              + table.getId()
+              + " • "
+              + table.getMaxSitting()
+              + " seats";
+
       reservableTables.put(label, table);
       tableComboBox.getItems().add(label);
     }
