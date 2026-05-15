@@ -12,11 +12,11 @@ public class TableOrder {
     private Workers waiter;
     private String notes;
     private double bill;
-    private ArrayList<OrderItem> menuItems;
+    private ArrayList<String> menuItems;
     private boolean isReservation;
     private boolean isPaid;
 
-    public TableOrder(int id, RestaurantTable restaurantTable, Workers waiter, String notes, ArrayList<OrderItem> menuItems, double bill, boolean isReservation) {
+    public TableOrder(int id, RestaurantTable restaurantTable, Workers waiter, String notes, ArrayList<String> menuItems, double bill, boolean isReservation) {
         this.id = id;
         this.restaurantTable = restaurantTable;
         this.waiter = waiter;
@@ -75,20 +75,14 @@ public class TableOrder {
         isPaid = paid;
     }
 
-    public ArrayList<OrderItem> getMenuItems() {
+    public ArrayList<String> getMenuItems() {
         return menuItems;
     }
 
-    public void addMenuItem(MenuItems menuItem) {
-
-        for(OrderItem item : menuItems) {
-
-            if(item.getMenuItem().getId() == menuItem.getId()) {
-                item.incrementQuantity();
-                return;
-            }
-        }
-
-        menuItems.add(new OrderItem(0, menuItem, 1));
+    public void addMenuItems(String menuItem) {
+        menuItems.add(menuItem);
+    }
+    public void removeMenuItems(String menuItem){
+        menuItems.remove(menuItem);
     }
 }

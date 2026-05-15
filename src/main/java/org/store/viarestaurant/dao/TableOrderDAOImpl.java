@@ -11,18 +11,18 @@ import java.util.NoSuchElementException;
 public class TableOrderDAOImpl implements TableOrderDAO {
 
     private static TableOrderDAOImpl instance;
-    private final RestaurantTableDAO restaurantTableDAO = RestaurantTableDAOImpl.getInstance();
-    private final WorkersDAO workersDAO = WorkersDAOImpl.getInstance();
-    private final MenuItemDAO menuItemDAO = MenuItemDAOImpl.getInstance();
+
 
     private TableOrderDAOImpl() throws SQLException {
+
         DriverManager.registerDriver(new Driver());
+
     }
 
     public static synchronized TableOrderDAOImpl getInstance()
             throws SQLException {
 
-        if(instance == null) {
+        if (instance == null) {
             instance = new TableOrderDAOImpl();
         }
 
@@ -33,18 +33,21 @@ public class TableOrderDAOImpl implements TableOrderDAO {
         return DatabaseConnection.getConnection();
     }
 
+    private final RestaurantTableDAO restaurantTableDAO = RestaurantTableDAOImpl.getInstance();
+    private final WorkersDAO workersDAO = WorkersDAOImpl.getInstance();
+    private final MenuItemDAO menuItemDAO = MenuItemDAOImpl.getInstance();
+
     @Override
     public TableOrder createTableOrder(
             Integer tableId,
             Integer waiterId,
             String notes,
             double bill,
-            ArrayList<OrderItem> menuItems,
+            ArrayList<String> menuItems,
             boolean isReservation
     ) throws SQLException {
 
-        try(Connection connection = getConnection()) {
-            connection.setAutoCommit(false);
+        try (Connection connection = getConnection()) {
 
             PreparedStatement statement =
                     connection.prepareStatement(
@@ -52,9 +55,7 @@ public class TableOrderDAOImpl implements TableOrderDAO {
                             "INSERT INTO tableorders " +
                                     "(tableid, waiterid, notes, bill, " +
                                     "isreservation, ispaid) " +
-
                                     "VALUES (?, ?, ?, ?, ?, ?) " +
-
                                     "RETURNING id"
                     );
 
@@ -67,91 +68,99 @@ public class TableOrderDAOImpl implements TableOrderDAO {
 
             ResultSet rs = statement.executeQuery();
 
-            if(!rs.next()) {
-                throw new SQLException(
-                        "Failed to create TableOrder"
+            if (rs.next()) {
+
+                Integer id = rs.getInt("id");
+
+                if (menuItems != null && !menuItems.isEmpty()) {
+                    try (PreparedStatement menuItemStatement = connection.prepareStatement("INSERT INTO MenuItemsTableOrder (menuItemId, tableOrderId) VALUES (?, ?)")) {
+
+                        for (String itemName : menuItems) {
+                            MenuItems items = menuItemDAO.getMenuItemByName(itemName);
+
+                            if (items != null) {
+                                menuItemStatement.setInt(1, items.getId());
+                                menuItemStatement.setInt(2, id);
+                                menuItemStatement.executeUpdate();
+                            }
+                        }
+                    }
+                }
+                RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
+
+                Workers waiter = workersDAO.getWorkerById(waiterId);
+
+                return new TableOrder(
+                        id,
+                        restaurantTable,
+                        waiter,
+                        notes,
+                        menuItems,
+                        bill,
+                        isReservation
                 );
             }
 
-            Integer orderId = rs.getInt("id");
-
-            if(menuItems != null && !menuItems.isEmpty()) {
-                PreparedStatement menuItemStatement =
-                        connection.prepareStatement(
-                                "INSERT INTO MenuItemsTableOrder " +
-                                        "(menuitemid, tableorderid, quantity) " +
-                                        "VALUES (?, ?, ?)"
-                        );
-
-                for(OrderItem item : menuItems) {
-                    menuItemStatement.setInt(1, item.getMenuItem().getId());
-                    menuItemStatement.setInt(2, orderId);
-                    menuItemStatement.setInt(3, item.getQuantity());
-
-                    menuItemStatement.executeUpdate();
-                }
-            }
-
-            connection.commit();
-
-            RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
-            Workers waiter = workersDAO.getWorkerById(waiterId);
-
-            TableOrder tableOrder =
-                    new TableOrder(
-                            orderId,
-                            restaurantTable,
-                            waiter,
-                            notes,
-                            menuItems,
-                            bill,
-                            isReservation
-                    );
-
-            tableOrder.setPaid(false);
-
-            return tableOrder;
+            throw new SQLException("No ID returned");
         }
     }
 
     @Override
-    public ArrayList<TableOrder> getAllTableOrders() throws SQLException {
+    public ArrayList<TableOrder> getAllTableOrders()
+            throws SQLException {
 
-        try(Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(
-                            "SELECT * FROM tableorders"
+        try (Connection connection = getConnection()) {
+
+            PreparedStatement statement =
+                    connection.prepareStatement(
+                            "SELECT t.id, " +
+                                    " t.tableid," +
+                                    " t.waiterid," +
+                                    " t.notes," +
+                                    " t.bill ," +
+                                    " t.isReservation as Reserved," +
+                                    " t.isPaid as Paid," +
+                                    "mi.name as ItemName" +
+                                    "  FROM tableorders t" +
+                                    " left join MenuItemsTableOrder mt on t.id = mt.tableorderid" +
+                                    " left join menuitems mi on mt.menuitemid = mi.id " +
+                                    "ORDER by t.id"
                     );
 
             ResultSet rs = statement.executeQuery();
 
-            ArrayList<TableOrder> finalList = new ArrayList<>();
+            ArrayList<TableOrder> finalList =
+                    new ArrayList<>();
 
-            while(rs.next()) {
-                Integer orderId = rs.getInt("id");
+            while (rs.next()) {
+
+                Integer id = rs.getInt("id");
                 Integer tableId = rs.getInt("tableid");
                 Integer waiterId = rs.getInt("waiterid");
                 String notes = rs.getString("notes");
                 double bill = rs.getDouble("bill");
-                boolean isReservation = rs.getBoolean("isreservation");
-                boolean isPaid = rs.getBoolean("ispaid");
+                boolean isReservation = rs.getBoolean("Reserved");
+                boolean isPaid = rs.getBoolean("Paid");
+                String itemName = rs.getString("ItemName");
 
                 RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
+                // TEMPORARY
                 Workers waiter = workersDAO.getWorkerById(waiterId);
-
-                ArrayList<OrderItem> items = getOrderItemsByOrderId(orderId);
 
                 TableOrder tableOrder =
                         new TableOrder(
-                                orderId,
+                                id,
                                 restaurantTable,
                                 waiter,
                                 notes,
-                                items,
+                                new ArrayList<>(),
                                 bill,
                                 isReservation
                         );
 
                 tableOrder.setPaid(isPaid);
+                if (itemName != null)
+                    tableOrder.addMenuItems(itemName);
 
                 finalList.add(tableOrder);
             }
@@ -164,151 +173,213 @@ public class TableOrderDAOImpl implements TableOrderDAO {
     public TableOrder getTableOrderByID(Integer id)
             throws SQLException {
 
-        try(Connection connection = getConnection()) {
+        try (Connection connection = getConnection()) {
 
-            PreparedStatement statement = connection.prepareStatement(
-                            "SELECT * FROM tableorders WHERE id=?"
+            PreparedStatement statement =
+                    connection.prepareStatement(
+                            "SELECT t.id, " +
+                                    " t.tableid," +
+                                    " t.waiterid," +
+                                    " t.notes," +
+                                    " t.bill ," +
+                                    " t.isReservation as Reserved," +
+                                    " t.isPaid as Paid," +
+                                    "mi.name as ItemName" +
+                                    "  FROM tableorders t" +
+                                    " left join MenuItemsTableOrder mt on t.id = mt.tableorderid" +
+                                    " left join menuitems mi on mt.menuitemid = mi.id " +
+                                    "where t.id = ?"
                     );
 
             statement.setInt(1, id);
 
             ResultSet rs = statement.executeQuery();
+            TableOrder tableOrder = null;
+            while (rs.next()) {
+                if (tableOrder == null) {
+                    Integer tableId = rs.getInt("tableid");
+                    Integer waiterId = rs.getInt("waiterid");
+                    String notes = rs.getString("notes");
+                    double bill = rs.getDouble("bill");
+                    boolean isReservation = rs.getBoolean("Reserved");
+                    boolean isPaid = rs.getBoolean("Paid");
+                    String itemName = rs.getString("ItemName");
 
-            if(!rs.next()) {
-                throw new NoSuchElementException("TableOrder with id " + id + " not found");
+                    RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
+
+                    // TEMPORARY
+                    Workers waiter = workersDAO.getWorkerById(waiterId);
+                    tableOrder =
+                            new TableOrder(
+                                    id,
+                                    restaurantTable,
+                                    waiter,
+                                    notes,
+                                    new ArrayList<>(),
+                                    bill,
+                                    isReservation
+                            );
+
+
+                    tableOrder.setPaid(isPaid);
+                    if (itemName != null)
+                        tableOrder.addMenuItems(itemName);
+
+                }
             }
-
-            Integer tableId = rs.getInt("tableid");
-            Integer waiterId = rs.getInt("waiterid");
-            String notes = rs.getString("notes");
-            double bill = rs.getDouble("bill");
-            boolean isReservation = rs.getBoolean("isreservation");
-            boolean isPaid = rs.getBoolean("ispaid");
-
-            RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
-            Workers waiter =workersDAO.getWorkerById(waiterId);
-
-            ArrayList<OrderItem> items = getOrderItemsByOrderId(id);
-
-            TableOrder tableOrder =
-                    new TableOrder(
-                            id,
-                            restaurantTable,
-                            waiter,
-                            notes,
-                            items,
-                            bill,
-                            isReservation
-                    );
-
-            tableOrder.setPaid(isPaid);
-
+            if (tableOrder == null) {
+                throw new SQLException(
+                        "TableOrder with id " + id + " not found"
+                );
+            }
             return tableOrder;
         }
     }
 
-    private ArrayList<OrderItem> getOrderItemsByOrderId(Integer orderId) throws SQLException {
-
-        try(Connection connection = getConnection()) {
-
-            PreparedStatement statement = connection.prepareStatement(
-                            "SELECT * FROM MenuItemsTableOrder " +
-                                    "WHERE tableorderid=?"
-                    );
-
-            statement.setInt(1, orderId);
-
-            ResultSet rs = statement.executeQuery();
-
-            ArrayList<OrderItem> items = new ArrayList<>();
-
-            while(rs.next()) {
-                Integer orderItemId = rs.getInt("id");
-                Integer menuItemId = rs.getInt("menuitemid");
-                Integer quantity = rs.getInt("quantity");
-                MenuItems menuItem = menuItemDAO.getMenuItemById(menuItemId);
-
-                items.add(
-                        new OrderItem(
-                                orderItemId,
-                                menuItem,
-                                quantity
-                        )
-                );
-            }
-
-            return items;
-        }
-    }
-
     @Override
-    public void deleteTableOrderByID(Integer id) throws SQLException {
+    public void deleteTableOrderByID(Integer id)
+            throws SQLException {
 
-        try(Connection connection = getConnection()) {
+        try (Connection connection = getConnection()) {
 
-            PreparedStatement statement = connection.prepareStatement(
-                            "DELETE FROM tableorders " +
-                                    "WHERE id=?"
+            PreparedStatement statement =
+                    connection.prepareStatement(
+                            "DELETE FROM tableorders WHERE id=?"
                     );
 
             statement.setInt(1, id);
 
-            int rowsAffected =
-                    statement.executeUpdate();
+            int rowsAffected = statement.executeUpdate();
 
-            if(rowsAffected == 0) {
+            if (rowsAffected == 0) {
 
-                throw new SQLException("TableOrder with id " + id + " not found");
+                throw new SQLException(
+                        "TableOrder with id " + id +
+                                " not found"
+                );
             }
         }
     }
 
     @Override
     public ArrayList<TableOrder> getTableOrdersByWaiterId(Integer waiterId) throws SQLException {
+        try (Connection connection = getConnection()) {
 
-        try(Connection connection = getConnection()) {
-
-            PreparedStatement statement = connection.prepareStatement(
-                            "SELECT * FROM tableorders " +
-                                    "WHERE waiterid=?"
+            PreparedStatement statement =
+                    connection.prepareStatement(
+                            "SELECT t.id, " +
+                                    " t.tableid," +
+                                    " t.waiterid," +
+                                    " t.notes," +
+                                    " t.bill ," +
+                                    " t.isReservation as Reserved," +
+                                    " t.isPaid as Paid," +
+                                    "mi.name as ItemName" +
+                                    "  FROM tableorders t" +
+                                    " left join MenuItemsTableOrder mt on t.id = mt.tableorderid" +
+                                    " left join menuitems mi on mt.menuitemid = mi.id " +
+                                    "where t.waiterid = ?"
                     );
 
             statement.setInt(1, waiterId);
 
             ResultSet rs = statement.executeQuery();
 
-            ArrayList<TableOrder> finalList = new ArrayList<>();
+            ArrayList<TableOrder> finalList =
+                    new ArrayList<>();
 
-            while(rs.next()) {
+            while (rs.next()) {
+
                 Integer orderId = rs.getInt("id");
+                Integer tableId = rs.getInt("tableid");
+                String notes = rs.getString("notes");
+                double bill = rs.getDouble("bill");
+                boolean isReservation = rs.getBoolean("Reserved");
+                boolean isPaid = rs.getBoolean("Paid");
+                String itemName = rs.getString("ItemName");
 
-                finalList.add(getTableOrderByID(orderId));
+                RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
+                Workers waiter = workersDAO.getWorkerById(waiterId);
+
+                TableOrder tableOrder =
+                        new TableOrder(
+                                orderId,
+                                restaurantTable,
+                                waiter,
+                                notes,
+                                new ArrayList<>(),
+                                bill,
+                                isReservation
+                        );
+
+                tableOrder.setPaid(isPaid);
+                if (itemName != null)
+                    tableOrder.addMenuItems(itemName);
+
+                finalList.add(tableOrder);
             }
 
             return finalList;
         }
     }
 
+
     @Override
     public ArrayList<TableOrder> getTableOrdersByTableId(Integer tableId) throws SQLException {
-
-        try(Connection connection = getConnection()) {
+        try (Connection connection = getConnection()) {
 
             PreparedStatement statement =
                     connection.prepareStatement(
-                            "SELECT * FROM tableorders WHERE tableid=?"
+                            "SELECT t.id, " +
+                                    " t.tableid," +
+                                    " t.waiterid," +
+                                    " t.notes," +
+                                    " t.bill ," +
+                                    " t.isReservation as Reserved," +
+                                    " t.isPaid as Paid," +
+                                    "mi.name as ItemName" +
+                                    "  FROM tableorders t" +
+                                    " left join MenuItemsTableOrder mt on t.id = mt.tableorderid" +
+                                    " left join menuitems mi on mt.menuitemid = mi.id " +
+                                    "where t.tableid = ?"
                     );
 
             statement.setInt(1, tableId);
 
             ResultSet rs = statement.executeQuery();
 
-            ArrayList<TableOrder> finalList = new ArrayList<>();
+            ArrayList<TableOrder> finalList =
+                    new ArrayList<>();
 
-            while(rs.next()) {
+            while (rs.next()) {
+
                 Integer orderId = rs.getInt("id");
+                Integer waiterId = rs.getInt("waiterid");
+                String notes = rs.getString("notes");
+                double bill = rs.getDouble("bill");
+                boolean isReservation = rs.getBoolean("Reserved");
+                boolean isPaid = rs.getBoolean("Paid");
+                String itemName = rs.getString("ItemName");
 
-                finalList.add(getTableOrderByID(orderId));
+                RestaurantTable restaurantTable = restaurantTableDAO.getRestaurantTableByID(tableId);
+                Workers waiter = workersDAO.getWorkerById(waiterId);
+
+                TableOrder tableOrder =
+                        new TableOrder(
+                                orderId,
+                                restaurantTable,
+                                waiter,
+                                notes,
+                                new ArrayList<>(),
+                                bill,
+                                isReservation
+                        );
+
+                tableOrder.setPaid(isPaid);
+                if (itemName != null)
+                    tableOrder.addMenuItems(itemName);
+
+                finalList.add(tableOrder);
             }
 
             return finalList;
@@ -317,22 +388,16 @@ public class TableOrderDAOImpl implements TableOrderDAO {
 
     @Override
     public TableOrder updateTableOrder(TableOrder tableOrder) throws SQLException {
-
-        try(Connection connection = getConnection()) {
-
-            connection.setAutoCommit(false);
-
+        try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
-                            "UPDATE tableorders SET " +
-                                    "tableid=?, " +
-                                    "waiterid=?, " +
-                                    "notes=?, " +
-                                    "bill=?, " +
-                                    "isreservation=?, " +
-                                    "ispaid=? " +
-                                    "WHERE id=?"
-                    );
-
+                    "update tableorders set tableId=?, " +
+                            "waiterId=?, " +
+                            "notes=?, " +
+                            "bill=?, " +
+                            "isReservation=?, " +
+                            "isPaid=? " +
+                            "WHERE id = ?"
+            );
             statement.setInt(1, tableOrder.getTable().getId());
             statement.setInt(2, tableOrder.getWaiter().getId());
             statement.setString(3, tableOrder.getNotes());
@@ -340,47 +405,15 @@ public class TableOrderDAOImpl implements TableOrderDAO {
             statement.setBoolean(5, tableOrder.isReservation());
             statement.setBoolean(6, tableOrder.isPaid());
             statement.setInt(7, tableOrder.getId());
-
             int rowsAffected = statement.executeUpdate();
 
-            if(rowsAffected == 0) {
-                throw new SQLException("TableOrder with id " + tableOrder.getId() + " not found");
-            }
-
-            updateMenuItemList(tableOrder.getMenuItems(), tableOrder.getId(), connection);
-
-            connection.commit();
-
-            return tableOrder;
-        }
-    }
-    @Override
-    public void updateMenuItemList(
-            ArrayList<OrderItem> items,
-            Integer tableOrderId,
-            Connection connection
-    ) throws SQLException {
-
-        if (items == null || items.isEmpty()) return;
-
-        PreparedStatement statement =
-                connection.prepareStatement(
-                        "INSERT INTO MenuItemsTableOrder " +
-                                "(menuItemId, tableOrderId, quantity) " +
-                                "VALUES (?, ?, ?) " +
-                                "ON CONFLICT (menuItemId, tableOrderId) " +
-                                "DO UPDATE SET quantity = MenuItemsTableOrder.quantity + EXCLUDED.quantity"
+            if (rowsAffected == 0) {
+                throw new SQLException(
+                        "Table Order with id " + tableOrder.getId() + " not found"
                 );
-
-        for (OrderItem item : items) {
-
-            statement.setInt(1, item.getMenuItem().getId());
-            statement.setInt(2, tableOrderId);
-            statement.setInt(3, item.getQuantity());
-
-            statement.addBatch();
+            }
+            else
+                return tableOrder;
         }
-
-        statement.executeBatch();
     }
 }
