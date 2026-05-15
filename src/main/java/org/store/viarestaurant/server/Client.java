@@ -19,7 +19,7 @@ public class Client
 
   public void connect() throws IOException
   {
-    socket = new Socket("localhost", 5000);
+    socket = new Socket("localhost", 2910);
 
     outToServer = new ObjectOutputStream(socket.getOutputStream());
     outToServer.flush();

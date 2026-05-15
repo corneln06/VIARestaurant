@@ -36,7 +36,14 @@ public class ServerConnection implements Runnable
     this.connectionPool = connectionPool;
     this.workersDAO =
         WorkersDAOImpl.getInstance();
-    this.reservationDAO = ReservationDAOImpl.getInstance();
+    try
+    {
+      this.reservationDAO = ReservationDAOImpl.getInstance();
+    }
+    catch(SQLException e)
+    {
+      throw new IOException("Could not initialize ReservationDAO", e);
+    }
 
     System.out.println(
         "[SERVER] Creating streams...");

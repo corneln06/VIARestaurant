@@ -32,19 +32,9 @@ public class LoginController extends NavigationController
     @FXML
     public void initialize()
     {
-        try
-        {
-            client = new Client();
-            client.connect();
-
             errorLabel.setVisible(false);
             errorLabel.setManaged(false);
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-            showError("Cannot connect to server.");
-        }
+
     }
 
     @FXML
@@ -53,41 +43,64 @@ public class LoginController extends NavigationController
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        try
+        new Thread(() ->
         {
-            LoginRequest request =
-                new LoginRequest(username, password);
-
-            client.send(request);
-
-            LoginResponse response =
-                (LoginResponse) client.receive();
-
-            if(!response.isSuccess())
+            try
             {
-                showError("Invalid credentials.");
-                return;
+                client = new Client();
+                client.connect();
+
+                LoginRequest request =
+                    new LoginRequest(username, password);
+
+                client.send(request);
+
+                LoginResponse response =
+                    (LoginResponse) client.receive();
+
+                if(!response.isSuccess())
+                {
+                    javafx.application.Platform.runLater(() ->
+                        showError("Invalid credentials.")
+                    );
+                    return;
+                }
+
+                client.startListening();
+
+                Workers worker =
+                    response.getRole();
+
+                javafx.application.Platform.runLater(() ->
+                {
+                    try
+                    {
+                        Parent root =
+                            loadDashboard(worker);
+
+                        Stage stage =
+                            (Stage) usernameField
+                                .getScene()
+                                .getWindow();
+
+                        stage.getScene().setRoot(root);
+                    }
+                    catch(IOException e)
+                    {
+                        e.printStackTrace();
+                        showError("Unable to open dashboard.");
+                    }
+                });
             }
-            client.startListening();
+            catch(Exception e)
+            {
+                e.printStackTrace();
 
-            Workers worker =
-                response.getRole();
-
-            Parent root =
-                loadDashboard(worker);
-
-            Stage stage =
-                (Stage) usernameField
-                    .getScene()
-                    .getWindow();
-
-            stage.getScene().setRoot(root);
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-            showError("Login failed.");
-        }
+                javafx.application.Platform.runLater(() ->
+                    showError("Login failed.")
+                );
+            }
+        }).start();
     }
 
     private Parent loadDashboard(Workers worker)
