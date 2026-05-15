@@ -6,8 +6,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.view.HelloApplication;
@@ -33,6 +40,19 @@ public class NavigationController
   @FXML private AnchorPane billDetailPage;
   @FXML private AnchorPane menuPage;
 
+  @FXML private GridPane reservationGrid;
+  @FXML private Pane reservationOverlayPane;
+
+  @FXML private StackPane newReservationOverlay;
+  @FXML private TextField guestNameField;
+  @FXML private DatePicker reservationDatePicker;
+  @FXML private TextField reservationTimeField;
+  @FXML private TextField partySizeField;
+  @FXML private ComboBox<String> tableComboBox;
+  @FXML private Label newReservationErrorLabel;
+
+  private HostController hostController;
+
   public void initData(Workers worker)
   {
     if (sidebarName != null)
@@ -51,7 +71,14 @@ public class NavigationController
   {
     switch (worker.getRole())
     {
-      case Host -> showTablesPage();
+      case Host -> {
+        hostController = new HostController();
+        hostController.init(reservationGrid, reservationOverlayPane);
+        hostController.initModal(newReservationOverlay, guestNameField, reservationDatePicker,
+            reservationTimeField, partySizeField, tableComboBox, newReservationErrorLabel);
+        hostController.refreshSchedule();
+        showTablesPage();
+      }
       case Waiter -> showWaiterTablesPage();
       case Manager -> showMenuPage();
     }
@@ -69,6 +96,10 @@ public class NavigationController
   {
     showOnly(reservationsPage);
     setActive(btnReservations, btnTables);
+    if (hostController != null)
+    {
+      hostController.refreshSchedule();
+    }
   }
 
   @FXML
@@ -142,6 +173,36 @@ public class NavigationController
   private void backToBillsList()
   {
     showBillsPage();
+  }
+
+  @FXML
+  private void openNewReservationModal()
+  {
+    if (hostController != null) hostController.openNewReservationModal();
+  }
+
+  @FXML
+  private void closeNewReservationModal(MouseEvent event)
+  {
+    if (hostController != null) hostController.closeNewReservationModal();
+  }
+
+  @FXML
+  private void closeNewReservationModalAction()
+  {
+    if (hostController != null) hostController.closeNewReservationModal();
+  }
+
+  @FXML
+  private void createReservation()
+  {
+    if (hostController != null) hostController.createReservation();
+  }
+
+  @FXML
+  private void consumeModalClick(MouseEvent event)
+  {
+    event.consume();
   }
 
   private void showOnly(AnchorPane selectedPage)

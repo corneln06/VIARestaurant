@@ -1,6 +1,9 @@
 package org.store.viarestaurant.model.enums;
 
-public enum WorkerRole {
+import java.io.Serializable;
+
+public enum WorkerRole implements Serializable
+{
     Manager,
     Host,
     Waiter

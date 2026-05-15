@@ -3,7 +3,10 @@ package org.store.viarestaurant.model.entities;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.store.viarestaurant.model.enums.WorkerRole;
 
-public abstract class Workers {
+import java.io.Serializable;
+
+public abstract class Workers implements Serializable
+{
     private Integer id;
     private String firstName;
     private String lastName;
