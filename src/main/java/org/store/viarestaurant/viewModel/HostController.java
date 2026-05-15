@@ -255,7 +255,7 @@ public class HostController
     {
       double offset = (minutesNow - minutesStart) / 30.0 * SLOT_WIDTH;
       Rectangle nowLine = new Rectangle(2, totalHeight);
-      nowLine.setFill(Color.web("#273469"));
+      nowLine.setFill(Color.RED);
       nowLine.setLayoutX(LABEL_WIDTH + offset);
       nowLine.setLayoutY(0);
       scheduleOverlayPane.getChildren().add(nowLine);
