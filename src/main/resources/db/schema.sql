@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS MenuItemsTableOrder (
     ON DELETE CASCADE,
 
     CONSTRAINT uq_menu_order
-    UNIQUE (menuItemId, tableOrderId);
+    UNIQUE (menuItemId, tableOrderId),
 
     CONSTRAINT fk_tableOrder
     FOREIGN KEY (tableOrderId)

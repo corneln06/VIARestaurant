@@ -9,6 +9,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javafx.geometry.HPos;
 import javafx.scene.control.ComboBox;
@@ -147,9 +148,21 @@ public class HostController
     try
     {
       RestaurantTable table = tableDAO.getRestaurantTableByID(tableId);
-      reservationDAO.createReservation(guestName, LocalDateTime.of(date, time), partySize, table);
-      closeNewReservationModal();
-      refreshSchedule();
+      ArrayList<Reservation> sameTimeReservations = reservationDAO.getReservationByDate(LocalDateTime.of(date, time));
+        Reservation repeatedReservation = sameTimeReservations.stream()
+                .filter(reservation ->
+                        Objects.equals(reservation.getTable().getId(), tableId)
+                )
+                .findFirst()
+                .orElse(null);
+
+        if (repeatedReservation == null) {
+            reservationDAO.createReservation(guestName, LocalDateTime.of(date, time), partySize, table);
+            closeNewReservationModal();
+            refreshSchedule();
+        }else {
+            showReservationError("That table is already reserved for that time, please select another one.");
+        }
     }
     catch (SQLException e)
     {
@@ -242,7 +255,7 @@ public class HostController
     {
       double offset = (minutesNow - minutesStart) / 30.0 * SLOT_WIDTH;
       Rectangle nowLine = new Rectangle(2, totalHeight);
-      nowLine.setFill(Color.web("#273469"));
+      nowLine.setFill(Color.RED);
       nowLine.setLayoutX(LABEL_WIDTH + offset);
       nowLine.setLayoutY(0);
       scheduleOverlayPane.getChildren().add(nowLine);
