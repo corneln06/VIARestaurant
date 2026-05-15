@@ -1,6 +1,8 @@
 package org.store.viarestaurant.viewModel;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,7 +24,8 @@ import org.store.viarestaurant.view.HelloApplication;
 public class NavigationController
 {
 
-  @FXML private Label sidebarName;
+    public Label reservationsDateLabel;
+    @FXML private Label sidebarName;
   @FXML private Label sidebarRole;
 
   @FXML private Button btnTables;
@@ -65,6 +68,9 @@ public class NavigationController
       sidebarRole.setText(worker.getRole().toString());
     }
     showDefaultPage(worker);
+      reservationsDateLabel.setText(
+              LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+      );
   }
 
   private void showDefaultPage(Workers worker)
