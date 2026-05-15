@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.server.dto.LoginRequest;
-import org.store.viarestaurant.server.dto.LoginResponse;
 import org.store.viarestaurant.view.HelloApplication;
 
 import java.io.IOException;
@@ -32,75 +31,67 @@ public class LoginController extends NavigationController
     @FXML
     public void initialize()
     {
-            errorLabel.setVisible(false);
-            errorLabel.setManaged(false);
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
 
+        try
+        {
+            client = new Client();
+            client.connect();
+
+            client.setLoginListener(response ->
+            {
+                if(!response.isSuccess())
+                {
+                    showError("Invalid credentials.");
+                    return;
+                }
+
+                Workers worker = response.getRole();
+
+                try
+                {
+                    Parent root = loadDashboard(worker);
+
+                    Stage stage =
+                        (Stage) usernameField
+                            .getScene()
+                            .getWindow();
+
+                    stage.getScene().setRoot(root);
+                }
+                catch(IOException e)
+                {
+                    e.printStackTrace();
+                    showError("Unable to open dashboard.");
+                }
+            });
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+            showError("Cannot connect to server.");
+        }
     }
 
     @FXML
     private void handleLogin()
     {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-
-        new Thread(() ->
+        try
         {
-            try
-            {
-                client = new Client();
-                client.connect();
-
-                LoginRequest request =
-                    new LoginRequest(username, password);
-
-                client.send(request);
-
-                LoginResponse response =
-                    (LoginResponse) client.receive();
-
-                if(!response.isSuccess())
-                {
-                    javafx.application.Platform.runLater(() ->
-                        showError("Invalid credentials.")
-                    );
-                    return;
-                }
-
-                client.startListening();
-
-                Workers worker =
-                    response.getRole();
-
-                javafx.application.Platform.runLater(() ->
-                {
-                    try
-                    {
-                        Parent root =
-                            loadDashboard(worker);
-
-                        Stage stage =
-                            (Stage) usernameField
-                                .getScene()
-                                .getWindow();
-
-                        stage.getScene().setRoot(root);
-                    }
-                    catch(IOException e)
-                    {
-                        e.printStackTrace();
-                        showError("Unable to open dashboard.");
-                    }
-                });
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-
-                javafx.application.Platform.runLater(() ->
-                    showError("Login failed.")
+            LoginRequest request =
+                new LoginRequest(
+                    usernameField.getText(),
+                    passwordField.getText()
                 );
-            }
-        }).start();
+
+            client.send(request);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+            showError("Login failed.");
+        }
     }
 
     private Parent loadDashboard(Workers worker)
@@ -130,17 +121,14 @@ public class LoginController extends NavigationController
         controller.initClient(client);
         controller.initData(worker);
 
-
         return root;
     }
 
     private void showError(String message)
     {
         errorLabel.setText(message);
-
         errorLabel.setVisible(true);
         errorLabel.setManaged(true);
-
         passwordField.clear();
     }
 }

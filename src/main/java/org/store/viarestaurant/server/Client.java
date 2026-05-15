@@ -1,7 +1,8 @@
 package org.store.viarestaurant.server;
 
 import javafx.application.Platform;
-import org.store.viarestaurant.server.dto.ReservationDto.ReservationCreatedMessage;
+import org.store.viarestaurant.server.dto.LoginResponse;
+import org.store.viarestaurant.server.dto.ReservationDto.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,6 +16,10 @@ public class Client
   private ObjectOutputStream outToServer;
   private ObjectInputStream inFromServer;
 
+  private Consumer<LoginResponse> loginListener;
+  private Consumer<GetTablesResponse> tablesListener;
+  private Consumer<GetReservationResponse> reservationsListener;
+  private Consumer<CreateReservationResponse> createReservationListener;
   private Consumer<ReservationCreatedMessage> reservationCreatedListener;
 
   public void connect() throws IOException
@@ -25,6 +30,8 @@ public class Client
     outToServer.flush();
 
     inFromServer = new ObjectInputStream(socket.getInputStream());
+
+    startListening();
   }
 
   public void send(Object object) throws IOException
@@ -43,15 +50,29 @@ public class Client
         {
           Object object = inFromServer.readObject();
 
-          if(object instanceof ReservationCreatedMessage message)
+          Platform.runLater(() ->
           {
-            if(reservationCreatedListener != null)
+            if(object instanceof LoginResponse response && loginListener != null)
             {
-              Platform.runLater(() ->
-                  reservationCreatedListener.accept(message)
-              );
+              loginListener.accept(response);
             }
-          }
+            else if(object instanceof GetTablesResponse response && tablesListener != null)
+            {
+              tablesListener.accept(response);
+            }
+            else if(object instanceof GetReservationResponse response && reservationsListener != null)
+            {
+              reservationsListener.accept(response);
+            }
+            else if(object instanceof CreateReservationResponse response && createReservationListener != null)
+            {
+              createReservationListener.accept(response);
+            }
+            else if(object instanceof ReservationCreatedMessage message && reservationCreatedListener != null)
+            {
+              reservationCreatedListener.accept(message);
+            }
+          });
         }
       }
       catch(Exception e)
@@ -63,15 +84,29 @@ public class Client
     listenerThread.setDaemon(true);
     listenerThread.start();
   }
-  public Object receive() throws IOException, ClassNotFoundException
+
+  public void setLoginListener(Consumer<LoginResponse> listener)
   {
-    return inFromServer.readObject();
+    this.loginListener = listener;
   }
 
-  public void setReservationCreatedListener(
-      Consumer<ReservationCreatedMessage> listener)
+  public void setTablesListener(Consumer<GetTablesResponse> listener)
+  {
+    this.tablesListener = listener;
+  }
+
+  public void setReservationsListener(Consumer<GetReservationResponse> listener)
+  {
+    this.reservationsListener = listener;
+  }
+
+  public void setCreateReservationListener(Consumer<CreateReservationResponse> listener)
+  {
+    this.createReservationListener = listener;
+  }
+
+  public void setReservationCreatedListener(Consumer<ReservationCreatedMessage> listener)
   {
     this.reservationCreatedListener = listener;
   }
-
 }
