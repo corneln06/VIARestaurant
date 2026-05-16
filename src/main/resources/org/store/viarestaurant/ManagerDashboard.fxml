@@ -15,6 +15,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ListView?>
+<?import java.lang.String?>
 <BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
     <left>
         <VBox prefWidth="220.0" spacing="18.0" styleClass="sidebar">
@@ -48,38 +51,63 @@
                                     <children>
                                         <Label styleClass="page-title" text="Menu" />
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Button styleClass="btn-base btn-primary" text="+ New Dish" />
+                                        <Button onAction="#openNewDishModal" styleClass="btn-base btn-primary" text="+ New Dish" />
                                     </children>
                                 </HBox>
-                                <TableView fx:id="menuTable" VBox.vgrow="ALWAYS">
+                                <TableView fx:id="menuTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                    </columnResizePolicy>
                                     <columns>
-                                        <TableColumn fx:id="nameColumn" prefWidth="360.0" text="Name" />
-                                        <TableColumn fx:id="typeColumn" prefWidth="220.0" text="Type" />
-                                        <TableColumn fx:id="priceColumn" prefWidth="160.0" text="Price" />
+                                        <TableColumn fx:id="nameColumn" text="Name" prefWidth="360.0" />
+                                        <TableColumn fx:id="typeColumn" text="Type" prefWidth="220.0" />
+                                        <TableColumn fx:id="priceColumn" text="Price" prefWidth="160.0" />
                                     </columns>
                                 </TableView>
                             </children>
                         </VBox>
                     </children>
                 </AnchorPane>
-                <StackPane fx:id="newDishOverlay" managed="false" styleClass="modal-overlay" visible="false">
+                <StackPane fx:id="newDishOverlay" managed="false" onMouseClicked="#closeNewDishModal" styleClass="modal-overlay" visible="false">
                     <children>
-                        <VBox maxWidth="440.0" spacing="14.0" styleClass="modal-card modal-card-large">
+                        <VBox maxWidth="440.0" maxHeight="420.0" onMouseClicked="#consumeModalClick" spacing="14.0">
+                            <styleClass>
+                                <String fx:value="modal-card"/>
+                                <String fx:value="modal-card-large"/>
+                            </styleClass>
                             <children>
                                 <Label styleClass="modal-title" text="New Dish" />
+
                                 <TextField fx:id="dishNameField" promptText="Dish name" styleClass="input-field" />
-                                <TextField fx:id="dishIngredientsField" promptText="Ingredients" styleClass="input-field" />
+
                                 <HBox spacing="12.0">
                                     <children>
-                                        <TextField fx:id="dishPriceField" promptText="Price" styleClass="input-field" HBox.hgrow="ALWAYS" />
                                         <ComboBox fx:id="dishTypeComboBox" prefWidth="180.0" promptText="Menu type" HBox.hgrow="ALWAYS" />
+                                        <TextField fx:id="dishPriceField" promptText="Price" styleClass="input-field" HBox.hgrow="ALWAYS" />
                                     </children>
                                 </HBox>
+
+                                <CheckBox fx:id="isVegetarianCheckBox" text="Vegetarian" />
+
+                                <Label text="Allergies"/>
+                                <ListView fx:id="allergiesListView" prefHeight="120.0" />
+
                                 <Label fx:id="newDishErrorLabel" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+
                                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
                                     <children>
-                                        <Button styleClass="btn-base btn-secondary" text="Cancel" />
-                                        <Button styleClass="btn-base btn-primary" text="Create" />
+                                        <Button onAction="#closeNewDishModalAction" text="Cancel">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-danger"/>
+                                            </styleClass>
+                                        </Button>
+                                        <Button onAction="#createDish" text="Create">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
                                     </children>
                                 </HBox>
                             </children>

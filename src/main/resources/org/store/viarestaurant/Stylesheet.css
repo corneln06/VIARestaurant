@@ -416,3 +416,7 @@
 .table-row-cell {
     -fx-cell-size: 42px;
 }
+.table-row-cell .table-cell {
+    -fx-alignment: center;
+    -fx-font-size: 15px;
+}
