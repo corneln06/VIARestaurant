@@ -28,6 +28,7 @@ public class NavigationController
 
   @FXML private Button btnTables;
   @FXML private Button btnReservations;
+  @FXML private Button btnWorkers;
   @FXML private Button btnOrders;
   @FXML private Button btnBills;
   @FXML private Button btnMenu;
@@ -132,14 +133,14 @@ public class NavigationController
   private void showTablesPage()
   {
     showOnly(tablesPage);
-    setActive(btnTables, btnReservations);
+    setActive(btnTables, btnReservations, btnWorkers, btnMenu);
   }
 
   @FXML
   private void showReservationsPage()
   {
     showOnly(reservationsPage);
-    setActive(btnReservations, btnTables);
+    setActive(btnReservations, btnTables, btnWorkers, btnMenu);
 
     if(hostController != null)
     {
@@ -151,6 +152,22 @@ public class NavigationController
       managerController.refreshSchedule();
     }
   }
+    @FXML
+    private void showWorkersPage()
+    {
+//        showOnly(reservationsPage);
+        setActive(btnWorkers, btnMenu, btnReservations, btnTables);
+
+//        if(hostController != null)
+//        {
+//            hostController.closeNewReservationModal();
+//            hostController.refreshSchedule();
+//        }
+//        else if(managerController != null)
+//        {
+//            managerController.refreshSchedule();
+//        }
+    }
 
   @FXML
   private void showWaiterTablesPage()
@@ -209,8 +226,18 @@ public class NavigationController
   @FXML
   private void showMenuPage()
   {
-    showOnly(menuPage);
-    setActive(btnMenu);
+      showOnly(menuPage);
+      setActive(btnMenu, btnReservations, btnTables, btnWorkers);
+
+//        if(hostController != null)
+//        {
+//            hostController.closeNewReservationModal();
+//            hostController.refreshSchedule();
+//        }
+//        else if(managerController != null)
+//        {
+//            managerController.refreshSchedule();
+//        }
   }
 
   @FXML

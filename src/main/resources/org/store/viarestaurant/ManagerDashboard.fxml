@@ -19,31 +19,30 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.Pane?>
-<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
+<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
     <left>
         <VBox prefWidth="220.0" spacing="18.0" styleClass="sidebar">
             <padding>
-                <Insets bottom="24.0" left="18.0" right="18.0" top="24.0" />
+                <Insets bottom="24.0" left="18.0" right="18.0" top="24.0"/>
             </padding>
             <children>
-                <Label styleClass="brand-title" text="Via Restaurant" />
+                <Label styleClass="brand-title" text="Via Restaurant"/>
                 <VBox spacing="4.0" styleClass="sidebar-user-card">
                     <children>
-                        <Label fx:id="sidebarName" styleClass="sidebar-name" text="Manager User" />
-                        <Label fx:id="sidebarRole" styleClass="sidebar-role" text="Manager" />
+                        <Label fx:id="sidebarName" styleClass="sidebar-name" text="Manager User"/>
+                        <Label fx:id="sidebarRole" styleClass="sidebar-role" text="Manager"/>
                     </children>
                 </VBox>
-                <Separator />
-                <Button maxWidth="Infinity" styleClass="nav-btn nav-btn-active" text="Menu" > <styleClass>
-                    <String fx:value="nav-btn"/>
-                    <String fx:value="nav-btn-active"/>
-                </styleClass> </Button>
-                <Button maxWidth="Infinity" fx:id="btnReservations" onAction="#showReservationsPage" styleClass="nav-btn" text="Reservation" />
-                <Button maxWidth="Infinity" styleClass="nav-btn" text="Tables" />
-                <Button maxWidth="Infinity" styleClass="nav-btn" text="Workers" />
-                <Region VBox.vgrow="ALWAYS" />
-                <Label styleClass="sidebar-footer" text="Menu Control" />
-            <Button fx:id="logOutButton" mnemonicParsing="false" prefHeight="25.0" onAction="#handleLogOut" prefWidth="184.0" style="-fx-background-color: red;" text="Log Out" textFill="WHITE" />
+                <Separator/>
+                <Button maxWidth="Infinity" fx:id="btnMenu" onAction="#showMenuPage" styleClass="nav-btn" text="Menu" />
+                <Button maxWidth="Infinity" fx:id="btnReservations" onAction="#showReservationsPage" styleClass="nav-btn" text="Reservation"/>
+                <Button maxWidth="Infinity" fx:id="btnTables" onAction="#showTablesPage" styleClass="nav-btn" text="Tables"/>
+                <Button maxWidth="Infinity" fx:id="btnWorkers" onAction="#showWorkersPage" styleClass="nav-btn" text="Workers"/>
+                <Region VBox.vgrow="ALWAYS"/>
+                <Label styleClass="sidebar-footer" text="Menu Control"/>
+                <Button fx:id="logOutButton" mnemonicParsing="false" prefHeight="25.0" onAction="#handleLogOut"
+                        prefWidth="184.0" style="-fx-background-color: red;" text="Log Out" textFill="WHITE"/>
             </children>
         </VBox>
     </left>
@@ -52,20 +51,26 @@
             <children>
                 <AnchorPane styleClass="page-surface">
                     <children>
-                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
+                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
+                              AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
                                 <HBox alignment="CENTER_LEFT">
                                     <children>
-                                        <Label styleClass="page-title" text="Menu" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Button styleClass="btn-base btn-primary" text="+ New Dish" />
+                                        <Label styleClass="page-title" text="Menu"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="+ New Dish">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
                                     </children>
                                 </HBox>
                                 <TableView fx:id="menuTable" VBox.vgrow="ALWAYS">
                                     <columns>
-                                        <TableColumn fx:id="nameColumn" prefWidth="360.0" text="Name" />
-                                        <TableColumn fx:id="typeColumn" prefWidth="220.0" text="Type" />
-                                        <TableColumn fx:id="priceColumn" prefWidth="160.0" text="Price" />
+                                        <TableColumn fx:id="nameColumn" prefWidth="360.0" text="Name"/>
+                                        <TableColumn fx:id="typeColumn" prefWidth="220.0" text="Type"/>
+                                        <TableColumn fx:id="priceColumn" prefWidth="160.0" text="Price"/>
                                     </columns>
                                 </TableView>
                             </children>
@@ -76,20 +81,24 @@
                     <children>
                         <VBox maxWidth="440.0" spacing="14.0" styleClass="modal-card modal-card-large">
                             <children>
-                                <Label styleClass="modal-title" text="New Dish" />
-                                <TextField fx:id="dishNameField" promptText="Dish name" styleClass="input-field" />
-                                <TextField fx:id="dishIngredientsField" promptText="Ingredients" styleClass="input-field" />
+                                <Label styleClass="modal-title" text="New Dish"/>
+                                <TextField fx:id="dishNameField" promptText="Dish name" styleClass="input-field"/>
+                                <TextField fx:id="dishIngredientsField" promptText="Ingredients"
+                                           styleClass="input-field"/>
                                 <HBox spacing="12.0">
                                     <children>
-                                        <TextField fx:id="dishPriceField" promptText="Price" styleClass="input-field" HBox.hgrow="ALWAYS" />
-                                        <ComboBox fx:id="dishTypeComboBox" prefWidth="180.0" promptText="Menu type" HBox.hgrow="ALWAYS" />
+                                        <TextField fx:id="dishPriceField" promptText="Price" styleClass="input-field"
+                                                   HBox.hgrow="ALWAYS"/>
+                                        <ComboBox fx:id="dishTypeComboBox" prefWidth="180.0" promptText="Menu type"
+                                                  HBox.hgrow="ALWAYS"/>
                                     </children>
                                 </HBox>
-                                <Label fx:id="newDishErrorLabel" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+                                <Label fx:id="newDishErrorLabel" managed="false" styleClass="error-label"
+                                       visible="false" wrapText="true"/>
                                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
                                     <children>
-                                        <Button styleClass="btn-base btn-secondary" text="Cancel" />
-                                        <Button styleClass="btn-base btn-primary" text="Create" />
+                                        <Button styleClass="btn-base btn-secondary" text="Cancel"/>
+                                        <Button styleClass="btn-base btn-primary" text="Create"/>
                                     </children>
                                 </HBox>
                             </children>
