@@ -2,7 +2,9 @@ package org.store.viarestaurant.model.state;
 
 import org.store.viarestaurant.model.entities.RestaurantTable;
 
-public class ReservedState implements TableState
+import java.io.Serializable;
+
+public class ReservedState implements TableState, Serializable
 {
   public void setAvailable(RestaurantTable restaurantTable) {
     restaurantTable.setState(new AvailableState());

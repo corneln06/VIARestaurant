@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.server.dto.LoginRequest;
-import org.store.viarestaurant.server.dto.LoginResponse;
 import org.store.viarestaurant.view.HelloApplication;
 
 import java.io.IOException;
@@ -32,13 +31,41 @@ public class LoginController extends NavigationController
     @FXML
     public void initialize()
     {
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
+
         try
         {
             client = new Client();
             client.connect();
 
-            errorLabel.setVisible(false);
-            errorLabel.setManaged(false);
+            client.setLoginListener(response ->
+            {
+                if(!response.isSuccess())
+                {
+                    showError("Invalid credentials.");
+                    return;
+                }
+
+                Workers worker = response.getRole();
+
+                try
+                {
+                    Parent root = loadDashboard(worker);
+
+                    Stage stage =
+                        (Stage) usernameField
+                            .getScene()
+                            .getWindow();
+
+                    stage.getScene().setRoot(root);
+                }
+                catch(IOException e)
+                {
+                    e.printStackTrace();
+                    showError("Unable to open dashboard.");
+                }
+            });
         }
         catch(IOException e)
         {
@@ -50,39 +77,17 @@ public class LoginController extends NavigationController
     @FXML
     private void handleLogin()
     {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-
         try
         {
             LoginRequest request =
-                new LoginRequest(username, password);
+                new LoginRequest(
+                    usernameField.getText(),
+                    passwordField.getText()
+                );
 
             client.send(request);
-
-            LoginResponse response =
-                (LoginResponse) client.receive();
-
-            if(!response.isSuccess())
-            {
-                showError("Invalid credentials.");
-                return;
-            }
-
-            Workers worker =
-                response.getRole();
-
-            Parent root =
-                loadDashboard(worker);
-
-            Stage stage =
-                (Stage) usernameField
-                    .getScene()
-                    .getWindow();
-
-            stage.getScene().setRoot(root);
         }
-        catch(Exception e)
+        catch(IOException e)
         {
             e.printStackTrace();
             showError("Login failed.");
@@ -113,6 +118,7 @@ public class LoginController extends NavigationController
         NavigationController controller =
             loader.getController();
 
+        controller.initClient(client);
         controller.initData(worker);
 
         return root;
@@ -121,10 +127,8 @@ public class LoginController extends NavigationController
     private void showError(String message)
     {
         errorLabel.setText(message);
-
         errorLabel.setVisible(true);
         errorLabel.setManaged(true);
-
         passwordField.clear();
     }
 }

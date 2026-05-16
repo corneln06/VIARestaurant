@@ -3,7 +3,9 @@ package org.store.viarestaurant.model.entities;
 import org.store.viarestaurant.model.state.AvailableState;
 import org.store.viarestaurant.model.state.TableState;
 
-public class RestaurantTable
+import java.io.Serializable;
+
+public class RestaurantTable implements Serializable
 {
   private Integer id;
   private int maxSitting;

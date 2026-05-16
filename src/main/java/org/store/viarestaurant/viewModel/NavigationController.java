@@ -13,13 +13,11 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.view.HelloApplication;
 
 public class NavigationController
@@ -54,6 +52,7 @@ public class NavigationController
   @FXML private TextField partySizeField;
   @FXML private ComboBox<String> tableComboBox;
   @FXML private Label newReservationErrorLabel;
+  protected Client client;
 
   @FXML private Button submitReservationButton;
   @FXML private Button deleteReservationButton;
@@ -75,17 +74,25 @@ public class NavigationController
       sidebarRole.setText(worker.getRole().toString());
     }
     showDefaultPage(worker);
-      reservationsDateLabel.setText(
-              LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-      );
+    if(hostController != null){
+    reservationsDateLabel.setText(
+            LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    );
+    }
   }
-
+  public void initClient(Client client)
+  {
+    this.client = client;
+  }
   private void showDefaultPage(Workers worker)
   {
     switch (worker.getRole())
     {
       case Host -> {
         hostController = new HostController();
+
+        hostController.initClient(client);
+
         hostController.init(reservationGrid, reservationOverlayPane);
         hostController.initModal(newReservationOverlay, guestNameField, reservationDatePicker,
             reservationTimeField, partySizeField, tableComboBox, newReservationErrorLabel,submitReservationButton,deleteReservationButton,modalTitle);
@@ -109,6 +116,7 @@ public class NavigationController
   {
     showOnly(reservationsPage);
     setActive(btnReservations, btnTables);
+    hostController.closeNewReservationModal();
     if (hostController != null)
     {
       hostController.refreshSchedule();
