@@ -1,8 +1,10 @@
 package org.store.viarestaurant.model.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Reservation {
+public class Reservation  implements Serializable
+{
     private final int id;
     private String name;
     private LocalDateTime dateTime;

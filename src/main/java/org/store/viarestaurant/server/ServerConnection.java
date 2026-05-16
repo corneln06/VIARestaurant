@@ -1,16 +1,18 @@
 package org.store.viarestaurant.server;
 
-import org.store.viarestaurant.dao.WorkersDAO;
-import org.store.viarestaurant.dao.WorkersDAOImpl;
+import org.store.viarestaurant.dao.*;
+import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.dto.LoginRequest;
 import org.store.viarestaurant.server.dto.LoginResponse;
+import org.store.viarestaurant.server.dto.ReservationDto.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class ServerConnection implements Runnable
 {
@@ -19,6 +21,8 @@ public class ServerConnection implements Runnable
   private final ObjectInputStream inFromClient;
   private final ConnectionPool connectionPool;
   private final WorkersDAO workersDAO;
+  private final RestaurantTableDAO restaurantTableDAO;
+  private final ReservationDAO reservationDAO;
 
   public ServerConnection(
       Socket connectionSocket,
@@ -27,9 +31,16 @@ public class ServerConnection implements Runnable
   {
     this.socket = connectionSocket;
     this.connectionPool = connectionPool;
-
-    this.workersDAO =
-        WorkersDAOImpl.getInstance();
+    try
+    {
+      this.workersDAO = WorkersDAOImpl.getInstance();
+      this.reservationDAO = ReservationDAOImpl.getInstance();
+      this.restaurantTableDAO = RestaurantTableDAOImpl.getInstance();
+    }
+    catch(SQLException e)
+    {
+      throw new IOException("Could not initialize ReservationDAO", e);
+    }
 
     System.out.println(
         "[SERVER] Creating streams...");
@@ -72,13 +83,25 @@ public class ServerConnection implements Runnable
               "[SERVER] LoginRequest detected");
 
           handleLogin(request);
+        } else if (object instanceof TableBookingRequest request)
+        {
+          System.out.println("[SERVER] TableBookingRequest detected");
+          handleTableBooking(request);
+        } else if(object instanceof GetTablesRequest)
+        {
+          handleGetTables();
+        }
+        else if(object instanceof GetReservationsRequest)
+        {
+          handleGetReservations();
         }
         else
         {
           System.out.println(
               "[SERVER] Unknown object received");
         }
-      }
+        }
+
     }
     catch(IOException e)
     {
@@ -98,6 +121,7 @@ public class ServerConnection implements Runnable
     {
       try
       {
+        connectionPool.remove(this);
         System.out.println(
             "[SERVER] Closing socket...");
 
@@ -112,7 +136,31 @@ public class ServerConnection implements Runnable
       }
     }
   }
-
+  private void handleGetTables() throws IOException{
+    try
+    {
+      send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetTablesResponse((new ArrayList<>())));
+    }
+  }
+  private void handleGetReservations() throws IOException
+  {
+    try
+    {
+      send(new GetReservationsResponse(
+          reservationDAO.getAllReservationsForToday()
+      ));
+    }
+    catch(SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetReservationsResponse(new ArrayList<>()));
+    }
+  }
   private void handleLogin(LoginRequest request)
       throws IOException
   {
@@ -214,6 +262,53 @@ public class ServerConnection implements Runnable
       e.printStackTrace();
 
       send(new LoginResponse(false, null));
+    }
+  }
+  public void handleTableBooking(TableBookingRequest request)
+      throws IOException
+  {
+    try
+    {
+      Reservation reservation =
+          reservationDAO.createReservation(
+              request.getName(),
+              request.getDateTime(),
+              request.getPartySize(),
+              request.getRestaurantTable()
+          );
+
+      if(reservation == null)
+      {
+        send(new CreateReservationResponse(
+            false,
+            "Could not create reservation"
+        ));
+
+        return;
+      }
+
+      send(new CreateReservationResponse(
+          true,
+          "Reservation successfully created"
+      ));
+
+      connectionPool.broadcast(
+          new ReservationCreatedMessage(
+              request.getName(),
+              request.getDateTime(),
+              request.getPartySize(),
+              request.getRestaurantTable()
+          )
+      );
+    }
+    catch(SQLException e)
+    {
+      e.printStackTrace();
+
+      send(new CreateReservationResponse(
+          false,
+          "Database error while creating reservation"
+      ));
     }
   }
 

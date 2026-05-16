@@ -16,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.view.HelloApplication;
 
 public class NavigationController
@@ -50,6 +51,7 @@ public class NavigationController
   @FXML private TextField partySizeField;
   @FXML private ComboBox<String> tableComboBox;
   @FXML private Label newReservationErrorLabel;
+  protected Client client;
 
   private HostController hostController;
 
@@ -71,16 +73,31 @@ public class NavigationController
     );
     }
   }
-
+  public void initClient(Client client)
+  {
+    this.client = client;
+  }
   private void showDefaultPage(Workers worker)
   {
     switch (worker.getRole())
     {
       case Host -> {
         hostController = new HostController();
+
+        hostController.initClient(client);
+
         hostController.init(reservationGrid, reservationOverlayPane);
-        hostController.initModal(newReservationOverlay, guestNameField, reservationDatePicker,
-            reservationTimeField, partySizeField, tableComboBox, newReservationErrorLabel);
+
+        hostController.initModal(
+            newReservationOverlay,
+            guestNameField,
+            reservationDatePicker,
+            reservationTimeField,
+            partySizeField,
+            tableComboBox,
+            newReservationErrorLabel
+        );
+
         hostController.refreshSchedule();
         showTablesPage();
       }

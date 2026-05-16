@@ -8,6 +8,7 @@ import org.store.viarestaurant.model.state.AvailableState;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ReservationDAOImpl implements ReservationDAO
 {
@@ -52,17 +53,29 @@ public class ReservationDAOImpl implements ReservationDAO
       statement.setInt(3, partySize);
       statement.setInt(4, restaurantTable.getId());
 
-      ResultSet rs = statement.executeQuery();
 
-      if (rs.next())
-      {
-        int id = rs.getInt("id");
-        return new Reservation(id, name, dateTime, partySize, restaurantTable);
-      }
-      else
-      {
-        throw new SQLException("No ID returned from reservation insert");
-      }
+        ArrayList<Reservation> sameTimeReservations = getReservationByDate(dateTime);
+        Reservation repeatedReservation = sameTimeReservations.stream()
+                .filter(reservation ->
+                        Objects.equals(reservation.getTable().getId(), restaurantTable.getId())
+                )
+                .findFirst()
+                .orElse(null);
+
+        if (repeatedReservation == null) {
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+            {
+                int id = rs.getInt("id");
+                return new Reservation(id, name, dateTime, partySize, restaurantTable);
+            }
+            else
+            {
+                throw new SQLException("No ID returned from reservation insert");
+            }
+        }else {
+            throw new SQLException("That table is already reserved for that time, please select another one.");
+        }
     }
   }
 
