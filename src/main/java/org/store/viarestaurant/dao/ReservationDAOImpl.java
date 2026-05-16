@@ -74,8 +74,9 @@ public class ReservationDAOImpl implements ReservationDAO
                 throw new SQLException("No ID returned from reservation insert");
             }
         }else {
-            throw new SQLException("That table is already reserved for that time, please select another one.");
+            throw new SQLException("please select another one. WE ARE IDIOTS");
         }
+        /////That table is already reserved for that time,
     }
   }
 
@@ -231,20 +232,35 @@ public class ReservationDAOImpl implements ReservationDAO
   public Reservation updateReservation(Reservation reservation) throws SQLException {
     try (Connection connection = getConnection())
     {
-         PreparedStatement statement = connection.prepareStatement(
-                 "update reservations set customer=?, " +
-                         "date=?," +
-                         "partySize=?," +
-                         "tableId=?" +
-                         " where id=?"
-         );
+      PreparedStatement statement = connection.prepareStatement(
+              "update reservations set customer=?, " +
+                      "date=?," +
+                      "partySize=?," +
+                      "tableId=?" +
+                      " where id=?"
+      );
 
       statement.setString(1, reservation.getName());
       statement.setTimestamp(2, Timestamp.valueOf(reservation.getDateTime()));
       statement.setInt(3,reservation.getPartySize());
       statement.setInt(4, reservation.getTable().getId());
       statement.setInt(5, reservation.getId());
-      int affected = statement.executeUpdate();
+
+      ArrayList<Reservation> sameTimeReservations = getReservationByDate(reservation.getDateTime());
+      Reservation repeatedReservation = sameTimeReservations.stream()
+              .filter(reservationRep ->
+                      Objects.equals(reservation.getTable().getId(), reservationRep.getTable().getId()) && reservation.getDateTime().equals(reservationRep.getDateTime()) && reservation.getId() != reservationRep.getId()
+              )
+              .findFirst()
+              .orElse(null);
+
+      int affected = 0;
+
+      if (repeatedReservation == null) {
+        affected = statement.executeUpdate();
+      } else {
+        throw new SQLException("That table is already reserved for that time, please select another one.");
+      }
 
       if (affected == 0)
       {

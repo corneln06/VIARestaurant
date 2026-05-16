@@ -21,6 +21,9 @@ public class Client
   private Consumer<GetReservationsResponse> reservationsListener;
   private Consumer<CreateReservationResponse> createReservationListener;
   private Consumer<ReservationCreatedMessage> reservationCreatedListener;
+  private Consumer<DeleteReservationResponse> deleteReservationListener;
+  private Consumer<UpdateReservationResponse> updateReservationListener;
+  private Consumer<ReservationDeletedMessage> reservationDeletedListener;
 
   public void connect() throws IOException
   {
@@ -72,6 +75,18 @@ public class Client
             {
               reservationCreatedListener.accept(message);
             }
+            else if (object instanceof DeleteReservationResponse response && deleteReservationListener != null)
+            {
+              deleteReservationListener.accept(response);
+            }
+            else if (object instanceof UpdateReservationResponse response && updateReservationListener != null)
+            {
+              updateReservationListener.accept(response);
+            }
+            else if (object instanceof ReservationDeletedMessage message && reservationDeletedListener != null)
+            {
+              reservationDeletedListener.accept(message);
+            }
           });
         }
       }
@@ -108,5 +123,19 @@ public class Client
   public void setReservationCreatedListener(Consumer<ReservationCreatedMessage> listener)
   {
     this.reservationCreatedListener = listener;
+  }
+  public void setDeleteReservationListener(Consumer<DeleteReservationResponse> listener)
+  {
+    this.deleteReservationListener = listener;
+  }
+
+  public void setUpdateReservationListener(Consumer<UpdateReservationResponse> listener)
+  {
+    this.updateReservationListener = listener;
+  }
+
+  public void setReservationDeletedListener(Consumer<ReservationDeletedMessage> listener)
+  {
+    this.reservationDeletedListener = listener;
   }
 }
