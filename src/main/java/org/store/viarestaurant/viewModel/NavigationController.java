@@ -54,6 +54,7 @@ public class NavigationController
   protected Client client;
 
   private HostController hostController;
+  private ManagerController managerController;
 
   public void initData(Workers worker)
   {
@@ -102,7 +103,28 @@ public class NavigationController
         showTablesPage();
       }
       case Waiter -> showWaiterTablesPage();
-      case Manager -> showMenuPage();
+      case Manager -> {
+        managerController = new ManagerController();
+
+        managerController.initClient(client);
+
+        managerController.init(
+            reservationGrid,
+            reservationOverlayPane
+        );
+
+        managerController.initModal(
+            newReservationOverlay,
+            guestNameField,
+            reservationDatePicker,
+            reservationTimeField,
+            partySizeField,
+            tableComboBox,
+            newReservationErrorLabel
+        );
+
+        showMenuPage();
+      }
     }
   }
 
@@ -118,10 +140,15 @@ public class NavigationController
   {
     showOnly(reservationsPage);
     setActive(btnReservations, btnTables);
-    hostController.closeNewReservationModal();
-    if (hostController != null)
+
+    if(hostController != null)
     {
+      hostController.closeNewReservationModal();
       hostController.refreshSchedule();
+    }
+    else if(managerController != null)
+    {
+      managerController.refreshSchedule();
     }
   }
 
@@ -197,29 +224,32 @@ public class NavigationController
   {
     showBillsPage();
   }
-
   @FXML
   private void openNewReservationModal()
   {
-    if (hostController != null) hostController.openNewReservationModal();
+    if(hostController != null) hostController.openNewReservationModal();
+    else if(managerController != null) managerController.openNewReservationModal();
   }
 
   @FXML
   private void closeNewReservationModal(MouseEvent event)
   {
-    if (hostController != null) hostController.closeNewReservationModal();
+    if(hostController != null) hostController.closeNewReservationModal();
+    else if(managerController != null) managerController.closeNewReservationModal();
   }
 
   @FXML
   private void closeNewReservationModalAction()
   {
-    if (hostController != null) hostController.closeNewReservationModal();
+    if(hostController != null) hostController.closeNewReservationModal();
+    else if(managerController != null) managerController.closeNewReservationModal();
   }
 
   @FXML
   private void createReservation()
   {
-    if (hostController != null) hostController.createReservation();
+    if(hostController != null) hostController.createReservation();
+    else if(managerController != null) managerController.createReservation();
   }
 
   @FXML
