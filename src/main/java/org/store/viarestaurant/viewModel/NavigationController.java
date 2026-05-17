@@ -7,14 +7,11 @@ import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.view.HelloApplication;
@@ -52,6 +49,16 @@ public class NavigationController
   @FXML private TextField partySizeField;
   @FXML private ComboBox<String> tableComboBox;
   @FXML private Label newReservationErrorLabel;
+
+  @FXML private StackPane newDishOverlay;
+  @FXML private TextField dishNameField;
+  @FXML private CheckBox isVegetarianCheckBox;
+  @FXML private ListView<String> allergiesListView;
+  @FXML private TextField dishPriceField;
+  @FXML private ComboBox<String> dishTypeComboBox;
+  @FXML private Label newDishErrorLabel;
+  @FXML private TableView<MenuItems> menuTable;
+
   protected Client client;
 
   private HostController hostController;
@@ -121,8 +128,19 @@ public class NavigationController
             reservationTimeField,
             partySizeField,
             tableComboBox,
-            newReservationErrorLabel
+            newReservationErrorLabel,
+            ///////////////////////// Menu Modal //////////////////
+            newDishOverlay,
+            dishNameField,
+            dishTypeComboBox,
+            dishPriceField,
+            isVegetarianCheckBox,
+            allergiesListView,
+            newDishErrorLabel,
+            menuTable
         );
+
+        managerController.refreshMenuTable();
 
         showMenuPage();
       }
@@ -322,5 +340,23 @@ public class NavigationController
       }
     }
   }
+  @FXML
+  private void openNewDishModal() {
+    if (managerController != null) managerController.openNewDishModal();
+  }
 
+  @FXML
+  private void closeNewDishModal(MouseEvent event) {
+    if (managerController != null) managerController.closeNewDishModal();
+  }
+
+  @FXML
+  private void closeNewDishModalAction() {
+    if (managerController != null) managerController.closeNewDishModal();
+  }
+
+  @FXML
+  private void createDish() {
+    if (managerController != null) managerController.createDish();
+  }
 }
