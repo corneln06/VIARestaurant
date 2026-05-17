@@ -4,12 +4,19 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.view.HelloApplication;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.Workers;
@@ -41,6 +48,12 @@ public class NavigationController
 
   @FXML private GridPane reservationGrid;
   @FXML private Pane reservationOverlayPane;
+
+  @FXML private GridPane tableGrid;
+  @FXML private StackPane tableModalOverlay;
+  @FXML private Label tableModalTitle;
+  @FXML private Label tableModalStateBadge;
+  @FXML private Label tableModalInfo;
 
   @FXML private StackPane newReservationOverlay;
   @FXML private TextField guestNameField;
@@ -95,9 +108,9 @@ public class NavigationController
 
         hostController.initClient(client);
 
-        hostController.init(reservationGrid, reservationOverlayPane);
+        hostController.init(reservationGrid, reservationOverlayPane, tableGrid);
 
-        hostController.initModal(
+        hostController.initReservationModal(
             newReservationOverlay,
             guestNameField,
             reservationDatePicker,
@@ -105,7 +118,10 @@ public class NavigationController
             partySizeField,
             tableComboBox,
             newReservationErrorLabel
+
         );
+
+        hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo);
 
         hostController.refreshSchedule();
         showTablesPage();
@@ -152,6 +168,7 @@ public class NavigationController
   {
     showOnly(tablesPage);
     setActive(btnTables, btnReservations, btnWorkers, btnMenu, btnBills, btnOrders);
+    if (hostController != null) hostController.refreshTableGrid();
   }
 
   @FXML
@@ -295,6 +312,18 @@ public class NavigationController
   {
     if(hostController != null) hostController.createReservation();
     else if(managerController != null) managerController.createReservation();
+  }
+
+  @FXML
+  private void closeTableModal(MouseEvent event)
+  {
+    if (hostController != null) hostController.closeTableModal();
+  }
+
+  @FXML
+  private void closeTableModalAction()
+  {
+    if (hostController != null) hostController.closeTableModal();
   }
 
   @FXML

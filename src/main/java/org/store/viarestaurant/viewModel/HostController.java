@@ -1,5 +1,9 @@
 package org.store.viarestaurant.viewModel;
 
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.viewModel.components.ReservationComponent;
+import org.store.viarestaurant.viewModel.components.TableComponent;
+
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -7,25 +11,30 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.viewModel.components.ReservationComponent;
 
 public class HostController
 {
+  private final TableComponent tableComponent = new TableComponent();
+
+
+
   private final ReservationComponent reservationComponent =
       new ReservationComponent();
 
   public void init(
       GridPane scheduleGrid,
-      Pane scheduleOverlayPane)
+      Pane scheduleOverlayPane, GridPane tableGrid)
   {
+
+    tableComponent.initGrid(tableGrid);
+
     reservationComponent.initView(
         scheduleGrid,
         scheduleOverlayPane
     );
   }
 
-  public void initModal(
+  public void initReservationModal(
       StackPane overlay,
       TextField guestName,
       DatePicker datePicker,
@@ -45,10 +54,21 @@ public class HostController
     );
   }
 
+  public void initTableModal(
+      StackPane overlay,
+      Label title,
+      Label badge,
+      Label info)
+  {
+    tableComponent.initModal(overlay, title, badge, info);
+  }
+
   public void initClient(Client client)
   {
     reservationComponent.initClient(client);
   }
+
+  //InitClient for Tables missing TODO
 
   public void refreshSchedule()
   {
@@ -69,4 +89,19 @@ public class HostController
   {
     reservationComponent.createReservation();
   }
+
+  //table component functionns
+
+  public void refreshTableGrid(){
+    tableComponent.refreshTableGrid();
+  }
+
+  public void closeTableModal(){
+    tableComponent.closeTableModal();
+  }
+
+
+
+ 
+
 }
