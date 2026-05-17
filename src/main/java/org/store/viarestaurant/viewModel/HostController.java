@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+import javafx.geometry.HPos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
@@ -107,11 +108,11 @@ public class HostController {
 
         client.setReservationCreatedListener(msg -> refreshSchedule());
         client.setUpdateReservationListener(response -> {
-            if (response.success()) {
+            if (response.isSuccess()) {
                 closeNewReservationModal();
                 refreshSchedule();
             } else {
-                showReservationError(response.message());
+                showReservationError(response.getMessage());
             }
         });
 
@@ -171,8 +172,6 @@ public class HostController {
             showReservationError("Select a table.");
             return;
         }
-
-        System.out.println(isEditMode);
 
         if (isEditMode) {
 
@@ -252,7 +251,10 @@ public class HostController {
 
     private void drawSchedule() {
 
-        if (scheduleGrid == null || scheduleOverlayPane == null) return;
+        if(scheduleGrid == null || scheduleOverlayPane == null)
+        {
+            return;
+        }
 
         scheduleGrid.getChildren().clear();
         scheduleGrid.getColumnConstraints().clear();
@@ -263,16 +265,41 @@ public class HostController {
         labelCol.setPrefWidth(LABEL_WIDTH);
         scheduleGrid.getColumnConstraints().add(labelCol);
 
-        for (int i = 0; i < SLOT_COUNT; i++) {
-            ColumnConstraints col = new ColumnConstraints();
-            col.setPrefWidth(SLOT_WIDTH);
-            scheduleGrid.getColumnConstraints().add(col);
+        for(int s = 0; s < SLOT_COUNT; s++)
+        {
+            ColumnConstraints slotCol = new ColumnConstraints();
+            slotCol.setPrefWidth(SLOT_WIDTH);
+            scheduleGrid.getColumnConstraints().add(slotCol);
         }
 
-        RowConstraints header = new RowConstraints();
-        header.setPrefHeight(40);
-        scheduleGrid.getRowConstraints().add(header);
+        RowConstraints headerRow = new RowConstraints();
+        headerRow.setPrefHeight(40);
+        scheduleGrid.getRowConstraints().add(headerRow);
 
+        for(RestaurantTable ignored : tables)
+        {
+            RowConstraints row = new RowConstraints();
+            row.setPrefHeight(ROW_HEIGHT);
+            scheduleGrid.getRowConstraints().add(row);
+        }
+
+        Label corner = new Label("Table");
+        corner.getStyleClass().add("gantt-header");
+        scheduleGrid.add(corner, 0, 0);
+
+        for(int s = 0; s < SLOT_COUNT; s++)
+        {
+            Label timeLabel =
+                    new Label(
+                            SERVICE_START
+                                    .plusMinutes(s * 30L)
+                                    .format(timeFormatter)
+                    );
+
+            timeLabel.getStyleClass().add("gantt-header");
+            GridPane.setHalignment(timeLabel, HPos.CENTER);
+            scheduleGrid.add(timeLabel, s + 1, 0);
+        }
         Map<Integer, Integer> tableRows = new LinkedHashMap<>();
         int row = 1;
 

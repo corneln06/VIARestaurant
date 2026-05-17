@@ -370,11 +370,11 @@ public class ServerConnection implements Runnable
   private void handleUpdateReservation(UpdateReservationRequest request) throws IOException {
     try {
       Reservation reservation = new Reservation(
-              request.id(),
-              request.name(),
-              request.dateTime(),
-              request.partySize(),
-              request.table()
+              request.getId(),
+              request.getName(),
+              request.getDateTime(),
+              request.getPartySize(),
+              request.getTable()
       );
 
       reservationDAO.updateReservation(reservation);
