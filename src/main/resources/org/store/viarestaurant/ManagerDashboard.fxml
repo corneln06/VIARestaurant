@@ -18,25 +18,33 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ListView?>
 <?import java.lang.String?>
-<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.Pane?>
+<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
     <left>
         <VBox prefWidth="220.0" spacing="18.0" styleClass="sidebar">
             <padding>
-                <Insets bottom="24.0" left="18.0" right="18.0" top="24.0" />
+                <Insets bottom="24.0" left="18.0" right="18.0" top="24.0"/>
             </padding>
             <children>
-                <Label styleClass="brand-title" text="Via Restaurant" />
+                <Label styleClass="brand-title" text="Via Restaurant"/>
                 <VBox spacing="4.0" styleClass="sidebar-user-card">
                     <children>
-                        <Label fx:id="sidebarName" styleClass="sidebar-name" text="Manager User" />
-                        <Label fx:id="sidebarRole" styleClass="sidebar-role" text="Manager" />
+                        <Label fx:id="sidebarName" styleClass="sidebar-name" text="Manager User"/>
+                        <Label fx:id="sidebarRole" styleClass="sidebar-role" text="Manager"/>
                     </children>
                 </VBox>
-                <Separator />
-                <Button maxWidth="Infinity" styleClass="nav-btn nav-btn-active" text="Edit Menu" />
-                <Region VBox.vgrow="ALWAYS" />
-                <Label styleClass="sidebar-footer" text="Menu Control" />
-            <Button fx:id="logOutButton" mnemonicParsing="false" prefHeight="25.0" onAction="#handleLogOut" prefWidth="184.0" style="-fx-background-color: red;" text="Log Out" textFill="WHITE" />
+                <Separator/>
+                <Button maxWidth="Infinity" fx:id="btnMenu" onAction="#showMenuPage" styleClass="nav-btn" text="Menu" />
+                <Button maxWidth="Infinity" fx:id="btnReservations" onAction="#showReservationsPage" styleClass="nav-btn" text="Reservation"/>
+                <Button maxWidth="Infinity" fx:id="btnTables" onAction="#showTablesPage" styleClass="nav-btn" text="Tables"/>
+                <Button maxWidth="Infinity" fx:id="btnWorkers" onAction="#showWorkersPage" styleClass="nav-btn" text="Workers"/>
+                <Region VBox.vgrow="ALWAYS"/>
+                <Label styleClass="sidebar-footer" text="Menu Control"/>
+                <Button fx:id="logOutButton" mnemonicParsing="false" prefHeight="25.0" onAction="#handleLogOut"
+                        prefWidth="184.0" style="-fx-background-color: red;" text="Log Out" textFill="WHITE"/>
             </children>
         </VBox>
     </left>
@@ -45,13 +53,19 @@
             <children>
                 <AnchorPane styleClass="page-surface">
                     <children>
-                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
+                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
+                              AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
                                 <HBox alignment="CENTER_LEFT">
                                     <children>
-                                        <Label styleClass="page-title" text="Menu" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Button onAction="#openNewDishModal" styleClass="btn-base btn-primary" text="+ New Dish" />
+                                        <Label styleClass="page-title" text="Menu"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="+ New Dish" onAction="#openNewDishModal">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
                                     </children>
                                 </HBox>
                                 <TableView fx:id="menuTable" VBox.vgrow="ALWAYS" styleClass="table-view">
@@ -114,6 +128,34 @@
                         </VBox>
                     </children>
                 </StackPane>
+                <AnchorPane fx:id="reservationsPage" managed="false" styleClass="page-surface" visible="false">
+                    <children>
+                        <VBox spacing="16.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
+                              AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label styleClass="page-title" text="Reservations"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="reservationsDateLabel" styleClass="page-subtitle"
+                                               text="2026-05-01"/>
+                                    </children>
+                                </HBox>
+                                <ScrollPane fitToHeight="true" pannable="true" styleClass="plain-scroll">
+                                    <content>
+                                        <StackPane alignment="TOP_LEFT">
+                                            <children>
+                                                <GridPane fx:id="reservationGrid"/>
+                                                <Pane fx:id="reservationOverlayPane" mouseTransparent="true"
+                                                      pickOnBounds="false"/>
+                                            </children>
+                                        </StackPane>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
             </children>
         </StackPane>
     </center>

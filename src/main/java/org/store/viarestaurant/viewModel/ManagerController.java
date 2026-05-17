@@ -10,8 +10,15 @@ import javafx.beans.property.SimpleStringProperty;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.viewModel.components.ReservationComponent;
 
-public class ManagerController {
+public class ManagerController
+{
+  private final ReservationComponent reservationComponent =
+      new ReservationComponent();
 
   private StackPane newDishOverlay;
   private TextField dishNameField;
@@ -61,6 +68,106 @@ public class ManagerController {
       }
     });
     allergiesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+  }
+
+  
+
+    ////// MAIN
+  public void init(
+      GridPane scheduleGrid,
+      Pane scheduleOverlayPane)
+  {
+    reservationComponent.initView(
+        scheduleGrid,
+        scheduleOverlayPane
+    );
+  }
+
+  public void initModal(
+      StackPane overlay,
+      TextField guestName,
+      DatePicker datePicker,
+      TextField timeField,
+      TextField partySize,
+      ComboBox<String> tableCombo,
+      Label errorLabel,
+      TextField nameField, 
+      ComboBox<String> typeCombo,
+      TextField priceField, 
+      CheckBox vegetarianCheckBox,
+      ListView<String> allergiesList, 
+      TableView<MenuItems> table)
+  {
+    reservationComponent.initModal(
+        overlay,
+        guestName,
+        datePicker,
+        timeField,
+        partySize,
+        tableCombo,
+        errorLabel
+    );
+
+    this.newDishOverlay = overlay;
+    this.dishNameField = nameField;
+    this.dishTypeComboBox = typeCombo;
+    this.dishPriceField = priceField;
+    this.isVegetarianCheckBox = vegetarianCheckBox;
+    this.allergiesListView = allergiesList;
+    this.newDishErrorLabel = errorLabel;
+    this.menuTable = table;
+
+    TableColumn<MenuItems, String> nameCol = (TableColumn<MenuItems, String>) table.getColumns().get(0);
+    TableColumn<MenuItems, String> typeCol = (TableColumn<MenuItems, String>) table.getColumns().get(1);
+    TableColumn<MenuItems, String> priceCol = (TableColumn<MenuItems, String>) table.getColumns().get(2);
+
+    nameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
+    typeCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getType().toString()));
+    priceCol.setCellValueFactory(data -> new SimpleStringProperty(String.format("%.2f", data.getValue().getPrice())));
+
+    dishTypeComboBox.getItems().setAll(
+        "Starter", "Main", "Dessert", "Beverage", "AlcoholicBeverage"
+    );
+
+    dishTypeComboBox.setButtonCell(new ListCell<>() {
+      @Override
+      protected void updateItem(String item, boolean empty) {
+        super.updateItem(item, empty);
+        if (item == null || empty) {
+          setText("Menu type");
+          setStyle("-fx-text-fill: #9ea8c0;");
+        } else {
+          setText(item);
+          setStyle("-fx-text-fill: #1d2440;");
+        }
+      }
+    });
+    allergiesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+  }
+
+  public void initClient(Client client)
+  {
+    reservationComponent.initClient(client);
+  }
+
+  public void refreshSchedule()
+  {
+    reservationComponent.refreshSchedule();
+  }
+
+  public void openNewReservationModal()
+  {
+    reservationComponent.openReservationModal();
+  }
+
+  public void closeNewReservationModal()
+  {
+    reservationComponent.closeReservationModal();
+  }
+
+  public void createReservation()
+  {
+    reservationComponent.createReservation();
   }
 
   public void refreshMenuTable() {
@@ -145,6 +252,5 @@ public class ManagerController {
 
   private void hideDishError() {
     newDishErrorLabel.setVisible(false);
-    newDishErrorLabel.setManaged(false);
-  }
+    newDishErrorLabel.setManaged(false);}
 }
