@@ -134,8 +134,4 @@ public class Client
     this.updateReservationListener = listener;
   }
 
-  public void setReservationDeletedListener(Consumer<ReservationDeletedMessage> listener)
-  {
-    this.reservationDeletedListener = listener;
-  }
 }

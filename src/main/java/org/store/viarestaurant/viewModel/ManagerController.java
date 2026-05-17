@@ -1,9 +1,6 @@
 package org.store.viarestaurant.viewModel;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -32,7 +29,10 @@ public class ManagerController
       TextField timeField,
       TextField partySize,
       ComboBox<String> tableCombo,
-      Label errorLabel)
+      Label errorLabel,
+      Button submit,
+      Button delete,
+      Label title)
   {
     reservationComponent.initModal(
         overlay,
@@ -41,7 +41,10 @@ public class ManagerController
         timeField,
         partySize,
         tableCombo,
-        errorLabel
+        errorLabel,
+            submit,
+            delete,
+            title
     );
   }
 

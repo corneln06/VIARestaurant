@@ -231,6 +231,16 @@ public class ReservationDAOImpl implements ReservationDAO
   public Reservation updateReservation(Reservation reservation) throws SQLException {
     try (Connection connection = getConnection())
     {
+
+      if (reservation.getDateTime().isBefore(LocalDateTime.now()))
+      {
+        throw new SQLException("Reservation cannot be created for the past!");
+      }
+      if (reservation.getTable().getMaxSitting() < reservation.getPartySize())
+      {
+        throw new SQLException("The party size exceeds max sitting!");
+      }
+
       PreparedStatement statement = connection.prepareStatement(
               "update reservations set customer=?, " +
                       "date=?," +

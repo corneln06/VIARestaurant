@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ReservationScheduleView
 {
@@ -26,7 +27,15 @@ public class ReservationScheduleView
   private static final int ROW_HEIGHT = 56;
 
   private final DateTimeFormatter timeFormatter =
-      DateTimeFormatter.ofPattern("HH:mm");
+          DateTimeFormatter.ofPattern("HH:mm");
+
+  private Consumer<Reservation> onReservationClicked;
+
+  public void setOnReservationClicked(
+          Consumer<Reservation> onReservationClicked)
+  {
+    this.onReservationClicked = onReservationClicked;
+  }
 
   public void draw(
       GridPane scheduleGrid,
@@ -164,6 +173,13 @@ public class ReservationScheduleView
 
       block.getStyleClass().add("reservation-block");
       block.setMaxWidth(Double.MAX_VALUE);
+      block.setOnMouseClicked(e ->
+      {
+        if(onReservationClicked != null)
+        {
+          onReservationClicked.accept(reservation);
+        }
+      });
 
       grid.add(block, startCol + 1, row);
       GridPane.setColumnSpan(block, 2);

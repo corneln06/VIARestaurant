@@ -1,13 +1,7 @@
 package org.store.viarestaurant.viewModel.services;
 
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.ReservationDto.CreateReservationResponse;
-import org.store.viarestaurant.server.dto.ReservationDto.GetReservationsResponse;
-import org.store.viarestaurant.server.dto.ReservationDto.GetReservationsRequest;
-import org.store.viarestaurant.server.dto.ReservationDto.GetTablesRequest;
-import org.store.viarestaurant.server.dto.ReservationDto.GetTablesResponse;
-import org.store.viarestaurant.server.dto.ReservationDto.ReservationCreatedMessage;
-import org.store.viarestaurant.server.dto.ReservationDto.TableBookingRequest;
+import org.store.viarestaurant.server.dto.ReservationDto.*;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -34,6 +28,20 @@ public class ReservationService
     client.send(request);
   }
 
+  public void updateReservation(
+          UpdateReservationRequest request
+  ) throws IOException
+  {
+    client.send(request);
+  }
+
+  public void deleteReservation(
+          DeleteReservationRequest request
+  ) throws IOException
+  {
+    client.send(request);
+  }
+
   public void onTablesLoaded(
       Consumer<GetTablesResponse> listener)
   {
@@ -56,5 +64,19 @@ public class ReservationService
       Consumer<ReservationCreatedMessage> listener)
   {
     client.setReservationCreatedListener(listener);
+  }
+
+  public void onReservationDelete(
+          Consumer<DeleteReservationResponse> listener
+  )
+  {
+    client.setDeleteReservationListener(listener);
+  }
+
+  public void onReservationUpdate(
+          Consumer<UpdateReservationResponse> listener
+  )
+  {
+    client.setUpdateReservationListener(listener);
   }
 }

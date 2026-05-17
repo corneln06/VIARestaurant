@@ -97,7 +97,8 @@ public class NavigationController
 
         hostController.init(reservationGrid, reservationOverlayPane);
         hostController.initModal(newReservationOverlay, guestNameField, reservationDatePicker,
-            reservationTimeField, partySizeField, tableComboBox, newReservationErrorLabel,submitReservationButton,deleteReservationButton,modalTitle);
+                reservationTimeField, partySizeField, tableComboBox, newReservationErrorLabel,
+                submitReservationButton,deleteReservationButton,modalTitle);
         hostController.refreshSchedule();
         showTablesPage();
       }
@@ -119,7 +120,10 @@ public class NavigationController
             reservationTimeField,
             partySizeField,
             tableComboBox,
-            newReservationErrorLabel
+            newReservationErrorLabel,
+                submitReservationButton,
+                deleteReservationButton,
+                modalTitle
         );
 
         showMenuPage();
