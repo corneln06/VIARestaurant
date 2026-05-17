@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.view.HelloApplication;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,11 +17,11 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.store.viarestaurant.model.entities.Workers;
-import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.view.HelloApplication;
 
 public class NavigationController
 {
@@ -94,9 +98,9 @@ public class NavigationController
 
         hostController.initClient(client);
 
-        hostController.init(reservationGrid, reservationOverlayPane);
+        hostController.init(reservationGrid, reservationOverlayPane, tableGrid);
 
-        hostController.initModal(
+        hostController.initReservationModal(
             newReservationOverlay,
             guestNameField,
             reservationDatePicker,
@@ -104,9 +108,9 @@ public class NavigationController
             partySizeField,
             tableComboBox,
             newReservationErrorLabel
+
         );
 
-        hostController.initTableGrid(tableGrid);
         hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo);
 
         hostController.refreshSchedule();
