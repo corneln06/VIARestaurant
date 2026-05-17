@@ -74,9 +74,8 @@ public class ReservationDAOImpl implements ReservationDAO
                 throw new SQLException("No ID returned from reservation insert");
             }
         }else {
-            throw new SQLException("please select another one. WE ARE IDIOTS");
+            throw new SQLException("That table is already reserved for that time, please select another one.");
         }
-        /////That table is already reserved for that time,
     }
   }
 
