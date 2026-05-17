@@ -164,7 +164,6 @@ public class NavigationController
             allergiesListView,
             newDishErrorLabel,
             menuTable,
-            newReservationErrorLabel,
                 submitReservationButton,
                 deleteReservationButton,
                 modalTitle
