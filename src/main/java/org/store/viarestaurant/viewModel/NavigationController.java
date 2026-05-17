@@ -45,6 +45,12 @@ public class NavigationController
   @FXML private GridPane reservationGrid;
   @FXML private Pane reservationOverlayPane;
 
+  @FXML private GridPane tableGrid;
+  @FXML private StackPane tableModalOverlay;
+  @FXML private Label tableModalTitle;
+  @FXML private Label tableModalStateBadge;
+  @FXML private Label tableModalInfo;
+
   @FXML private StackPane newReservationOverlay;
   @FXML private TextField guestNameField;
   @FXML private DatePicker reservationDatePicker;
@@ -100,6 +106,9 @@ public class NavigationController
             newReservationErrorLabel
         );
 
+        hostController.initTableGrid(tableGrid);
+        hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo);
+
         hostController.refreshSchedule();
         showTablesPage();
       }
@@ -134,6 +143,7 @@ public class NavigationController
   {
     showOnly(tablesPage);
     setActive(btnTables, btnReservations, btnWorkers, btnMenu);
+    if (hostController != null) hostController.refreshTableGrid();
   }
 
   @FXML
@@ -277,6 +287,18 @@ public class NavigationController
   {
     if(hostController != null) hostController.createReservation();
     else if(managerController != null) managerController.createReservation();
+  }
+
+  @FXML
+  private void closeTableModal(MouseEvent event)
+  {
+    if (hostController != null) hostController.closeTableModal();
+  }
+
+  @FXML
+  private void closeTableModalAction()
+  {
+    if (hostController != null) hostController.closeTableModal();
   }
 
   @FXML

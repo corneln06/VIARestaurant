@@ -204,6 +204,7 @@
 }
 
 .table-btn {
+    -fx-max-width: 150px;
     -fx-background-radius: 12px;
     -fx-min-width: 150px;
     -fx-min-height: 84px;
