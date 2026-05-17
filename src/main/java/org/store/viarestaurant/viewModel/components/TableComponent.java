@@ -36,15 +36,7 @@ public class TableComponent
   public void initGrid(GridPane tableGrid)
   {
     this.tableGrid = tableGrid;
-    try
-    {
-      reservationDAO = ReservationDAOImpl.getInstance();
-      tableDAO = RestaurantTableDAOImpl.getInstance();
-    }
-    catch (SQLException e)
-    {
-      e.printStackTrace();
-    }
+
     configureTableGrid();
     buildTableGrid();
   }
