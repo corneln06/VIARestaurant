@@ -1,6 +1,7 @@
 package org.store.viarestaurant.viewModel.components;
 
 import javafx.geometry.HPos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -161,6 +162,12 @@ public class ReservationScheduleView
                   + reservation.getPartySize()
                   + " guests"
           );
+      block.setOnMouseEntered( e -> {
+        block.setCursor(Cursor.HAND);
+      });
+      block.setOnDragExited(e -> {
+        block.setCursor(Cursor.DEFAULT);
+      });
 
       block.getStyleClass().add("reservation-block");
       block.setMaxWidth(Double.MAX_VALUE);
