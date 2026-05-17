@@ -280,7 +280,7 @@ public class ServerConnection implements Runnable
 
       if(reservation == null)
       {
-        send(new CreateReservationResponse(
+        send(new MessageResponse(
             false,
             "Could not create reservation"
         ));
@@ -288,7 +288,7 @@ public class ServerConnection implements Runnable
         return;
       }
 
-      send(new CreateReservationResponse(
+      send(new MessageResponse(
           true,
           "Reservation successfully created"
       ));
@@ -306,24 +306,34 @@ public class ServerConnection implements Runnable
     {
       e.printStackTrace();
 
-      send(new CreateReservationResponse(
+      send(new MessageResponse(
           false,
           "Database error while creating reservation"
       ));
     }
   }
-  public void handleCreateTable(TableCreateRequest request){
+  public void handleCreateTable(TableCreateRequest request) throws IOException
+  {
     try
     {
-      RestaurantTable restaurantTable = restaurantTableDAO.createRestaurantTable(request.getMaxSitting());
-
-      if(restaurantTable != null){
+      RestaurantTable restaurantTable =
+          restaurantTableDAO.createRestaurantTable(
+              request.getMaxSitting());
+      if(restaurantTable == null)
+      {
         send(new MessageResponse(false, "Cannot create a table"));
+        return;
       }
+      send(new MessageResponse(true, "Table created successfully"));
+
+      connectionPool.broadcast(
+          new TableCreatedMessage(restaurantTable)
+      );
     }
-    catch (SQLException | IOException e)
+    catch(SQLException e)
     {
-      throw new RuntimeException(e);
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while creating table"));
     }
   }
 

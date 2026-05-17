@@ -19,9 +19,10 @@ public class Client
   private Consumer<LoginResponse> loginListener;
   private Consumer<GetTablesResponse> reservationTablesListener;
   private Consumer<GetReservationsResponse> reservationsListener;
-  private Consumer<CreateReservationResponse> createReservationListener;
+  private Consumer<MessageResponse> createReservationListener;
   private Consumer<ReservationCreatedMessage> reservationCreatedListener;
   private Consumer<GetTablesResponse> tablesPageListener;
+  private Consumer<TableCreatedMessage> tableCreatedListener;
 
   public void connect() throws IOException
   {
@@ -74,13 +75,20 @@ public class Client
             {
               reservationsListener.accept(response);
             }
-            else if(object instanceof CreateReservationResponse response && createReservationListener != null)
+            else if(object instanceof MessageResponse response && createReservationListener != null)
             {
               createReservationListener.accept(response);
             }
             else if(object instanceof ReservationCreatedMessage message && reservationCreatedListener != null)
             {
               reservationCreatedListener.accept(message);
+            }
+            else if (object instanceof TableCreatedMessage message && tableCreatedListener != null)
+            {
+              tableCreatedListener.accept(message);
+            }
+            {
+              
             }
           });
         }
@@ -113,7 +121,7 @@ public class Client
     this.tablesPageListener = listener;
   }
 
-  public void setCreateReservationListener(Consumer<CreateReservationResponse> listener)
+  public void setCreateReservationListener(Consumer<MessageResponse> listener)
   {
     this.createReservationListener = listener;
   }

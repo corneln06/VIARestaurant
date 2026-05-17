@@ -1,13 +1,7 @@
 package org.store.viarestaurant.viewModel.services;
 
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.ReservationDto.CreateReservationResponse;
-import org.store.viarestaurant.server.dto.ReservationDto.GetReservationsResponse;
-import org.store.viarestaurant.server.dto.ReservationDto.GetReservationsRequest;
-import org.store.viarestaurant.server.dto.ReservationDto.GetTablesRequest;
-import org.store.viarestaurant.server.dto.ReservationDto.GetTablesResponse;
-import org.store.viarestaurant.server.dto.ReservationDto.ReservationCreatedMessage;
-import org.store.viarestaurant.server.dto.ReservationDto.TableBookingRequest;
+import org.store.viarestaurant.server.dto.ReservationDto.*;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -47,7 +41,7 @@ public class ReservationService
   }
 
   public void onCreateReservationResponse(
-      Consumer<CreateReservationResponse> listener)
+      Consumer<MessageResponse> listener)
   {
     client.setCreateReservationListener(listener);
   }

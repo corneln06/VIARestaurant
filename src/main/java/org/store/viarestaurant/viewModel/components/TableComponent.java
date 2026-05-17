@@ -162,9 +162,9 @@ public class TableComponent
 
     tablesService.onTablesLoaded(response ->
     {
-      this.tables = response.getTables();
-
+      tables = response.getTables();
       buildTableGrid();
+      refreshTableGrid();
     });
 
     reservationService.onReservationLoaded(response ->
