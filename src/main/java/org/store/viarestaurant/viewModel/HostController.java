@@ -1,16 +1,31 @@
 package org.store.viarestaurant.viewModel;
 
+
+import javafx.geometry.HPos;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import org.store.viarestaurant.model.entities.Reservation;
+import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.ReservationDto.*;
+import org.store.viarestaurant.viewModel.components.ReservationComponent;
+
+import javafx.scene.control.*;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
 import org.store.viarestaurant.viewModel.components.TableComponent;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 
 public class HostController
 {
@@ -41,7 +56,10 @@ public class HostController
       TextField timeField,
       TextField partySize,
       ComboBox<String> tableCombo,
-      Label errorLabel)
+      Label errorLabel,
+      Button submitButton,
+      Button deleteButton,
+      Label modalTitle)
   {
     reservationComponent.initModal(
         overlay,
@@ -50,7 +68,10 @@ public class HostController
         timeField,
         partySize,
         tableCombo,
-        errorLabel
+        errorLabel,
+        submitButton,
+            deleteButton,
+            modalTitle
     );
   }
 
@@ -91,6 +112,12 @@ public class HostController
     reservationComponent.createReservation();
   }
 
+
+  public void deleteReservation()
+  {
+    reservationComponent.deleteReservation();
+  }
+
   //table component functionns
 
   public void refreshTableGrid(){
@@ -103,6 +130,6 @@ public class HostController
 
 
 
- 
+
 
 }

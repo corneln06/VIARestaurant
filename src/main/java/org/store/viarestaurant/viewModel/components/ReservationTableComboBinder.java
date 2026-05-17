@@ -6,6 +6,7 @@ import org.store.viarestaurant.model.entities.RestaurantTable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ReservationTableComboBinder
 {
@@ -37,5 +38,16 @@ public class ReservationTableComboBinder
       ComboBox<String> comboBox)
   {
     return tableMap.get(comboBox.getValue());
+  }
+  public String getLabelForTable(RestaurantTable table)
+  {
+    return tableMap.entrySet()
+            .stream()
+            .filter(entry ->
+                    Objects.equals(entry.getValue().getId(), table.getId())
+            )
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElse(null);
   }
 }

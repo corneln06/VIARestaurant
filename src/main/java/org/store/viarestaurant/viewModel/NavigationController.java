@@ -18,6 +18,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
@@ -74,6 +75,12 @@ public class NavigationController
 
   protected Client client;
 
+  @FXML private Button submitReservationButton;
+  @FXML private Button deleteReservationButton;
+
+  @FXML private Label modalTitle;
+
+
   private HostController hostController;
   private ManagerController managerController;
 
@@ -117,7 +124,10 @@ public class NavigationController
             reservationTimeField,
             partySizeField,
             tableComboBox,
-            newReservationErrorLabel
+            newReservationErrorLabel,
+                submitReservationButton,
+                deleteReservationButton,
+                modalTitle
 
         );
 
@@ -153,7 +163,10 @@ public class NavigationController
             isVegetarianCheckBox,
             allergiesListView,
             newDishErrorLabel,
-            menuTable
+            menuTable,
+                submitReservationButton,
+                deleteReservationButton,
+                modalTitle
         );
 
         managerController.refreshMenuTable();
@@ -367,6 +380,14 @@ public class NavigationController
       {
         button.getStyleClass().remove("nav-btn-active");
       }
+    }
+  }
+  @FXML
+  private void deleteReservation()
+  {
+    if (hostController != null)
+    {
+      hostController.deleteReservation();
     }
   }
   @FXML

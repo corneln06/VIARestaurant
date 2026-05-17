@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
 
@@ -49,13 +50,16 @@ public class ManagerController
       ComboBox<String> tableCombo,
       Label errorLabel,
       StackPane overlayNewDish,
-      TextField nameField, 
+      TextField nameField,
       ComboBox<String> typeCombo,
-      TextField priceField, 
+      TextField priceField,
       CheckBox vegetarianCheckBox,
       ListView<String> allergiesList,
       Label errorLabelNewDish,
-      TableView<MenuItems> table)
+      TableView<MenuItems> table,
+      Button submit,
+      Button delete,
+      Label title)
   {
     reservationComponent.initModal(
         overlay,
@@ -64,7 +68,10 @@ public class ManagerController
         timeField,
         partySize,
         tableCombo,
-        errorLabel
+        errorLabel,
+            submit,
+            delete,
+            title
     );
 
     this.newDishOverlay = overlayNewDish;

@@ -28,6 +28,20 @@ public class ReservationService
     client.send(request);
   }
 
+  public void updateReservation(
+          UpdateReservationRequest request
+  ) throws IOException
+  {
+    client.send(request);
+  }
+
+  public void deleteReservation(
+          DeleteReservationRequest request
+  ) throws IOException
+  {
+    client.send(request);
+  }
+
   public void onTablesLoaded(
       Consumer<GetTablesResponse> listener)
   {
@@ -50,5 +64,19 @@ public class ReservationService
       Consumer<ReservationCreatedMessage> listener)
   {
     client.setReservationCreatedListener(listener);
+  }
+
+  public void onReservationDelete(
+          Consumer<DeleteReservationResponse> listener
+  )
+  {
+    client.setDeleteReservationListener(listener);
+  }
+
+  public void onReservationUpdate(
+          Consumer<UpdateReservationResponse> listener
+  )
+  {
+    client.setUpdateReservationListener(listener);
   }
 }
