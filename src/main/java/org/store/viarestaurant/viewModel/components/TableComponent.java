@@ -1,11 +1,7 @@
 package org.store.viarestaurant.viewModel.components;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.store.viarestaurant.dao.ReservationDAOImpl;
 import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
@@ -19,6 +15,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.viewModel.services.TablesService;
 
 public class TableComponent
 {
@@ -32,6 +30,8 @@ public class TableComponent
 
   private ReservationDAOImpl reservationDAO;
   private RestaurantTableDAOImpl tableDAO;
+  private TablesService tablesService;
+  private ArrayList<RestaurantTable> tables = new ArrayList<>();
 
   public void initGrid(GridPane tableGrid)
   {
@@ -180,5 +180,13 @@ public class TableComponent
     {
       e.printStackTrace();
     }
+  }
+  public void initClient(Client client){
+    this.tablesService = new TablesService(client);
+
+    tablesService.onTablesLoaded(response ->
+        tables = response.getTables());
+
+    buildTableGrid();
   }
 }
