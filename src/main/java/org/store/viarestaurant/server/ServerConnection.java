@@ -95,11 +95,22 @@ public class ServerConnection implements Runnable
         {
           handleGetReservations();
         }
+        else if(object instanceof UpdateReservationRequest request)
+        {
+          System.out.println("[SERVER] Update Reservation detected");
+          handleUpdateReservation(request);
+        }
+        else if(object instanceof DeleteReservationRequest request)
+        {
+          System.out.println("[SERVER] DeleteReservationRequest detected");
+          handleDeleteReservation(request);
+        }
         else
         {
           System.out.println(
               "[SERVER] Unknown object received");
         }
+
         }
 
     }
@@ -136,6 +147,7 @@ public class ServerConnection implements Runnable
       }
     }
   }
+
   private void handleGetTables() throws IOException{
     try
     {
@@ -325,4 +337,66 @@ public class ServerConnection implements Runnable
     System.out.println(
         "[SERVER] Object sent");
   }
+
+
+  private void handleDeleteReservation(DeleteReservationRequest request) throws IOException {
+    try
+    {
+      reservationDAO.deleteById(request.getReservationId());
+
+      send(new DeleteReservationResponse(
+              true,
+              "Reservation deleted successfully"
+      ));
+
+      connectionPool.broadcast(
+              new ReservationDeletedMessage(request.getReservationId())
+      );
+      connectionPool.broadcast(
+              new GetReservationsResponse(
+                      reservationDAO.getAllReservationsForToday()
+              )
+      );
+    }
+    catch (SQLException e)
+    {
+      send(new DeleteReservationResponse(
+              false,
+              e.getMessage()
+      ));
+    }
+  }
+
+  private void handleUpdateReservation(UpdateReservationRequest request) throws IOException {
+    try {
+      Reservation reservation = new Reservation(
+              request.getId(),
+              request.getName(),
+              request.getDateTime(),
+              request.getPartySize(),
+              request.getTable()
+      );
+
+      reservationDAO.updateReservation(reservation);
+
+      send(new UpdateReservationResponse(
+              true,
+              "Reservation updated successfully"
+      ));
+
+      connectionPool.broadcast(
+              new GetReservationsResponse(
+                      reservationDAO.getAllReservationsForToday()
+              )
+      );
+
+
+    } catch (SQLException e) {
+      send(new UpdateReservationResponse(
+              false,
+              e.getMessage()
+      ));
+    }
+  }
+
 }
