@@ -6,7 +6,7 @@ module org.store.viarestaurant {
   requires org.postgresql.jdbc;
   requires javafx.graphics;
 
-  exports org.store.viarestaurant.model.state;
+    exports org.store.viarestaurant.model.state;
   opens org.store.viarestaurant.model.state to javafx.fxml;
   exports org.store.viarestaurant.view;
   opens org.store.viarestaurant.view to javafx.fxml;

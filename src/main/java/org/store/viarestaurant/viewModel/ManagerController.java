@@ -15,11 +15,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
+import org.store.viarestaurant.viewModel.components.TableComponent;
 
 public class ManagerController
 {
   private final ReservationComponent reservationComponent =
       new ReservationComponent();
+  private final TableComponent tableComponent = new TableComponent();
 
   private StackPane newDishOverlay;
   private TextField dishNameField;
@@ -33,12 +35,15 @@ public class ManagerController
     ////// MAIN
   public void init(
       GridPane scheduleGrid,
-      Pane scheduleOverlayPane)
+      Pane scheduleOverlayPane,
+      GridPane tableGrid)
   {
     reservationComponent.initView(
         scheduleGrid,
         scheduleOverlayPane
     );
+
+    tableComponent.initGrid(tableGrid);
   }
 
   public void initModal(
@@ -110,6 +115,15 @@ public class ManagerController
     });
     allergiesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
   }
+
+  public void initTableModal(
+            StackPane overlay,
+            Label title,
+            Label badge,
+            Label info)
+    {
+        tableComponent.initModal(overlay, title, badge, info);
+    }
 
   public void initClient(Client client)
   {
@@ -218,5 +232,14 @@ public class ManagerController
 
   private void hideDishError() {
     newDishErrorLabel.setVisible(false);
-    newDishErrorLabel.setManaged(false);}
+    newDishErrorLabel.setManaged(false);
+  }
+
+  public void closeTableModal(){
+      tableComponent.closeTableModal();
+  }
+
+  public void refreshTableGrid(){
+      tableComponent.refreshTableGrid();
+  }
 }
