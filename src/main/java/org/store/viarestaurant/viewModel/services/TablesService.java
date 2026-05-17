@@ -19,11 +19,11 @@ public class TablesService
   {
     client.send(new GetTablesRequest());
   }
-  public void createTables(TableCreateRequest request) throws IOException{
+  public void createTable(TableCreateRequest request) throws IOException{
     client.send(request);
   }
   public void onTablesLoaded(Consumer<GetTablesResponse> listener){
-    client.setTablesListener(listener);
+    client.setTablesPageListener(listener);;
   }
 
 }

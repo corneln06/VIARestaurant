@@ -17,10 +17,11 @@ public class Client
   private ObjectInputStream inFromServer;
 
   private Consumer<LoginResponse> loginListener;
-  private Consumer<GetTablesResponse> tablesListener;
+  private Consumer<GetTablesResponse> reservationTablesListener;
   private Consumer<GetReservationsResponse> reservationsListener;
   private Consumer<CreateReservationResponse> createReservationListener;
   private Consumer<ReservationCreatedMessage> reservationCreatedListener;
+  private Consumer<GetTablesResponse> tablesPageListener;
 
   public void connect() throws IOException
   {
@@ -56,9 +57,18 @@ public class Client
             {
               loginListener.accept(response);
             }
-            else if(object instanceof GetTablesResponse response && tablesListener != null)
+            else if(object instanceof GetTablesResponse response)
             {
-              tablesListener.accept(response);
+              if(reservationTablesListener != null)
+              {
+                reservationTablesListener.accept(response);
+              }
+              if(tablesPageListener != null)
+              {
+                tablesPageListener.accept(response);
+              }
+
+
             }
             else if(object instanceof GetReservationsResponse response && reservationsListener != null)
             {
@@ -90,14 +100,17 @@ public class Client
     this.loginListener = listener;
   }
 
-  public void setTablesListener(Consumer<GetTablesResponse> listener)
+  public void setReservationTablesListener(Consumer<GetTablesResponse> listener)
   {
-    this.tablesListener = listener;
+    this.reservationTablesListener = listener;
   }
 
   public void setReservationsListener(Consumer<GetReservationsResponse> listener)
   {
     this.reservationsListener = listener;
+  }
+  public void setTablesPageListener(Consumer<GetTablesResponse> listener){
+    this.tablesPageListener = listener;
   }
 
   public void setCreateReservationListener(Consumer<CreateReservationResponse> listener)
