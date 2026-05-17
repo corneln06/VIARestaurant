@@ -2,6 +2,7 @@ package org.store.viarestaurant.server;
 
 import org.store.viarestaurant.dao.*;
 import org.store.viarestaurant.model.entities.Reservation;
+import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.dto.LoginRequest;
 import org.store.viarestaurant.server.dto.LoginResponse;
@@ -309,6 +310,20 @@ public class ServerConnection implements Runnable
           false,
           "Database error while creating reservation"
       ));
+    }
+  }
+  public void handleCreateTable(TableCreateRequest request){
+    try
+    {
+      RestaurantTable restaurantTable = restaurantTableDAO.createRestaurantTable(request.getMaxSitting());
+
+      if(restaurantTable != null){
+        send(new MessageResponse(false, "Cannot create a table"));
+      }
+    }
+    catch (SQLException | IOException e)
+    {
+      throw new RuntimeException(e);
     }
   }
 
