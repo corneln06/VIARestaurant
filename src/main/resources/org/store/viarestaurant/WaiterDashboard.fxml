@@ -17,6 +17,8 @@
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.layout.GridPane?>
+<?import java.lang.String?>
 <BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
     <left>
         <VBox prefWidth="220.0" spacing="18.0" styleClass="sidebar">
@@ -50,18 +52,46 @@
             <children>
                 <AnchorPane fx:id="tablesPage" styleClass="page-surface">
                     <children>
-                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
+                        <VBox spacing="20.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
+                              AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
-                                <Label styleClass="page-title" text="Live Tables" />
-                                <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll" VBox.vgrow="ALWAYS">
-                                    <content>
-                                        <FlowPane fx:id="waiterTablesFlow" hgap="16.0" prefWrapLength="800.0" vgap="16.0" />
-                                    </content>
-                                </ScrollPane>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label styleClass="page-title" text="Tables"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                </HBox>
+                                <GridPane fx:id="tableGrid" hgap="18.0" vgap="18.0"/>
                             </children>
                         </VBox>
                     </children>
                 </AnchorPane>
+                <StackPane fx:id="tableModalOverlay" managed="false" onMouseClicked="#closeTableModal" styleClass="modal-overlay" visible="false">
+                    <children>
+                        <VBox maxWidth="380.0" spacing="16.0" styleClass="modal-card modal-card-medium">
+                            <children>
+                                <Label fx:id="tableModalTitle" styleClass="modal-title" text="Table 1"/>
+                                <VBox spacing="10.0" styleClass="modal-info-box">
+                                    <children>
+                                        <Label fx:id="tableModalStateBadge" styleClass="state-badge badge-available"
+                                               text="Available"/>
+                                        <Label fx:id="tableModalInfo" styleClass="muted-label"
+                                               text="Ready for walk-ins and upcoming service." wrapText="true"/>
+                                    </children>
+                                </VBox>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <children>
+                                        <Button onAction="#closeTableModalAction" styleClass="btn-base btn-secondary" text="Close"/>
+                                        <Button fx:id="tableModalPrimaryButton" styleClass="btn-base btn-danger"
+                                                text="Unavailable"/>
+                                        <Button fx:id="tableModalSecondaryButton" styleClass="btn-base btn-warning"
+                                                text="Reserved"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
                 <AnchorPane fx:id="ordersListPage" managed="false" styleClass="page-surface" visible="false">
                     <children>
                         <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">

@@ -83,6 +83,7 @@ public class NavigationController
 
     private HostController hostController;
     private ManagerController managerController;
+    private WaiterController waiterController;
 
     public void initData(Workers worker)
     {
@@ -136,7 +137,14 @@ public class NavigationController
                 hostController.refreshSchedule();
                 showTablesPage();
             }
-            case Waiter -> showWaiterTablesPage();
+            case Waiter -> {
+                waiterController = new WaiterController();
+
+                waiterController.init(tableGrid);
+
+                showTablesPage();
+                showWaiterTablesPage();
+            }
             case Manager -> {
                 managerController = new ManagerController();
 
@@ -148,7 +156,7 @@ public class NavigationController
                 );
 
                 managerController.initModal(
-                        //Menu Modal props
+                        //Reservation Modal props
                         newReservationOverlay,
                         guestNameField,
                         reservationDatePicker,
@@ -187,6 +195,7 @@ public class NavigationController
         setActive(btnTables, btnReservations, btnWorkers, btnMenu, btnBills, btnOrders);
         if (hostController != null) hostController.refreshTableGrid();
         if (managerController != null) managerController.refreshTableGrid();
+        if (waiterController != null) waiterController.refreshTableGrid();
     }
 
     @FXML
