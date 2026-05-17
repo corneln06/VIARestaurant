@@ -29,49 +29,6 @@ public class ManagerController
   private Label newDishErrorLabel;
   private TableView<MenuItems> menuTable;
 
-  public void initModal(StackPane overlay, TextField nameField, ComboBox<String> typeCombo,
-      TextField priceField, CheckBox vegetarianCheckBox,
-      ListView<String> allergiesList, Label errorLabel,
-      TableView<MenuItems> table) {
-    this.newDishOverlay = overlay;
-    this.dishNameField = nameField;
-    this.dishTypeComboBox = typeCombo;
-    this.dishPriceField = priceField;
-    this.isVegetarianCheckBox = vegetarianCheckBox;
-    this.allergiesListView = allergiesList;
-    this.newDishErrorLabel = errorLabel;
-    this.menuTable = table;
-
-    TableColumn<MenuItems, String> nameCol = (TableColumn<MenuItems, String>) table.getColumns().get(0);
-    TableColumn<MenuItems, String> typeCol = (TableColumn<MenuItems, String>) table.getColumns().get(1);
-    TableColumn<MenuItems, String> priceCol = (TableColumn<MenuItems, String>) table.getColumns().get(2);
-
-    nameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
-    typeCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getType().toString()));
-    priceCol.setCellValueFactory(data -> new SimpleStringProperty(String.format("%.2f", data.getValue().getPrice())));
-
-    dishTypeComboBox.getItems().setAll(
-        "Starter", "Main", "Dessert", "Beverage", "AlcoholicBeverage"
-    );
-
-    dishTypeComboBox.setButtonCell(new ListCell<>() {
-      @Override
-      protected void updateItem(String item, boolean empty) {
-        super.updateItem(item, empty);
-        if (item == null || empty) {
-          setText("Menu type");
-          setStyle("-fx-text-fill: #9ea8c0;");
-        } else {
-          setText(item);
-          setStyle("-fx-text-fill: #1d2440;");
-        }
-      }
-    });
-    allergiesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-  }
-
-  
-
     ////// MAIN
   public void init(
       GridPane scheduleGrid,
@@ -91,11 +48,13 @@ public class ManagerController
       TextField partySize,
       ComboBox<String> tableCombo,
       Label errorLabel,
+      StackPane overlayNewDish,
       TextField nameField, 
       ComboBox<String> typeCombo,
       TextField priceField, 
       CheckBox vegetarianCheckBox,
-      ListView<String> allergiesList, 
+      ListView<String> allergiesList,
+      Label errorLabelNewDish,
       TableView<MenuItems> table)
   {
     reservationComponent.initModal(
@@ -108,13 +67,13 @@ public class ManagerController
         errorLabel
     );
 
-    this.newDishOverlay = overlay;
+    this.newDishOverlay = overlayNewDish;
     this.dishNameField = nameField;
     this.dishTypeComboBox = typeCombo;
     this.dishPriceField = priceField;
     this.isVegetarianCheckBox = vegetarianCheckBox;
     this.allergiesListView = allergiesList;
-    this.newDishErrorLabel = errorLabel;
+    this.newDishErrorLabel = errorLabelNewDish;
     this.menuTable = table;
 
     TableColumn<MenuItems, String> nameCol = (TableColumn<MenuItems, String>) table.getColumns().get(0);

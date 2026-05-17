@@ -24,11 +24,11 @@ public class AllergyDAOImplTest {
     @Order(1)
     void testCreateAllergy() throws SQLException
     {
-        Allergy allergy = dao.createAllergy("Peanuts");
+        Allergy allergy = dao.createAllergy("Work");
 
         assertNotNull(allergy);
         assertTrue(allergy.getId() > 0);
-        assertEquals("Peanuts", allergy.getName());
+        assertEquals("Work", allergy.getName());
 
         createdId = allergy.getId();
     }
