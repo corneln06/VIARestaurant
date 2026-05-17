@@ -4,18 +4,22 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.view.HelloApplication;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.store.viarestaurant.model.entities.Reservation;
+import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.view.HelloApplication;
@@ -46,6 +50,12 @@ public class NavigationController
   @FXML private GridPane reservationGrid;
   @FXML private Pane reservationOverlayPane;
 
+  @FXML private GridPane tableGrid;
+  @FXML private StackPane tableModalOverlay;
+  @FXML private Label tableModalTitle;
+  @FXML private Label tableModalStateBadge;
+  @FXML private Label tableModalInfo;
+
   @FXML private StackPane newReservationOverlay;
   @FXML private TextField guestNameField;
   @FXML private DatePicker reservationDatePicker;
@@ -53,6 +63,16 @@ public class NavigationController
   @FXML private TextField partySizeField;
   @FXML private ComboBox<String> tableComboBox;
   @FXML private Label newReservationErrorLabel;
+
+  @FXML private StackPane newDishOverlay;
+  @FXML private TextField dishNameField;
+  @FXML private CheckBox isVegetarianCheckBox;
+  @FXML private ListView<String> allergiesListView;
+  @FXML private TextField dishPriceField;
+  @FXML private ComboBox<String> dishTypeComboBox;
+  @FXML private Label newDishErrorLabel;
+  @FXML private TableView<MenuItems> menuTable;
+
   protected Client client;
 
   @FXML private Button submitReservationButton;
@@ -95,10 +115,24 @@ public class NavigationController
 
         hostController.initClient(client);
 
-        hostController.init(reservationGrid, reservationOverlayPane);
-        hostController.initModal(newReservationOverlay, guestNameField, reservationDatePicker,
-                reservationTimeField, partySizeField, tableComboBox, newReservationErrorLabel,
-                submitReservationButton,deleteReservationButton,modalTitle);
+        hostController.init(reservationGrid, reservationOverlayPane, tableGrid);
+
+        hostController.initReservationModal(
+            newReservationOverlay,
+            guestNameField,
+            reservationDatePicker,
+            reservationTimeField,
+            partySizeField,
+            tableComboBox,
+            newReservationErrorLabel,
+                submitReservationButton,
+                deleteReservationButton,
+                modalTitle
+
+        );
+
+        hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo);
+
         hostController.refreshSchedule();
         showTablesPage();
       }
@@ -121,10 +155,22 @@ public class NavigationController
             partySizeField,
             tableComboBox,
             newReservationErrorLabel,
+            ///////////////////////// Menu Modal //////////////////
+            newDishOverlay,
+            dishNameField,
+            dishTypeComboBox,
+            dishPriceField,
+            isVegetarianCheckBox,
+            allergiesListView,
+            newDishErrorLabel,
+            menuTable,
+            newReservationErrorLabel,
                 submitReservationButton,
                 deleteReservationButton,
                 modalTitle
         );
+
+        managerController.refreshMenuTable();
 
         showMenuPage();
       }
@@ -135,7 +181,8 @@ public class NavigationController
   private void showTablesPage()
   {
     showOnly(tablesPage);
-    setActive(btnTables, btnReservations, btnWorkers, btnMenu);
+    setActive(btnTables, btnReservations, btnWorkers, btnMenu, btnBills, btnOrders);
+    if (hostController != null) hostController.refreshTableGrid();
   }
 
   @FXML
@@ -182,7 +229,7 @@ public class NavigationController
   private void showOrdersPage()
   {
     showOnly(ordersListPage);
-    setActive(btnOrders, btnTables, btnBills);
+    setActive(btnOrders, btnBills, btnTables);
   }
 
   @FXML
@@ -282,6 +329,18 @@ public class NavigationController
   }
 
   @FXML
+  private void closeTableModal(MouseEvent event)
+  {
+    if (hostController != null) hostController.closeTableModal();
+  }
+
+  @FXML
+  private void closeTableModalAction()
+  {
+    if (hostController != null) hostController.closeTableModal();
+  }
+
+  @FXML
   private void consumeModalClick(MouseEvent event)
   {
     event.consume();
@@ -332,5 +391,23 @@ public class NavigationController
       hostController.deleteReservation();
     }
   }
+  @FXML
+  private void openNewDishModal() {
+    if (managerController != null) managerController.openNewDishModal();
+  }
 
+  @FXML
+  private void closeNewDishModal(MouseEvent event) {
+    if (managerController != null) managerController.closeNewDishModal();
+  }
+
+  @FXML
+  private void closeNewDishModalAction() {
+    if (managerController != null) managerController.closeNewDishModal();
+  }
+
+  @FXML
+  private void createDish() {
+    if (managerController != null) managerController.createDish();
+  }
 }

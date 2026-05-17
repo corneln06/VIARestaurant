@@ -204,8 +204,8 @@
 }
 
 .table-btn {
+    -fx-width: 150px;
     -fx-background-radius: 12px;
-    -fx-min-width: 150px;
     -fx-min-height: 84px;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
@@ -415,4 +415,8 @@
 
 .table-row-cell {
     -fx-cell-size: 42px;
+}
+.table-row-cell .table-cell {
+    -fx-alignment: center;
+    -fx-font-size: 15px;
 }

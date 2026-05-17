@@ -2,8 +2,11 @@ package org.store.viarestaurant.dao;
 
 import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.model.entities.Allergy;
+import org.store.viarestaurant.model.entities.Reservation;
+import org.store.viarestaurant.model.entities.RestaurantTable;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class AllergyDAOImpl implements AllergyDAO{
 
@@ -45,6 +48,29 @@ public class AllergyDAOImpl implements AllergyDAO{
             }
         }
     };
+
+  @Override
+  public ArrayList<Allergy> getAllAllergies() throws SQLException
+  {
+    String sql = "SELECT id, name from allergies";
+
+    try (Connection connection = getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql))
+    {
+      ResultSet rs = statement.executeQuery();
+      ArrayList<Allergy> allergies = new ArrayList<>();
+
+      while (rs.next())
+      {
+        allergies.add(new Allergy(
+            rs.getInt("id"),
+            rs.getString("name")
+        ));
+      }
+
+      return allergies;
+    }
+  }
 
     @Override
     public Allergy getAllergyById(Integer id) throws SQLException {

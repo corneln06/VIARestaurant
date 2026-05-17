@@ -24,11 +24,11 @@ public class AllergyDAOImplTest {
     @Order(1)
     void testCreateAllergy() throws SQLException
     {
-        Allergy allergy = dao.createAllergy("Peanuts");
+        Allergy allergy = dao.createAllergy("Work");
 
         assertNotNull(allergy);
         assertTrue(allergy.getId() > 0);
-        assertEquals("Peanuts", allergy.getName());
+        assertEquals("Work", allergy.getName());
 
         createdId = allergy.getId();
     }
@@ -50,8 +50,27 @@ public class AllergyDAOImplTest {
         assertNotNull(allergy);
         assertEquals("Peanuts", allergy.getName());
     }
+
+  @Test
+  @Order(4)
+  void testGetAllAllergies() throws SQLException {
+    ArrayList<Allergy> allergies = dao.getAllAllergies();
+
+    assertNotNull(allergies);
+    assertFalse(allergies.isEmpty());
+
+    boolean found = allergies.stream()
+        .anyMatch(a -> a.getName().equals("Peanuts"));
+
+    assertTrue(found, "Peanuts allergy should be in the list");
+
+    allergies.forEach(a -> {
+      assertTrue(a.getId() > 0);
+      assertNotNull(a.getName());
+    });
+  }
     @Test
-    @Order(4)
+    @Order(5)
     void testUpdateAllergy() throws SQLException {
         Allergy allergy = dao.getAllergyById(createdId);
         allergy.setName("Nuts");
@@ -66,7 +85,7 @@ public class AllergyDAOImplTest {
 
 
     @Test
-    @Order(5)
+    @Order(6)
     void testDeleteById() throws SQLException
     {
         dao.delete(createdId);
