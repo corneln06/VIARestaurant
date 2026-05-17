@@ -1,6 +1,5 @@
 package org.store.viarestaurant.viewModel.components;
 
-import javafx.geometry.HPos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
@@ -47,6 +46,7 @@ public class ReservationScheduleView
     Map<Integer, Integer> tableRows = drawTableRows(scheduleGrid, tables);
     drawReservations(scheduleGrid, reservations, tableRows);
     setupSize(scheduleGrid, scheduleOverlayPane, tables.size());
+    drawHourLines(scheduleOverlayPane, tables.size());
     drawNowLine(scheduleOverlayPane, tables.size());
   }
 
@@ -98,7 +98,6 @@ public class ReservationScheduleView
           new Label(SERVICE_START.plusMinutes(s * 30L).format(timeFormatter));
 
       timeLabel.getStyleClass().add("gantt-header");
-      GridPane.setHalignment(timeLabel, HPos.CENTER);
 
       grid.add(timeLabel, s + 1, 0);
     }
@@ -187,6 +186,22 @@ public class ReservationScheduleView
 
     grid.setPrefSize(totalWidth, totalHeight);
     overlay.setPrefSize(totalWidth, totalHeight);
+  }
+
+  private void drawHourLines(Pane overlay, int tableCount)
+  {
+    double totalHeight = 40 + tableCount * ROW_HEIGHT;
+    long minutesStart = SERVICE_START.getHour() * 60L;
+
+    for(int hour = SERVICE_START.getHour() + 1; hour <= 23; hour++)
+    {
+      double offset = (hour * 60L - minutesStart) / 30.0 * SLOT_WIDTH;
+      Rectangle line = new Rectangle(1, totalHeight);
+      line.setFill(Color.LIGHTGRAY);
+      line.setLayoutX(LABEL_WIDTH + offset);
+      line.setLayoutY(0);
+      overlay.getChildren().add(line);
+    }
   }
 
   private void drawNowLine(Pane overlay, int tableCount)
