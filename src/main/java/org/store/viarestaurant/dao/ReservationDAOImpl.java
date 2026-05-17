@@ -13,6 +13,7 @@ import java.util.Objects;
 public class ReservationDAOImpl implements ReservationDAO
 {
   private static ReservationDAOImpl instance;
+  private static final int RESERVATION_DURATION = 120;
 
   private ReservationDAOImpl() throws SQLException{
     DriverManager.registerDriver(new org.postgresql.Driver());
@@ -43,7 +44,8 @@ public class ReservationDAOImpl implements ReservationDAO
     }
 
     String sql = "INSERT INTO reservations (customer, date, partySize, tableId) " +
-        "VALUES (?, ?, ?, ?) RETURNING id";
+        "VALUES (?, ?, ?, ?) " +
+            " RETURNING id";
 
     try (Connection connection = getConnection();
         PreparedStatement statement = connection.prepareStatement(sql))
@@ -53,16 +55,25 @@ public class ReservationDAOImpl implements ReservationDAO
       statement.setInt(3, partySize);
       statement.setInt(4, restaurantTable.getId());
 
+      ArrayList<Reservation> sameDayReservations =
+              getReservationByDate(dateTime);
 
-        ArrayList<Reservation> sameTimeReservations = getReservationByDate(dateTime);
-        Reservation repeatedReservation = sameTimeReservations.stream()
-                .filter(reservation ->
-                        Objects.equals(reservation.getTable().getId(), restaurantTable.getId())
-                )
-                .findFirst()
-                .orElse(null);
+      Reservation conflict =
+              sameDayReservations.stream()
+                      .filter(r ->
+                              r.getTable().getId().equals(restaurantTable.getId())
+                                      && hasConflict(
+                                      new Reservation(-1, name, dateTime, partySize, restaurantTable),
+                                      r
+                              )
+                      )
+                      .findFirst()
+                      .orElse(null);
 
-        if (repeatedReservation == null) {
+      if (conflict != null) {
+        throw new SQLException("That table is already reserved for that time.");
+      }
+
             ResultSet rs = statement.executeQuery();
             if (rs.next())
             {
@@ -73,9 +84,7 @@ public class ReservationDAOImpl implements ReservationDAO
             {
                 throw new SQLException("No ID returned from reservation insert");
             }
-        }else {
-            throw new SQLException("That table is already reserved for that time, please select another one.");
-        }
+
     }
   }
 
@@ -255,21 +264,26 @@ public class ReservationDAOImpl implements ReservationDAO
       statement.setInt(4, reservation.getTable().getId());
       statement.setInt(5, reservation.getId());
 
-      ArrayList<Reservation> sameTimeReservations = getReservationByDate(reservation.getDateTime());
-      Reservation repeatedReservation = sameTimeReservations.stream()
-              .filter(reservationRep ->
-                      Objects.equals(reservation.getTable().getId(), reservationRep.getTable().getId()) && reservation.getDateTime().equals(reservationRep.getDateTime()) && reservation.getId() != reservationRep.getId()
-              )
-              .findFirst()
-              .orElse(null);
 
-      int affected = 0;
+      int affected = statement.executeUpdate();
 
-      if (repeatedReservation == null) {
-        affected = statement.executeUpdate();
-      } else {
-        throw new SQLException("That table is already reserved for that time, please select another one.");
+      ArrayList<Reservation> sameDayReservations =
+              getReservationByDate(reservation.getDateTime());
+
+      Reservation conflict =
+              sameDayReservations.stream()
+                      .filter(r ->
+                              r.getTable().getId().equals(reservation.getTable().getId())
+                                      && r.getId() != reservation.getId()
+                                      && hasConflict(reservation, r)
+                      )
+                      .findFirst()
+                      .orElse(null);
+
+      if (conflict != null) {
+        throw new SQLException("That table is already reserved for that time.");
       }
+
 
       if (affected == 0)
       {
@@ -277,5 +291,18 @@ public class ReservationDAOImpl implements ReservationDAO
       }
       return reservation;
     }
+  }
+  private boolean hasConflict(
+          Reservation newRes,
+          Reservation existing
+  ) {
+    LocalDateTime newStart = newRes.getDateTime();
+    LocalDateTime newEnd = newStart.plusMinutes(RESERVATION_DURATION);
+
+    LocalDateTime existingStart = existing.getDateTime();
+    LocalDateTime existingEnd = existingStart.plusMinutes(RESERVATION_DURATION);
+
+    return newStart.isBefore(existingEnd)
+            && existingStart.isBefore(newEnd);
   }
 }

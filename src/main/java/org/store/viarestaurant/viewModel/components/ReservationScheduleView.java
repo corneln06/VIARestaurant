@@ -182,7 +182,7 @@ public class ReservationScheduleView
       });
 
       grid.add(block, startCol + 1, row);
-      GridPane.setColumnSpan(block, 2);
+      GridPane.setColumnSpan(block, 4);
     }
   }
 
