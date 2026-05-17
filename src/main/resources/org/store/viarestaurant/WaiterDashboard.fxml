@@ -34,9 +34,9 @@
                 <Separator />
                 <VBox spacing="8.0">
                     <children>
-                        <Button fx:id="btnTables" maxWidth="Infinity" styleClass="nav-btn" text="Tables" />
-                        <Button fx:id="btnOrders" maxWidth="Infinity" styleClass="nav-btn" text="Orders" />
-                        <Button fx:id="btnBills" maxWidth="Infinity" styleClass="nav-btn" text="Bills" />
+                        <Button fx:id="btnTables" maxWidth="Infinity"  onAction="#showTablesPage" styleClass="nav-btn" text="Tables" />
+                        <Button fx:id="btnOrders" maxWidth="Infinity" onAction="#showOrdersPage" styleClass="nav-btn" text="Orders" />
+                        <Button fx:id="btnBills" maxWidth="Infinity" onAction="#showBillsPage" styleClass="nav-btn" text="Bills" />
                     </children>
                 </VBox>
                 <Region VBox.vgrow="ALWAYS" />

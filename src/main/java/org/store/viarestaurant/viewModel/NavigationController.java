@@ -133,7 +133,7 @@ public class NavigationController
   private void showTablesPage()
   {
     showOnly(tablesPage);
-    setActive(btnTables, btnReservations, btnWorkers, btnMenu);
+    setActive(btnTables, btnReservations, btnWorkers, btnMenu, btnBills, btnOrders);
   }
 
   @FXML
@@ -180,7 +180,7 @@ public class NavigationController
   private void showOrdersPage()
   {
     showOnly(ordersListPage);
-    setActive(btnOrders, btnTables, btnBills);
+    setActive(btnOrders, btnBills, btnTables);
   }
 
   @FXML
