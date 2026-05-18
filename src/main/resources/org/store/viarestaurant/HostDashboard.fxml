@@ -105,7 +105,11 @@
                 </AnchorPane>
                 <StackPane fx:id="tableModalOverlay" managed="false" onMouseClicked="#closeTableModal" styleClass="modal-overlay" visible="false">
                     <children>
-                        <VBox maxWidth="380.0" spacing="16.0" styleClass="modal-card modal-card-medium">
+                        <VBox maxWidth="440.0" maxHeight="330.0" spacing="16.0">
+                            <styleClass>
+                                <String fx:value="modal-card"/>
+                                <String fx:value="modal-card-medium"/>
+                            </styleClass>
                             <children>
                                 <Label fx:id="tableModalTitle" styleClass="modal-title" text="Table 1"/>
                                 <VBox spacing="10.0" styleClass="modal-info-box">
@@ -122,9 +126,21 @@
                                 </VBox>
                                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
                                     <children>
-                                        <Button onAction="#closeTableModalAction" styleClass="btn-base btn-secondary" text="Close"/>
+                                        <Button onAction="#closeTableModalAction"  text="Close">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-secondary"/>
+                                            </styleClass>
+                                        </Button>
                                         <Button fx:id="tableModalPrimaryButton" onAction="#seatTable" styleClass="btn-base btn-primary"
-                                                text="Seat Table"/>
+                                                text="Seat Table">
+
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+
+                                        </Button>
                                     </children>
                                 </HBox>
                             </children>
