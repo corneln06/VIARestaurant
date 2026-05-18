@@ -15,6 +15,7 @@ import org.store.viarestaurant.dao.TableOrderDAOImpl;
 import org.store.viarestaurant.dao.WorkersDAOImpl;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.model.state.SeatedState;
@@ -97,7 +98,9 @@ public class TableComponent
         if (btn != null)
         {
           btn.setText("Table " + table.getId());
-          updateTableButton(btn, reservedIds.contains(table.getId()));
+          boolean reserved = reservedIds.contains(table.getId());
+          boolean seated = table.getStatus().getName().equals("Seated");
+          updateTableButton(btn, reserved, seated);
         }
       }
     }
@@ -157,7 +160,7 @@ public class TableComponent
         });
         tableGrid.add(btn, i % 5, i / 5);
         tableButtonMap.put(id, btn);
-        updateTableButton(btn, false);
+        updateTableButton(btn, false, false);
       }
     }
     catch (SQLException e)
@@ -166,10 +169,12 @@ public class TableComponent
     }
   }
 
-  private void updateTableButton(Button btn, boolean reserved)
+  private void updateTableButton(Button btn, boolean reserved, boolean seated)
   {
-    btn.getStyleClass().removeAll("table-available", "table-reserved");
-    btn.getStyleClass().add(reserved ? "table-reserved" : "table-available");
+    btn.getStyleClass().removeAll("table-available", "table-reserved", "table-unavailable");
+    if (seated) btn.getStyleClass().add("table-unavailable");
+    else if (reserved) btn.getStyleClass().add("table-reserved");
+    else btn.getStyleClass().add("table-available");
   }
 
   private void openTableModal(int tableId) throws SQLException
@@ -189,6 +194,14 @@ public class TableComponent
       }
     }
     tableModalWaiterComboBox.getSelectionModel().clearSelection();
+    List<TableOrder> activeOrders = tableOrderDAO.getTableOrdersByTableId(tableId);
+    activeOrders.stream()
+        .filter(o -> !o.isPaid() && o.getWaiter() != null)
+        .findFirst()
+        .ifPresent(o -> {
+          String label = o.getWaiter().getFirstName() + " " + o.getWaiter().getLastName();
+          tableModalWaiterComboBox.setValue(label);
+        });
     
     if (tableModalOverlay == null) return;
     try

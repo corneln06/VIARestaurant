@@ -11,6 +11,7 @@ import java.util.NoSuchElementException;
 import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.state.TableState;
+import org.store.viarestaurant.model.state.TableStateFactory;
 
 public class RestaurantTableDAOImpl implements RestaurantTableDAO {
 
@@ -67,6 +68,7 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
 
                 RestaurantTable restaurantTable =
                         new RestaurantTable(id, maxSitting);
+                restaurantTable.setState(TableStateFactory.fromString(rs.getString("status")));
 
                 finalList.add(restaurantTable);
             }
