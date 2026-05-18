@@ -93,10 +93,12 @@ public class ServerConnection implements Runnable
           handleTableBooking(request);
         } else if(object instanceof GetTablesRequest)
         {
+          System.out.println("[SERVER] Get Tables detected");
           handleGetTables();
         }
         else if(object instanceof GetReservationsRequest)
         {
+          System.out.println("[SERVER] Get Reservation detected");
           handleGetReservations();
         }
         else if(object instanceof UpdateReservationRequest request)
@@ -156,7 +158,7 @@ public class ServerConnection implements Runnable
       try
       {
           if (currentUser.getRole() == WorkerRole.Waiter){
-              send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTablesByWaiter(currentUser.getId())));
+              send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
           } else {
               send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
           }

@@ -15,10 +15,10 @@ public class WaiterController {
         tableComponent.initGrid(tableGrid);
     }
 
-//    public void initClient(Client client)
-//    {
-//        reservationComponent.initClient(client);
-//    }
+    public void initClient(Client client)
+    {
+        tableComponent.initClient(client);
+    }
 
     public void refreshTableGrid(){
         tableComponent.refreshTableGrid();
