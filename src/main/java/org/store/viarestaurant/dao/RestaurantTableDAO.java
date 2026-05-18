@@ -12,5 +12,5 @@ public interface RestaurantTableDAO {
     RestaurantTable getRestaurantTableByID(Integer id) throws SQLException;
     void deleteRestaurantTableByID(Integer id) throws SQLException;
     RestaurantTable updateRestaurantTable(RestaurantTable restaurantTable) throws SQLException;
-
+    ArrayList<RestaurantTable> getAllRestaurantTablesByWaiter(Integer waiterId) throws SQLException;
 }

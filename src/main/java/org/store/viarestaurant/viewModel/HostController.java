@@ -87,6 +87,7 @@ public class HostController
   public void initClient(Client client)
   {
     reservationComponent.initClient(client);
+    tableComponent.initClient(client);
   }
 
   //InitClient for Tables missing TODO
