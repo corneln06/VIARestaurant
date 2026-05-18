@@ -6,10 +6,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.state.TableState;
 import org.store.viarestaurant.model.state.TableStateFactory;
 
@@ -136,7 +138,40 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
         }
     }
 
-    //new method forupdating thr table status since the existing method only updates max sitting
+    @Override
+    public ArrayList<RestaurantTable> getAllRestaurantTablesByWaiter(Integer waiterId) throws SQLException {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT * FROM restauranttable"
+            );
+
+            ResultSet rs = statement.executeQuery();
+            ArrayList<RestaurantTable> allTables = new ArrayList<>();
+
+            while (rs.next()) {
+                Integer id = rs.getInt("id");
+                int maxSitting = rs.getInt("maxSitting");
+
+                allTables.add(new RestaurantTable(id, maxSitting));
+            }
+
+            TableOrderDAO tableOrderDAO = new TableOrderDAOImpl();
+
+            List<TableOrder> orders =
+                    tableOrderDAO.getTableOrdersByWaiterId(waiterId);
+
+            List<RestaurantTable> filteredTables = allTables.stream()
+                    .filter(table ->
+                            orders.stream().anyMatch(order ->
+                                    order.getTable().getId().equals(table.getId())
+                                            && !order.isPaid()
+                            )
+                    )
+                    .toList();
+
+            return new ArrayList<>(filteredTables);
+        }
+    }
 
     public void updateTableState(int tableId, TableState state) throws SQLException {
         String sql = "UPDATE restauranttable SET status = ? WHERE id = ?";

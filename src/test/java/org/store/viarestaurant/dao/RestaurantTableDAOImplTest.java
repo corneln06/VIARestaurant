@@ -25,12 +25,12 @@ public class RestaurantTableDAOImplTest {
     @Test
     @Order(1)
     void createTable() throws SQLException {
-        RestaurantTable r = dao.createRestaurantTable(5);
+        RestaurantTable r = dao.createRestaurantTable(4);
 
         assertNotNull(r);
         assertTrue(r.getId()>0);
 
-        assertEquals(5, r.getMaxSitting());
+        assertEquals(4, r.getMaxSitting());
         assertEquals("Available", r.getStatus().getName());
 
         createdId = r.getId();

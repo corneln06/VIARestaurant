@@ -2,7 +2,9 @@ package org.store.viarestaurant.server;
 
 import org.store.viarestaurant.dao.*;
 import org.store.viarestaurant.model.entities.Reservation;
+import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.server.dto.LoginRequest;
 import org.store.viarestaurant.server.dto.LoginResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
@@ -23,6 +25,8 @@ public class ServerConnection implements Runnable
   private final WorkersDAO workersDAO;
   private final RestaurantTableDAO restaurantTableDAO;
   private final ReservationDAO reservationDAO;
+
+  private Workers currentUser;
 
   public ServerConnection(
       Socket connectionSocket,
@@ -89,10 +93,12 @@ public class ServerConnection implements Runnable
           handleTableBooking(request);
         } else if(object instanceof GetTablesRequest)
         {
+          System.out.println("[SERVER] Get Tables detected");
           handleGetTables();
         }
         else if(object instanceof GetReservationsRequest)
         {
+          System.out.println("[SERVER] Get Reservation detected");
           handleGetReservations();
         }
         else if(object instanceof UpdateReservationRequest request)
@@ -149,15 +155,19 @@ public class ServerConnection implements Runnable
   }
 
   private void handleGetTables() throws IOException{
-    try
-    {
-      send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
-    }
-    catch (SQLException e)
-    {
-      e.printStackTrace();
-      send(new GetTablesResponse((new ArrayList<>())));
-    }
+      try
+      {
+          if (currentUser.getRole() == WorkerRole.Waiter){
+              send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTablesByWaiter(currentUser.getId())));
+          } else {
+              send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
+          }
+      }
+      catch (SQLException e)
+      {
+          e.printStackTrace();
+          send(new GetTablesResponse((new ArrayList<>())));
+      }
   }
   private void handleGetReservations() throws IOException
   {
@@ -249,6 +259,7 @@ public class ServerConnection implements Runnable
             new LoginResponse(
                 true,
                 worker);
+        currentUser = worker;
       }
       else
       {
@@ -291,7 +302,7 @@ public class ServerConnection implements Runnable
 
       if(reservation == null)
       {
-        send(new CreateReservationResponse(
+        send(new MessageResponse(
             false,
             "Could not create reservation"
         ));
@@ -299,7 +310,7 @@ public class ServerConnection implements Runnable
         return;
       }
 
-      send(new CreateReservationResponse(
+      send(new MessageResponse(
           true,
           "Reservation successfully created"
       ));
@@ -317,10 +328,34 @@ public class ServerConnection implements Runnable
     {
       e.printStackTrace();
 
-      send(new CreateReservationResponse(
+      send(new MessageResponse(
           false,
           "Database error while creating reservation"
       ));
+    }
+  }
+  public void handleCreateTable(TableCreateRequest request) throws IOException
+  {
+    try
+    {
+      RestaurantTable restaurantTable =
+          restaurantTableDAO.createRestaurantTable(
+              request.getMaxSitting());
+      if(restaurantTable == null)
+      {
+        send(new MessageResponse(false, "Cannot create a table"));
+        return;
+      }
+      send(new MessageResponse(true, "Table created successfully"));
+
+      connectionPool.broadcast(
+          new TableCreatedMessage(restaurantTable)
+      );
+    }
+    catch(SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while creating table"));
     }
   }
 

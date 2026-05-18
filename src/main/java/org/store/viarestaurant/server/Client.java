@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class Client
@@ -17,10 +19,12 @@ public class Client
   private ObjectInputStream inFromServer;
 
   private Consumer<LoginResponse> loginListener;
-  private Consumer<GetTablesResponse> tablesListener;
-  private Consumer<GetReservationsResponse> reservationsListener;
-  private Consumer<CreateReservationResponse> createReservationListener;
+  private Consumer<GetTablesResponse> reservationTablesListener;
+  private List<Consumer<GetReservationsResponse>> reservationsListener = new ArrayList<>();
+  private Consumer<MessageResponse> createReservationListener;
   private Consumer<ReservationCreatedMessage> reservationCreatedListener;
+  private List<Consumer<GetTablesResponse>> tablesPageListener = new ArrayList<>();
+  private Consumer<TableCreatedMessage> tableCreatedListener;
   private Consumer<DeleteReservationResponse> deleteReservationListener;
   private Consumer<UpdateReservationResponse> updateReservationListener;
   private Consumer<ReservationDeletedMessage> reservationDeletedListener;
@@ -59,21 +63,35 @@ public class Client
             {
               loginListener.accept(response);
             }
-            else if(object instanceof GetTablesResponse response && tablesListener != null)
+            else if(object instanceof GetTablesResponse response && tablesPageListener != null)
             {
-              tablesListener.accept(response);
+              if(reservationTablesListener != null)
+              {
+                reservationTablesListener.accept(response);
+              }
+
+              for (Consumer<GetTablesResponse> responseConsumer : tablesPageListener){
+                responseConsumer.accept(response);
+              }
             }
             else if(object instanceof GetReservationsResponse response && reservationsListener != null)
             {
-              reservationsListener.accept(response);
+
+              for (Consumer<GetReservationsResponse> reservationsResponseConsumer : reservationsListener){
+                reservationsResponseConsumer.accept(response);
+              }
             }
-            else if(object instanceof CreateReservationResponse response && createReservationListener != null)
+            else if(object instanceof MessageResponse response && createReservationListener != null)
             {
               createReservationListener.accept(response);
             }
             else if(object instanceof ReservationCreatedMessage message && reservationCreatedListener != null)
             {
               reservationCreatedListener.accept(message);
+            }
+            else if (object instanceof TableCreatedMessage message && tableCreatedListener != null)
+            {
+              tableCreatedListener.accept(message);
             }
             else if (object instanceof DeleteReservationResponse response && deleteReservationListener != null)
             {
@@ -105,17 +123,20 @@ public class Client
     this.loginListener = listener;
   }
 
-  public void setTablesListener(Consumer<GetTablesResponse> listener)
+  public void setReservationTablesListener(Consumer<GetTablesResponse> listener)
   {
-    this.tablesListener = listener;
+    this.reservationTablesListener = listener;
   }
 
   public void setReservationsListener(Consumer<GetReservationsResponse> listener)
   {
-    this.reservationsListener = listener;
+    reservationsListener.add(listener);
+  }
+  public void setTablesPageListener(Consumer<GetTablesResponse> listener){
+    tablesPageListener.add(listener);
   }
 
-  public void setCreateReservationListener(Consumer<CreateReservationResponse> listener)
+  public void setCreateReservationListener(Consumer<MessageResponse> listener)
   {
     this.createReservationListener = listener;
   }

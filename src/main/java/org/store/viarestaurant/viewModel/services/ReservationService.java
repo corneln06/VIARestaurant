@@ -45,7 +45,7 @@ public class ReservationService
   public void onTablesLoaded(
       Consumer<GetTablesResponse> listener)
   {
-    client.setTablesListener(listener);
+    client.setReservationTablesListener(listener);
   }
 
   public void onReservationLoaded(
@@ -55,7 +55,7 @@ public class ReservationService
   }
 
   public void onCreateReservationResponse(
-      Consumer<CreateReservationResponse> listener)
+      Consumer<MessageResponse> listener)
   {
     client.setCreateReservationListener(listener);
   }
