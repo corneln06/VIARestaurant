@@ -13,7 +13,7 @@ public class TableOrderDAOImpl implements TableOrderDAO {
     private static TableOrderDAOImpl instance;
 
 
-    TableOrderDAOImpl() throws SQLException {
+    private TableOrderDAOImpl() throws SQLException {
 
         DriverManager.registerDriver(new Driver());
 

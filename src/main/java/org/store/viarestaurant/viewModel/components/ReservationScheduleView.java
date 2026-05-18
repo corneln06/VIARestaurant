@@ -27,12 +27,12 @@ public class ReservationScheduleView
   private static final int ROW_HEIGHT = 56;
 
   private final DateTimeFormatter timeFormatter =
-      DateTimeFormatter.ofPattern("HH:mm");
+          DateTimeFormatter.ofPattern("HH:mm");
 
   private Consumer<Reservation> onReservationClicked;
 
   public void setOnReservationClicked(
-      Consumer<Reservation> onReservationClicked)
+          Consumer<Reservation> onReservationClicked)
   {
     this.onReservationClicked = onReservationClicked;
   }
@@ -52,16 +52,8 @@ public class ReservationScheduleView
     setupColumns(scheduleGrid);
     setupRows(scheduleGrid, tables);
     drawHeaders(scheduleGrid);
-
-    Map<Integer, Integer> tableRows =
-        drawTableRows(scheduleGrid, tables);
-
-    drawReservations(
-        scheduleGrid,
-        reservations,
-        tableRows
-    );
-
+    Map<Integer, Integer> tableRows = drawTableRows(scheduleGrid, tables);
+    drawReservations(scheduleGrid, reservations, tableRows);
     setupSize(scheduleGrid, scheduleOverlayPane, tables.size());
     drawHourLines(scheduleOverlayPane, tables.size());
     drawNowLine(scheduleOverlayPane, tables.size());
@@ -89,9 +81,7 @@ public class ReservationScheduleView
     }
   }
 
-  private void setupRows(
-      GridPane grid,
-      List<RestaurantTable> tables)
+  private void setupRows(GridPane grid, List<RestaurantTable> tables)
   {
     RowConstraints headerRow = new RowConstraints();
     headerRow.setPrefHeight(40);
@@ -114,13 +104,10 @@ public class ReservationScheduleView
     for(int s = 0; s < SLOT_COUNT; s++)
     {
       Label timeLabel =
-          new Label(
-              SERVICE_START
-                  .plusMinutes(s * 30L)
-                  .format(timeFormatter)
-          );
+          new Label(SERVICE_START.plusMinutes(s * 30L).format(timeFormatter));
 
       timeLabel.getStyleClass().add("gantt-header");
+
       grid.add(timeLabel, s + 1, 0);
     }
   }
@@ -129,8 +116,7 @@ public class ReservationScheduleView
       GridPane grid,
       List<RestaurantTable> tables)
   {
-    Map<Integer, Integer> tableRows =
-        new LinkedHashMap<>();
+    Map<Integer, Integer> tableRows = new LinkedHashMap<>();
 
     int rowIndex = 1;
 
@@ -156,21 +142,13 @@ public class ReservationScheduleView
   {
     for(Reservation reservation : reservations)
     {
-      System.out.println(
-          "Reservation: "
-              + reservation.getName()
-              + ", table object: "
-              + reservation.getTable()
-              + ", table id: "
-              + (reservation.getTable() == null ? null : reservation.getTable().getId()));
-      Integer tableId = getReservationTableId(reservation);
-
-      if(tableId == null)
+      if(reservation.getTable() == null)
       {
         continue;
       }
 
-      Integer row = tableRows.get(tableId);
+      Integer row =
+          tableRows.get(reservation.getTable().getId());
 
       if(row == null)
       {
@@ -183,13 +161,7 @@ public class ReservationScheduleView
               - SERVICE_START.getHour() * 60;
 
       int startCol =
-          Math.max(
-              0,
-              Math.min(
-                  SLOT_COUNT - 1,
-                  minutesFromStart / 30
-              )
-          );
+          Math.max(0, Math.min(SLOT_COUNT - 1, minutesFromStart / 30));
 
       Label block =
           new Label(
@@ -198,18 +170,15 @@ public class ReservationScheduleView
                   + reservation.getPartySize()
                   + " guests"
           );
+      block.setOnMouseEntered( e -> {
+        block.setCursor(Cursor.HAND);
+      });
+      block.setOnDragExited(e -> {
+        block.setCursor(Cursor.DEFAULT);
+      });
 
       block.getStyleClass().add("reservation-block");
       block.setMaxWidth(Double.MAX_VALUE);
-
-      block.setOnMouseEntered(e ->
-          block.setCursor(Cursor.HAND)
-      );
-
-      block.setOnMouseExited(e ->
-          block.setCursor(Cursor.DEFAULT)
-      );
-
       block.setOnMouseClicked(e ->
       {
         if(onReservationClicked != null)
@@ -223,20 +192,7 @@ public class ReservationScheduleView
     }
   }
 
-  private Integer getReservationTableId(Reservation reservation)
-  {
-    if(reservation.getTable() != null)
-    {
-      return reservation.getTable().getId();
-    }
-
-    return null;
-  }
-
-  private void setupSize(
-      GridPane grid,
-      Pane overlay,
-      int tableCount)
+  private void setupSize(GridPane grid, Pane overlay, int tableCount)
   {
     double totalWidth =
         LABEL_WIDTH + SLOT_COUNT * SLOT_WIDTH;
@@ -250,24 +206,16 @@ public class ReservationScheduleView
 
   private void drawHourLines(Pane overlay, int tableCount)
   {
-    double totalHeight =
-        40 + tableCount * ROW_HEIGHT;
-
-    long minutesStart =
-        SERVICE_START.getHour() * 60L;
+    double totalHeight = 40 + tableCount * ROW_HEIGHT;
+    long minutesStart = SERVICE_START.getHour() * 60L;
 
     for(int hour = SERVICE_START.getHour() + 1; hour <= 23; hour++)
     {
-      double offset =
-          (hour * 60L - minutesStart)
-              / 30.0
-              * SLOT_WIDTH;
-
+      double offset = (hour * 60L - minutesStart) / 30.0 * SLOT_WIDTH;
       Rectangle line = new Rectangle(1, totalHeight);
       line.setFill(Color.LIGHTGRAY);
       line.setLayoutX(LABEL_WIDTH + offset);
       line.setLayoutY(0);
-
       overlay.getChildren().add(line);
     }
   }
@@ -293,13 +241,9 @@ public class ReservationScheduleView
         40 + tableCount * ROW_HEIGHT;
 
     double offset =
-        (minutesNow - minutesStart)
-            / 30.0
-            * SLOT_WIDTH;
+        (minutesNow - minutesStart) / 30.0 * SLOT_WIDTH;
 
-    Rectangle nowLine =
-        new Rectangle(2, totalHeight);
-
+    Rectangle nowLine = new Rectangle(2, totalHeight);
     nowLine.setFill(Color.RED);
     nowLine.setLayoutX(LABEL_WIDTH + offset);
     nowLine.setLayoutY(0);
