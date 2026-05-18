@@ -113,7 +113,6 @@ public class NavigationController
       case Host -> {
         hostController = new HostController();
 
-        hostController.initClient(client);
 
         hostController.init(reservationGrid, reservationOverlayPane, tableGrid);
 
@@ -133,6 +132,7 @@ public class NavigationController
 
         hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo);
 
+        hostController.initClient(client);
         hostController.refreshSchedule();
         showTablesPage();
       }
