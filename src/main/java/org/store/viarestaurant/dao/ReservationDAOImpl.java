@@ -7,6 +7,7 @@ import org.store.viarestaurant.model.state.AvailableState;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -38,6 +39,16 @@ public class ReservationDAOImpl implements ReservationDAO
     {
       throw new SQLException("Reservation cannot be created for the past!");
     }
+
+
+    if (dateTime.toLocalTime().isBefore(LocalTime.of(17, 0))
+            || dateTime.toLocalTime().isAfter(LocalTime.of(22, 0)))
+    {
+      throw new SQLException(
+              "Reservations are only allowed between 17:00 and 22:00."
+      );
+    }
+
     if (restaurantTable.getMaxSitting() < partySize)
     {
       throw new SQLException("The party size exceeds max sitting!");
@@ -240,11 +251,27 @@ public class ReservationDAOImpl implements ReservationDAO
   public Reservation updateReservation(Reservation reservation) throws SQLException {
     try (Connection connection = getConnection())
     {
+      LocalDateTime oldTime = getReservationById(reservation.getId()).getDateTime();
+      LocalDateTime newTime = reservation.getDateTime();
 
-      if (reservation.getDateTime().isBefore(LocalDateTime.now()))
+      if (!oldTime.equals(newTime)
+              && newTime.isBefore(LocalDateTime.now()))
       {
-        throw new SQLException("Reservation cannot be created for the past!");
+        throw new SQLException(
+                "Reservation time cannot be changed to the past!"
+        );
       }
+
+      LocalTime reservationTime = reservation.getDateTime().toLocalTime();
+
+      if (reservationTime.isBefore(LocalTime.of(17, 0))
+              || reservationTime.isAfter(LocalTime.of(22, 0)))
+      {
+        throw new SQLException(
+                "Reservations are only allowed between 17:00 and 22:00."
+        );
+      }
+
       if (reservation.getTable().getMaxSitting() < reservation.getPartySize())
       {
         throw new SQLException("The party size exceeds max sitting!");

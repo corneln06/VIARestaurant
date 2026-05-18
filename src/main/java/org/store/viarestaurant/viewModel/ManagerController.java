@@ -117,6 +117,6 @@ public class ManagerController
   public void refreshTableGrid(){
       tableComponent.refreshTableGrid();
   }
-
+  
   public void createDish() { menuItemComponent.createDish();}
 }
