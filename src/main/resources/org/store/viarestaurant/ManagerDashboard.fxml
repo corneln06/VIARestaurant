@@ -77,6 +77,7 @@
                                         <TableColumn fx:id="nameColumn" text="Name" prefWidth="360.0" />
                                         <TableColumn fx:id="typeColumn" text="Type" prefWidth="220.0" />
                                         <TableColumn fx:id="priceColumn" text="Price" prefWidth="160.0" />
+
                                     </columns>
                                 </TableView>
                             </children>
@@ -91,7 +92,7 @@
                                 <String fx:value="modal-card-large"/>
                             </styleClass>
                             <children>
-                                <Label styleClass="modal-title" text="New Dish" />
+                                <Label fx:id="dishModalTitle" styleClass="modal-title" text="New Dish" />
 
                                 <TextField fx:id="dishNameField" promptText="Dish name" styleClass="input-field" />
 
@@ -117,7 +118,18 @@
                                                 <String fx:value="btn-danger"/>
                                             </styleClass>
                                         </Button>
-                                        <Button onAction="#createDish" text="Create">
+                                        <Button
+                                        fx:id="deleteDishButton"
+                                        onAction="#deleteDish"
+                                        visible="false"
+                                        managed="false"
+                                        text="Delete">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
+                                        <Button fx:id="submitDishButton" onAction="#createDish" text="Create">
                                             <styleClass>
                                                 <String fx:value="btn-base"/>
                                                 <String fx:value="btn-primary"/>
