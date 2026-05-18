@@ -52,7 +52,10 @@ public class ManagerController
       TableView<MenuItems> table,
       Button submit,
       Button delete,
-      Label title)
+      Label title,
+      Button submitDishButton,
+      Button deleteDishButton,
+      Label dishModalTitle)
   {
     reservationComponent.initModal(
         overlay, guestName, datePicker, timeField,
@@ -61,7 +64,7 @@ public class ManagerController
 
     menuItemComponent.initModal(
         overlayNewDish, nameField, typeCombo, priceField,
-        vegetarianCheckBox, allergiesList, errorLabelNewDish, table
+        vegetarianCheckBox, allergiesList, errorLabelNewDish, table, submitDishButton, deleteDishButton, dishModalTitle
     );
   }
 
@@ -127,4 +130,6 @@ public class ManagerController
   }
   
   public void createDish() { menuItemComponent.createDish();}
+
+  public void deleteDish() { menuItemComponent.deleteDish();}
 }

@@ -21,6 +21,11 @@ public class MenuItemComponent
   private ListView<String> allergiesListView;
   private Label newDishErrorLabel;
   private TableView<MenuItems> menuTable;
+  private boolean isEditMode = false;
+  private MenuItems editingMenuItem;
+  private Button submitDishButton;
+  private Button deleteDishButton;
+  private Label dishModalTitle;
 
   public void initModal(
       StackPane overlay,
@@ -30,7 +35,10 @@ public class MenuItemComponent
       CheckBox vegetarianCheckBox,
       ListView<String> allergiesList,
       Label errorLabel,
-      TableView<MenuItems> table)
+      TableView<MenuItems> table,
+      Button submitButton,
+      Button deleteButton,
+      Label modalTitle)
   {
     this.newDishOverlay = overlay;
     this.dishNameField = nameField;
@@ -40,6 +48,9 @@ public class MenuItemComponent
     this.allergiesListView = allergiesList;
     this.newDishErrorLabel = errorLabel;
     this.menuTable = table;
+    this.submitDishButton = submitButton;
+    this.deleteDishButton = deleteButton;
+    this.dishModalTitle = modalTitle;
 
     TableColumn<MenuItems, String> nameCol =
         (TableColumn<MenuItems, String>) table.getColumns().get(0);
@@ -74,6 +85,30 @@ public class MenuItemComponent
     });
 
     allergiesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+    table.setRowFactory(tv -> {
+      TableRow<MenuItems> row = new TableRow<>();
+      row.setOnMouseClicked(e -> {
+        if (e.getClickCount() == 2 && !row.isEmpty()){
+          openMenuAsForm(row.getItem());
+        }
+      });
+      return row;
+    });
+  }
+
+  private void openMenuAsForm(MenuItems item)
+  {
+    setEditMode(true);
+    editingMenuItem = item;
+    dishNameField.setText(item.getName());
+    dishTypeComboBox.setValue(item.getType().toString());
+    dishPriceField.setText(String.valueOf(item.getPrice()));
+    isVegetarianCheckBox.setSelected(item.isVegetarian());
+
+    populateAllergies();
+    hideError();
+    showOverlay(newDishOverlay);
   }
 
   public void refreshMenuTable()
@@ -87,6 +122,7 @@ public class MenuItemComponent
 
   public void openNewDishModal()
   {
+    setEditMode(false);
     dishNameField.clear();
     dishPriceField.clear();
     dishTypeComboBox.getSelectionModel().clearSelection();
@@ -124,6 +160,20 @@ public class MenuItemComponent
     ArrayList<String> allergies =
         new ArrayList<>(allergiesListView.getSelectionModel().getSelectedItems());
 
+    if (isEditMode){
+      try {
+        MenuItems updated = new MenuItems(
+            editingMenuItem.getId(), name, MenuTypes.valueOf(typeStr), price, isVegetarian, allergies
+        );
+        MenuItemDAOImpl.getInstance().updateMenuItem(updated);
+        closeNewDishModal();
+        refreshMenuTable();
+      }
+      catch (SQLException e){
+        showError("Database Error: " + e.getMessage());
+      }
+      return;
+    }
     try {
       MenuItemDAOImpl.getInstance().createMenuItem(
           name, MenuTypes.valueOf(typeStr), price, isVegetarian, allergies
@@ -169,5 +219,28 @@ public class MenuItemComponent
   {
     newDishErrorLabel.setVisible(false);
     newDishErrorLabel.setManaged(false);
+  }
+  private void setEditMode(boolean edit) {
+    isEditMode = edit;
+    submitDishButton.setText(edit ? "Apply" : "Create");
+    deleteDishButton.setVisible(edit);
+    deleteDishButton.setManaged(edit);
+    dishModalTitle.setText(edit ? "Edit Dish" : "New Dish");
+  }
+
+  public void deleteDish(){
+    if (editingMenuItem == null){
+      showError("No dish selected");
+      return;
+    }
+    try {
+      MenuItemDAOImpl.getInstance().delete(editingMenuItem.getId());
+      closeNewDishModal();
+      refreshMenuTable();
+    }
+    catch (SQLException e){
+      showError("Database error: " + e.getMessage());
+    }
+
   }
 }

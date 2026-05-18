@@ -64,6 +64,10 @@ public class NavigationController
     @FXML private ComboBox<String> tableComboBox;
     @FXML private Label newReservationErrorLabel;
 
+    @FXML private Button submitDishButton;
+    @FXML private Button deleteDishButton;
+    @FXML private Label dishModalTitle;
+
     @FXML private StackPane newDishOverlay;
     @FXML private TextField dishNameField;
     @FXML private CheckBox isVegetarianCheckBox;
@@ -175,7 +179,10 @@ public class NavigationController
                         menuTable,
                         submitReservationButton,
                         deleteReservationButton,
-                        modalTitle
+                        modalTitle,
+                        submitDishButton,
+                        deleteDishButton,
+                        dishModalTitle
                 );
 
                 managerController.refreshMenuTable();
@@ -428,5 +435,10 @@ public class NavigationController
     @FXML
     private void createDish() {
         if (managerController != null) managerController.createDish();
+    }
+
+    @FXML
+    private void deleteDish() {
+      if (managerController != null) managerController.deleteDish();
     }
 }
