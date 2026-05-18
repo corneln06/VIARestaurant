@@ -127,8 +127,4 @@ public class HostController
     tableComponent.closeTableModal();
   }
 
-
-
-
-
 }
