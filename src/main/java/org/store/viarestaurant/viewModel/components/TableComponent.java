@@ -56,6 +56,10 @@ public class TableComponent
     this.tableModalInfo = info;
   }
 
+  public void loadTables(){
+    tablesService.loadTables();
+  }
+
   public void refreshTableGrid()
   {
     if (tableGrid == null) return;

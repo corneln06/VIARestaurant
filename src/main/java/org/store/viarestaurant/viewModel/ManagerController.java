@@ -10,6 +10,8 @@ import org.store.viarestaurant.viewModel.components.MenuItemComponent;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
 import org.store.viarestaurant.viewModel.components.TableComponent;
 
+import java.io.IOException;
+
 public class ManagerController
 {
   private final ReservationComponent reservationComponent =
@@ -75,11 +77,17 @@ public class ManagerController
   public void initClient(Client client)
   {
     reservationComponent.initClient(client);
+    tableComponent.initClient(client);
   }
 
   public void refreshSchedule()
   {
     reservationComponent.refreshSchedule();
+  }
+
+  public void loadTables()
+  {
+    tableComponent.loadTables();
   }
 
   public void openNewReservationModal()

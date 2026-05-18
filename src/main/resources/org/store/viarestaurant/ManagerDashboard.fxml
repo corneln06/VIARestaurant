@@ -52,6 +52,7 @@
     <center>
         <StackPane styleClass="content-area">
             <children>
+
                 <AnchorPane styleClass="page-surface">
                     <children>
                         <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
@@ -83,6 +84,7 @@
                         </VBox>
                     </children>
                 </AnchorPane>
+
                 <StackPane fx:id="newDishOverlay" managed="false" onMouseClicked="#closeNewDishModal" styleClass="modal-overlay" visible="false">
                     <children>
                         <VBox maxWidth="440.0" maxHeight="420.0" onMouseClicked="#consumeModalClick" spacing="14.0">
@@ -129,40 +131,7 @@
                         </VBox>
                     </children>
                 </StackPane>
-                <AnchorPane fx:id="reservationsPage" managed="false" styleClass="page-surface" visible="false">
-                    <children>
-                        <VBox spacing="16.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
-                              AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
-                            <children>
-                                <HBox alignment="CENTER_LEFT">
-                                    <children>
-                                        <Label styleClass="page-title" text="Reservations"/>
-                                        <Region HBox.hgrow="ALWAYS"/>
-                                        <Label fx:id="reservationsDateLabel" styleClass="page-subtitle"
-                                               text="2026-05-01"/>
-                                        <Button text="+ New Reservation" onAction="#openNewReservationModal">
-                                            <styleClass>
-                                                <String fx:value="btn-base"/>
-                                                <String fx:value="btn-primary"/>
-                                            </styleClass>
-                                        </Button>
-                                    </children>
-                                </HBox>
-                                <ScrollPane fitToHeight="true" pannable="true" styleClass="plain-scroll">
-                                    <content>
-                                        <StackPane alignment="TOP_LEFT">
-                                            <children>
-                                                <GridPane fx:id="reservationGrid"/>
-                                                <Pane fx:id="reservationOverlayPane" mouseTransparent="true"
-                                                      pickOnBounds="false"/>
-                                            </children>
-                                        </StackPane>
-                                    </content>
-                                </ScrollPane>
-                            </children>
-                        </VBox>
-                    </children>
-                </AnchorPane>
+
                 <AnchorPane fx:id="tablesPage" styleClass="page-surface">
                     <children>
                         <VBox spacing="20.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
@@ -212,6 +181,40 @@
                         </VBox>
                     </children>
                 </StackPane>
+                <AnchorPane fx:id="reservationsPage" managed="false" styleClass="page-surface" visible="false">
+                    <children>
+                        <VBox spacing="16.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
+                              AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label styleClass="page-title" text="Reservations"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="reservationsDateLabel" styleClass="page-subtitle"
+                                               text="2026-05-01"/>
+                                        <Button text="+ New Reservation" onAction="#openNewReservationModal">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                                <ScrollPane fitToHeight="true" pannable="true" styleClass="plain-scroll">
+                                    <content>
+                                        <StackPane alignment="TOP_LEFT">
+                                            <children>
+                                                <GridPane fx:id="reservationGrid"/>
+                                                <Pane fx:id="reservationOverlayPane" mouseTransparent="true"
+                                                      pickOnBounds="false"/>
+                                            </children>
+                                        </StackPane>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
                 <StackPane fx:id="newReservationOverlay" managed="false" onMouseClicked="#closeNewReservationModal"
                            styleClass="modal-overlay" visible="false">
                     <children>

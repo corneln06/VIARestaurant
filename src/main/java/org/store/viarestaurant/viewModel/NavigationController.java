@@ -139,7 +139,7 @@ public class NavigationController
             }
             case Waiter -> {
                 waiterController = new WaiterController();
-
+                waiterController.initClient(client);
                 waiterController.init(tableGrid);
 
                 showTablesPage();
@@ -194,8 +194,8 @@ public class NavigationController
         showOnly(tablesPage);
         setActive(btnTables, btnReservations, btnWorkers, btnMenu, btnBills, btnOrders);
         if (hostController != null) hostController.refreshTableGrid();
-        if (managerController != null) managerController.refreshTableGrid();
-        if (waiterController != null) waiterController.refreshTableGrid();
+        if (managerController != null) {managerController.refreshTableGrid(); managerController.loadTables();}
+        if (waiterController != null) {waiterController.refreshTableGrid(); waiterController.loadtables();}
     }
 
     @FXML
