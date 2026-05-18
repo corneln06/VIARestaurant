@@ -78,6 +78,7 @@ public class NavigationController
     @FXML private TableView<MenuItems> menuTable;
 
     @FXML private ComboBox<String> tableModalWaiterComboBox;
+    @FXML private Button tableModalPrimaryButton;
 
     protected Client client;
 
@@ -137,7 +138,7 @@ public class NavigationController
                         modalTitle
                 );
 
-                hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo, tableModalWaiterComboBox);
+                hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo, tableModalWaiterComboBox, tableModalPrimaryButton);
 
                 hostController.refreshSchedule();
                 showTablesPage();

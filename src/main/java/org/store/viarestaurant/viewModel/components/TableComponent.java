@@ -18,6 +18,7 @@ import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.model.enums.WorkerRole;
+import org.store.viarestaurant.model.state.AvailableState;
 import org.store.viarestaurant.model.state.SeatedState;
 
 import javafx.scene.control.Button;
@@ -42,6 +43,7 @@ public class TableComponent
   private ReservationDAOImpl reservationDAO;
   private RestaurantTableDAOImpl tableDAO;
 
+  private Button tableModalPrimaryButton;
   private ComboBox<String> tableModalWaiterComboBox;
   private final Map<String, Workers> waiterMap = new LinkedHashMap<>();
   private int currentTableId;
@@ -72,13 +74,15 @@ public class TableComponent
       Label title,
       Label badge,
       Label info,
-      ComboBox<String> waiterComboBox)
+      ComboBox<String> waiterComboBox,
+      Button primaryButton)
   {
     this.tableModalOverlay = overlay;
     this.tableModalTitle = title;
     this.tableModalStateBadge = badge;
     this.tableModalInfo = info;
     this.tableModalWaiterComboBox = waiterComboBox;
+    this.tableModalPrimaryButton = primaryButton;
   }
 
   public void refreshTableGrid()
@@ -215,18 +219,33 @@ public class TableComponent
           .stream().anyMatch(r -> r.getTable().getId() == tableId);
 
       tableModalTitle.setText("Table " + tableId);
-      tableModalStateBadge.getStyleClass().removeAll("badge-available", "badge-reserved");
-      if (reserved)
+      tableModalStateBadge.getStyleClass().removeAll("badge-available", "badge-reserved", "badge-unavailable");
+
+      boolean seated = table.getStatus().getName().equals("Seated");
+
+      if (seated)
+      {
+        tableModalStateBadge.setText("Seated");
+        tableModalStateBadge.getStyleClass().add("badge-unavailable");
+        tableModalInfo.setText("Table is currently occupied.");
+        tableModalPrimaryButton.setText("Set Available");
+        tableModalPrimaryButton.setOnAction(e -> setAvailable());
+      }
+      else if (reserved)
       {
         tableModalStateBadge.setText("Reserved");
         tableModalStateBadge.getStyleClass().add("badge-reserved");
         tableModalInfo.setText("This table has a reservation today.");
+        tableModalPrimaryButton.setText("Seat Table");
+        tableModalPrimaryButton.setOnAction(e -> seatTable());
       }
       else
       {
         tableModalStateBadge.setText("Available");
         tableModalStateBadge.getStyleClass().add("badge-available");
         tableModalInfo.setText("Ready for walk-ins and upcoming service.");
+        tableModalPrimaryButton.setText("Seat Table");
+        tableModalPrimaryButton.setOnAction(e -> seatTable());
       }
       tableModalOverlay.setVisible(true);
       tableModalOverlay.setManaged(true);
@@ -252,6 +271,17 @@ public class TableComponent
         refreshTableGrid();
     } catch (SQLException e) {
         e.printStackTrace();
+    }
+  }
+
+  public void setAvailable()
+  {
+    try {
+      tableDAO.updateTableState(currentTableId, new AvailableState());
+      closeTableModal();
+      refreshTableGrid();
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
   }
 }

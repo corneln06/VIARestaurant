@@ -67,9 +67,10 @@ public class HostController
       Label title,
       Label badge,
       Label info,
-    ComboBox<String> waiterComboBox)
+      ComboBox<String> waiterComboBox,
+      Button primaryButton)
   {
-    tableComponent.initModal(overlay, title, badge, info, waiterComboBox);
+    tableComponent.initModal(overlay, title, badge, info, waiterComboBox, primaryButton);
   }
 
   public void initClient(Client client)
