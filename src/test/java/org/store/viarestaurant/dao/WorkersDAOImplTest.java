@@ -80,7 +80,7 @@ class WorkersDAOImplTest
 
     assertEquals("Ada", managerWorker.getFirstName());
     assertEquals("Smith", managerWorker.getLastName());
-    assertEquals("manager", managerWorker.getEmail());
+    assertEquals("manager@test.com", managerWorker.getEmail());
     assertEquals(WorkerRole.Manager, managerWorker.getRole());
   }
 
