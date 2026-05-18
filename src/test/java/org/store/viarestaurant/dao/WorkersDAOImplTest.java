@@ -71,7 +71,7 @@ class WorkersDAOImplTest
     managerWorker = workersDAO.createWorkers(
         "Ada",
         "Smith",
-        "manager",
+        "manager@test.com",
         "1234",
         WorkerRole.Manager
     );
