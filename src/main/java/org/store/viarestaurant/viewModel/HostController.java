@@ -1,8 +1,6 @@
 package org.store.viarestaurant.viewModel;
 
 
-import java.sql.SQLException;
-
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
 import org.store.viarestaurant.viewModel.components.TableComponent;
@@ -27,7 +25,7 @@ public class HostController
 
   public void init(
       GridPane scheduleGrid,
-      Pane scheduleOverlayPane, GridPane tableGrid) throws SQLException
+      Pane scheduleOverlayPane, GridPane tableGrid)
   {
 
     tableComponent.initGrid(tableGrid);

@@ -48,13 +48,15 @@ public class TableComponent
   private TableOrderDAOImpl tableOrderDAO;
 
 
-  public void initGrid(GridPane tableGrid) throws SQLException
+  public void initGrid(GridPane tableGrid)
   {
     this.tableGrid = tableGrid;
     try
     {
       reservationDAO = ReservationDAOImpl.getInstance();
       tableDAO = RestaurantTableDAOImpl.getInstance();
+      workersDAO = WorkersDAOImpl.getInstance();
+      tableOrderDAO = TableOrderDAOImpl.getInstance();
     }
     catch (SQLException e)
     {
@@ -62,9 +64,6 @@ public class TableComponent
     }
     configureTableGrid();
     buildTableGrid();
-
-    workersDAO = WorkersDAOImpl.getInstance();
-    tableOrderDAO = TableOrderDAOImpl.getInstance();
   }
 
   public void initModal(
@@ -78,7 +77,7 @@ public class TableComponent
     this.tableModalTitle = title;
     this.tableModalStateBadge = badge;
     this.tableModalInfo = info;
-  
+    this.tableModalWaiterComboBox = waiterComboBox;
   }
 
   public void refreshTableGrid()
