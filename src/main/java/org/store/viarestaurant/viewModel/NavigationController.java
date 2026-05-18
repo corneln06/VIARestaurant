@@ -91,7 +91,7 @@ public class NavigationController
     private ManagerController managerController;
     private WaiterController waiterController;
 
-    public void initData(Workers worker) throws SQLException
+    public void initData(Workers worker)
     {
         if (sidebarName != null)
         {
@@ -113,7 +113,7 @@ public class NavigationController
     {
         this.client = client;
     }
-    private void showDefaultPage(Workers worker) throws SQLException
+    private void showDefaultPage(Workers worker)
     {
         switch (worker.getRole())
         {
@@ -135,7 +135,6 @@ public class NavigationController
                         submitReservationButton,
                         deleteReservationButton,
                         modalTitle
-
                 );
 
                 hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo, tableModalWaiterComboBox);
