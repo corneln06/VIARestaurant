@@ -118,11 +118,14 @@
                                 </VBox>
                                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
                                     <children>
+                                    <VBox spacing="6.0">
+                                        <Label text="Assign Waiter" styleClass="muted-label"/>
+                                        <ComboBox fx:id="tableModalWaiterComboBox" maxWidth="Infinity" promptText="Select a waiter"/>
+                                        </VBox>
                                         <Button onAction="#closeTableModalAction" styleClass="btn-base btn-secondary" text="Close"/>
-                                        <Button fx:id="tableModalPrimaryButton" styleClass="btn-base btn-danger"
-                                                text="Unavailable"/>
-                                        <Button fx:id="tableModalSecondaryButton" styleClass="btn-base btn-warning"
-                                                text="Reserved"/>
+                                        <Button fx:id="tableModalPrimaryButton" onAction="#seatTable" styleClass="btn-base btn-danger"
+                                                text="Seat Table"/>
+                    
                                     </children>
                                 </HBox>
                             </children>

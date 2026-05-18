@@ -1,31 +1,20 @@
 package org.store.viarestaurant.viewModel;
 
 
-import javafx.geometry.HPos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import org.store.viarestaurant.model.entities.Reservation;
-import org.store.viarestaurant.model.entities.RestaurantTable;
-import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.ReservationDto.*;
-import org.store.viarestaurant.viewModel.components.ReservationComponent;
+import java.sql.SQLException;
 
-import javafx.scene.control.*;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
 import org.store.viarestaurant.viewModel.components.TableComponent;
 
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.*;
 
 public class HostController
 {
@@ -38,7 +27,7 @@ public class HostController
 
   public void init(
       GridPane scheduleGrid,
-      Pane scheduleOverlayPane, GridPane tableGrid)
+      Pane scheduleOverlayPane, GridPane tableGrid) throws SQLException
   {
 
     tableComponent.initGrid(tableGrid);
@@ -79,9 +68,10 @@ public class HostController
       StackPane overlay,
       Label title,
       Label badge,
-      Label info)
+      Label info,
+    ComboBox<String> waiterComboBox)
   {
-    tableComponent.initModal(overlay, title, badge, info);
+    tableComponent.initModal(overlay, title, badge, info, waiterComboBox);
   }
 
   public void initClient(Client client)
@@ -127,8 +117,9 @@ public class HostController
     tableComponent.closeTableModal();
   }
 
-
-
-
+  //Table Modal function
+  public void seatTable(){
+    tableComponent.seatTable();
+  }
 
 }

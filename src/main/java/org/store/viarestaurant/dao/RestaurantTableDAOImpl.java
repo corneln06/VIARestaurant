@@ -1,13 +1,16 @@
 package org.store.viarestaurant.dao;
 
-import org.store.viarestaurant.config.DatabaseConnection;
-import org.store.viarestaurant.model.entities.*;
-import org.store.viarestaurant.model.state.TableState;
-import org.store.viarestaurant.model.state.TableStateFactory;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+
+import org.store.viarestaurant.config.DatabaseConnection;
+import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.model.state.TableState;
 
 public class RestaurantTableDAOImpl implements RestaurantTableDAO {
 
@@ -128,6 +131,19 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
             }
 
             return restaurantTable;
+        }
+    }
+
+    //new method forupdating thr table status since the existing method only updates max sitting
+
+    public void updateTableState(int tableId, TableState state) throws SQLException {
+        String sql = "UPDATE restauranttable SET status = ? WHERE id = ?";
+        try(Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setString(1,state.getName());
+            statement.setInt(2,tableId);
+            statement.executeUpdate();
         }
     }
 }

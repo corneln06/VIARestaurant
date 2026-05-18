@@ -1,18 +1,26 @@
 package org.store.viarestaurant.viewModel.components;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.store.viarestaurant.dao.ReservationDAOImpl;
 import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
+import org.store.viarestaurant.dao.TableOrderDAOImpl;
+import org.store.viarestaurant.dao.WorkersDAOImpl;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.model.enums.WorkerRole;
+import org.store.viarestaurant.model.state.SeatedState;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -33,7 +41,14 @@ public class TableComponent
   private ReservationDAOImpl reservationDAO;
   private RestaurantTableDAOImpl tableDAO;
 
-  public void initGrid(GridPane tableGrid)
+  private ComboBox<String> tableModalWaiterComboBox;
+  private final Map<String, Workers> waiterMap = new LinkedHashMap<>();
+  private int currentTableId;
+  private WorkersDAOImpl workersDAO;
+  private TableOrderDAOImpl tableOrderDAO;
+
+
+  public void initGrid(GridPane tableGrid) throws SQLException
   {
     this.tableGrid = tableGrid;
     try
@@ -47,18 +62,23 @@ public class TableComponent
     }
     configureTableGrid();
     buildTableGrid();
+
+    workersDAO = WorkersDAOImpl.getInstance();
+    tableOrderDAO = TableOrderDAOImpl.getInstance();
   }
 
   public void initModal(
       StackPane overlay,
       Label title,
       Label badge,
-      Label info)
+      Label info,
+      ComboBox<String> waiterComboBox)
   {
     this.tableModalOverlay = overlay;
     this.tableModalTitle = title;
     this.tableModalStateBadge = badge;
     this.tableModalInfo = info;
+  
   }
 
   public void refreshTableGrid()
@@ -128,7 +148,14 @@ public class TableComponent
         GridPane.setHgrow(btn, Priority.ALWAYS);
         GridPane.setVgrow(btn, Priority.ALWAYS);
         final int id = table.getId();
-        btn.setOnAction(e -> openTableModal(id));
+        btn.setOnAction(e -> {
+          try {
+            openTableModal(id);
+          } catch (SQLException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+          }
+        });
         tableGrid.add(btn, i % 5, i / 5);
         tableButtonMap.put(id, btn);
         updateTableButton(btn, false);
@@ -146,8 +173,24 @@ public class TableComponent
     btn.getStyleClass().add(reserved ? "table-reserved" : "table-available");
   }
 
-  private void openTableModal(int tableId)
+  private void openTableModal(int tableId) throws SQLException
   {
+    currentTableId = tableId;
+    //populate waiter combo boc
+    waiterMap.clear();
+    tableModalWaiterComboBox.getItems().clear();
+    List<Workers> allWorkers = workersDAO.getAllWorkers();
+    for(Workers w : allWorkers) {
+      if(w.getRole() == WorkerRole.Waiter){
+        String label = w.getFirstName() + " " + w.getLastName();
+        waiterMap.put(label, w);
+        tableModalWaiterComboBox.getItems().add(label);
+
+
+      }
+    }
+    tableModalWaiterComboBox.getSelectionModel().clearSelection();
+    
     if (tableModalOverlay == null) return;
     try
     {
@@ -179,6 +222,24 @@ public class TableComponent
     catch (SQLException e)
     {
       e.printStackTrace();
+    }
+  }
+
+  //seating table function
+  public void seatTable(){
+    Workers waiter = waiterMap.get(tableModalWaiterComboBox.getValue());
+    if(waiter == null){
+      //if waiter not selected, no function
+      return;
+    }
+    try {
+        tableOrderDAO.createTableOrder(currentTableId, waiter.getId(), "", 0.0,
+        new ArrayList<>(), false);
+        tableDAO.updateTableState(currentTableId, new SeatedState());
+        closeTableModal();
+        refreshTableGrid();
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
   }
 }
