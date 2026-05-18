@@ -242,4 +242,8 @@ public class ManagerController
   public void refreshTableGrid(){
       tableComponent.refreshTableGrid();
   }
+
+  public void deleteReservation() {
+    reservationComponent.deleteReservation();
+  }
 }

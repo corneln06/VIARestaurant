@@ -405,6 +405,10 @@ public class NavigationController
         {
             hostController.deleteReservation();
         }
+        if (managerController != null)
+        {
+            managerController.deleteReservation();
+        }
     }
     @FXML
     private void openNewDishModal() {

@@ -71,7 +71,7 @@ class WorkersDAOImplTest
     managerWorker = workersDAO.createWorkers(
         "Ada",
         "Smith",
-        "manager@test.com",
+        "manager",
         "1234",
         WorkerRole.Manager
     );
@@ -80,7 +80,7 @@ class WorkersDAOImplTest
 
     assertEquals("Ada", managerWorker.getFirstName());
     assertEquals("Smith", managerWorker.getLastName());
-    assertEquals("manager@test.com", managerWorker.getEmail());
+    assertEquals("manager", managerWorker.getEmail());
     assertEquals(WorkerRole.Manager, managerWorker.getRole());
   }
 

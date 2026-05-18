@@ -21,6 +21,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.DatePicker?>
 <BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
     <left>
@@ -139,6 +140,12 @@
                                         <Region HBox.hgrow="ALWAYS"/>
                                         <Label fx:id="reservationsDateLabel" styleClass="page-subtitle"
                                                text="2026-05-01"/>
+                                        <Button text="+ New Reservation" onAction="#openNewReservationModal">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
                                     </children>
                                 </HBox>
                                 <ScrollPane fitToHeight="true" pannable="true" styleClass="plain-scroll">
@@ -199,6 +206,72 @@
                                                 text="Unavailable"/>
                                         <Button fx:id="tableModalSecondaryButton" styleClass="btn-base btn-warning"
                                                 text="Reserved"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+                <StackPane fx:id="newReservationOverlay" managed="false" onMouseClicked="#closeNewReservationModal"
+                           styleClass="modal-overlay" visible="false">
+                    <children>
+                        <VBox maxWidth="440.0" maxHeight="330.0" onMouseClicked="#consumeModalClick" spacing="14.0"
+                              styleClass="modal-card modal-card-large">
+                            <styleClass>
+                                <String fx:value="modal-card"/>
+                                <String fx:value="modal-card-large"/>
+                            </styleClass>
+                            <children>
+                                <Label fx:id="modalTitle" styleClass="modal-title" text="New Reservation"/>
+                                <TextField fx:id="guestNameField" promptText="Guest name" styleClass="input-field"/>
+                                <HBox spacing="12.0">
+                                    <children>
+                                        <DatePicker fx:id="reservationDatePicker" HBox.hgrow="ALWAYS"/>
+                                        <TextField fx:id="reservationTimeField" promptText="19:00"
+                                                   styleClass="input-field" HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                </HBox>
+                                <HBox spacing="12.0">
+                                    <children>
+                                        <TextField fx:id="partySizeField" promptText="Party size"
+                                                   styleClass="input-field" HBox.hgrow="ALWAYS"/>
+                                        <ComboBox fx:id="tableComboBox" prefWidth="180.0" promptText="Select table"
+                                                  HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                </HBox>
+                                <Label fx:id="newReservationErrorLabel" managed="false" styleClass="error-label"
+                                       visible="false" wrapText="true"/>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <children>
+
+                                        <Button onAction="#closeNewReservationModalAction"
+                                                text="Cancel">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-secondary"/>
+                                            </styleClass>
+                                        </Button>
+
+                                        <Button fx:id="deleteReservationButton"
+                                                onAction="#deleteReservation"
+                                                text="Delete"
+                                                visible="false"
+                                                managed="false">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-danger"/>
+                                            </styleClass>
+                                        </Button>
+
+                                        <Button fx:id="submitReservationButton"
+                                                onAction="#createReservation"
+                                                text="Create">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
+
                                     </children>
                                 </HBox>
                             </children>
