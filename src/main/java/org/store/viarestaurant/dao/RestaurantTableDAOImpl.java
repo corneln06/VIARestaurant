@@ -7,6 +7,7 @@ import org.store.viarestaurant.model.state.TableStateFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public class RestaurantTableDAOImpl implements RestaurantTableDAO {
@@ -128,6 +129,41 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
             }
 
             return restaurantTable;
+        }
+    }
+
+    @Override
+    public ArrayList<RestaurantTable> getAllRestaurantTablesByWaiter(Integer waiterId) throws SQLException {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT * FROM restauranttable"
+            );
+
+            ResultSet rs = statement.executeQuery();
+            ArrayList<RestaurantTable> allTables = new ArrayList<>();
+
+            while (rs.next()) {
+                Integer id = rs.getInt("id");
+                int maxSitting = rs.getInt("maxSitting");
+
+                allTables.add(new RestaurantTable(id, maxSitting));
+            }
+
+            TableOrderDAO tableOrderDAO = new TableOrderDAOImpl();
+
+            List<TableOrder> orders =
+                    tableOrderDAO.getTableOrdersByWaiterId(waiterId);
+
+            List<RestaurantTable> filteredTables = allTables.stream()
+                    .filter(table ->
+                            orders.stream().anyMatch(order ->
+                                    order.getTable().getId().equals(table.getId())
+                                            && !order.isPaid()
+                            )
+                    )
+                    .toList();
+
+            return new ArrayList<>(filteredTables);
         }
     }
 }

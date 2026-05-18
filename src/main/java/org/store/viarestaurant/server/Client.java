@@ -31,7 +31,7 @@ public class Client
 
   public void connect() throws IOException
   {
-    socket = new Socket("localhost", 2910);
+    socket = new Socket("10.154.198.42", 2910);
 
     outToServer = new ObjectOutputStream(socket.getOutputStream());
     outToServer.flush();

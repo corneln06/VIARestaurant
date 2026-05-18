@@ -4,6 +4,7 @@ import org.store.viarestaurant.dao.*;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.server.dto.LoginRequest;
 import org.store.viarestaurant.server.dto.LoginResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
@@ -24,6 +25,8 @@ public class ServerConnection implements Runnable
   private final WorkersDAO workersDAO;
   private final RestaurantTableDAO restaurantTableDAO;
   private final ReservationDAO reservationDAO;
+
+  private Workers currentUser;
 
   public ServerConnection(
       Socket connectionSocket,
@@ -150,15 +153,19 @@ public class ServerConnection implements Runnable
   }
 
   private void handleGetTables() throws IOException{
-    try
-    {
-      send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
-    }
-    catch (SQLException e)
-    {
-      e.printStackTrace();
-      send(new GetTablesResponse((new ArrayList<>())));
-    }
+      try
+      {
+          if (currentUser.getRole() == WorkerRole.Waiter){
+              send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTablesByWaiter(currentUser.getId())));
+          } else {
+              send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
+          }
+      }
+      catch (SQLException e)
+      {
+          e.printStackTrace();
+          send(new GetTablesResponse((new ArrayList<>())));
+      }
   }
   private void handleGetReservations() throws IOException
   {
@@ -250,6 +257,7 @@ public class ServerConnection implements Runnable
             new LoginResponse(
                 true,
                 worker);
+        currentUser = worker;
       }
       else
       {
