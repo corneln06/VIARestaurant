@@ -156,6 +156,55 @@
                         </VBox>
                     </children>
                 </AnchorPane>
+                <AnchorPane fx:id="tablesPage" styleClass="page-surface">
+                    <children>
+                        <VBox spacing="20.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
+                              AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label styleClass="page-title" text="Tables"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button onAction="#openNewReservationModal" fx:id="btnMenuBla"
+                                                text="+ New Table">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                                <GridPane fx:id="tableGrid" hgap="18.0" vgap="18.0"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+                <StackPane fx:id="tableModalOverlay" managed="false" onMouseClicked="#closeTableModal" styleClass="modal-overlay" visible="false">
+                    <children>
+                        <VBox maxWidth="380.0" spacing="16.0" styleClass="modal-card modal-card-medium">
+                            <children>
+                                <Label fx:id="tableModalTitle" styleClass="modal-title" text="Table 1"/>
+                                <VBox spacing="10.0" styleClass="modal-info-box">
+                                    <children>
+                                        <Label fx:id="tableModalStateBadge" styleClass="state-badge badge-available"
+                                               text="Available"/>
+                                        <Label fx:id="tableModalInfo" styleClass="muted-label"
+                                               text="Ready for walk-ins and upcoming service." wrapText="true"/>
+                                    </children>
+                                </VBox>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <children>
+                                        <Button onAction="#closeTableModalAction" styleClass="btn-base btn-secondary" text="Close"/>
+                                        <Button fx:id="tableModalPrimaryButton" styleClass="btn-base btn-danger"
+                                                text="Unavailable"/>
+                                        <Button fx:id="tableModalSecondaryButton" styleClass="btn-base btn-warning"
+                                                text="Reserved"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
             </children>
         </StackPane>
     </center>
