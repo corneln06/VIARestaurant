@@ -158,7 +158,7 @@ public class ServerConnection implements Runnable
       try
       {
           if (currentUser.getRole() == WorkerRole.Waiter){
-              send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
+              send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTablesByWaiter(currentUser.getId())));
           } else {
               send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
           }

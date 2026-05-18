@@ -195,7 +195,7 @@ public class NavigationController
         setActive(btnTables, btnReservations, btnWorkers, btnMenu, btnBills, btnOrders);
         if (hostController != null) hostController.refreshTableGrid();
         if (managerController != null) {managerController.refreshTableGrid(); managerController.loadTables();}
-        if (waiterController != null) waiterController.refreshTableGrid();
+        if (waiterController != null) {waiterController.refreshTableGrid(); waiterController.loadtables();}
     }
 
     @FXML
