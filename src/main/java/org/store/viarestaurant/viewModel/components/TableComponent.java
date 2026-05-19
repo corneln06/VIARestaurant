@@ -16,6 +16,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.store.viarestaurant.dao.TableOrderDAO;
+import org.store.viarestaurant.dao.TableOrderDAOImpl;
 import org.store.viarestaurant.model.entities.*;
 import org.store.viarestaurant.model.enums.WorkerRole;
 import javafx.scene.layout.*;
@@ -75,13 +78,23 @@ public class TableComponent
   public void setLabelSuffix(String labelSuffix) {
       this.labelSuffix = labelSuffix;
   }
-
-
-
+  // delete after connecting
+  private TableOrderDAOImpl tableOrderDAO;
+  // end of delete
 
   public void initGrid(GridPane tableGrid)
   {
     this.tableGrid = tableGrid;
+    //delete after connecting
+      try
+      {
+          tableOrderDAO = TableOrderDAOImpl.getInstance();
+      }
+        catch (SQLException e)
+        {
+        e.printStackTrace();
+    }
+      // end of delete
     configureTableGrid();
     buildTableGrid();
   }
@@ -191,7 +204,12 @@ public class TableComponent
       final int id = table.getId();
       btn.setOnAction(e -> {
           if (labelSuffix.isEmpty()){
-            openTableModal(id);
+              //delete try and catch after connecting
+              try {
+                  openTableModal(id);
+              } catch (SQLException ex) {
+                  throw new RuntimeException(ex);
+              }
           } else {
               System.out.println("YES");
           }
@@ -211,8 +229,7 @@ public class TableComponent
     else btn.getStyleClass().add("table-available");
   }
 
-  private void openTableModal(int tableId)
-  {
+  private void openTableModal(int tableId) throws SQLException {
     currentTableId = tableId;
     waiterMap.clear();
     tableModalWaiterComboBox.getItems().clear();
@@ -262,6 +279,9 @@ public class TableComponent
 
     if(seated)
     {
+      TableOrder currentOrder = tableOrderDAO.getCurrentTableOrderByTableId(tableId);
+      Workers waiterAssigned = currentOrder.getWaiter();
+      tableModalWaiterComboBox.getSelectionModel().select(waiterAssigned.getFirstName() + " " + waiterAssigned.getLastName());
       tableModalStateBadge.setText("Seated");
       tableModalStateBadge.getStyleClass().add("badge-unavailable");
       tableModalInfo.setText("Table is currently occupied.");

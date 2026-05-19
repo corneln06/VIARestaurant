@@ -22,4 +22,5 @@ public interface TableOrderDAO {
     ArrayList<TableOrder> getTableOrdersByWaiterId(Integer id) throws SQLException;
     ArrayList<TableOrder> getTableOrdersByTableId(Integer id) throws SQLException;
     TableOrder updateTableOrder(TableOrder tableOrder) throws SQLException;
+    TableOrder getCurrentTableOrderByTableId(Integer tableId) throws SQLException;
 }
