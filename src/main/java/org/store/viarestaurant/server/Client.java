@@ -31,6 +31,7 @@ public class Client
   private Consumer<ReservationDeletedMessage> reservationDeletedListener;
   private Consumer<GetWorkersResponse> workersListener;
   private Consumer<TableUpdatedMessage> updatedMessageListener;
+  private Consumer<GetClosestReservationResponse> closestReservationListener;
 
   public void connect() throws IOException
   {
@@ -120,6 +121,10 @@ public class Client
             {
               reservationDeletedListener.accept(message);
             }
+            else if (object instanceof GetClosestReservationResponse message && closestReservationListener != null)
+            {
+                closestReservationListener.accept(message);
+            }
           });
         }
       }
@@ -183,4 +188,6 @@ public class Client
   public void setTablesCreateListener(Consumer<TableCreatedMessage> listener) {
     this.tableCreatedListener = listener;
   }
+
+  public void setClosestReservationListener(Consumer<GetClosestReservationResponse> listener){this.closestReservationListener = listener;}
 }

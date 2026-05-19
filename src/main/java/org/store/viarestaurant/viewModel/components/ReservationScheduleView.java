@@ -156,13 +156,6 @@ public class ReservationScheduleView
   {
     for(Reservation reservation : reservations)
     {
-      System.out.println(
-          "Reservation: "
-              + reservation.getName()
-              + ", table object: "
-              + reservation.getTable()
-              + ", table id: "
-              + (reservation.getTable() == null ? null : reservation.getTable().getId()));
       Integer tableId = getReservationTableId(reservation);
 
       if(tableId == null)

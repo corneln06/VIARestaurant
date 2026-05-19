@@ -13,7 +13,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import org.w3c.dom.Text;
 
 public class HostController
 {
@@ -71,10 +70,11 @@ public class HostController
           StackPane newOverlay,
           TextField maxSitting,
           Label error,
-      ComboBox<String> waiterComboBox,
-      Button primaryButton)
+          ComboBox<String> waiterComboBox,
+          Button primaryButton,
+          Button secondaryButton)
   {
-    tableComponent.initModal(overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton);
+    tableComponent.initModal(overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton, secondaryButton);
   }
 
   public void initClient(Client client)

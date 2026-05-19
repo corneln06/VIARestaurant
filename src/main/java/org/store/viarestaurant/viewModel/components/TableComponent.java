@@ -1,14 +1,12 @@
 package org.store.viarestaurant.viewModel.components;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.*;
 
-import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-import org.store.viarestaurant.dao.ReservationDAOImpl;
-import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,13 +19,11 @@ import org.store.viarestaurant.dao.TableOrderDAO;
 import org.store.viarestaurant.dao.TableOrderDAOImpl;
 import org.store.viarestaurant.model.entities.*;
 import org.store.viarestaurant.model.enums.WorkerRole;
-import javafx.scene.layout.*;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.ReservationDto.SeatTableRequest;
-import org.store.viarestaurant.server.dto.ReservationDto.SetTableAvailableRequest;
+import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.viewModel.services.ReservationService;
 import org.store.viarestaurant.viewModel.services.TablesService;
 
@@ -40,11 +36,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import org.store.viarestaurant.viewModel.services.WorkersService;
-import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.ReservationDto.TableCreateRequest;
-import org.store.viarestaurant.server.dto.ReservationDto.UpdateReservationRequest;
-import org.store.viarestaurant.viewModel.services.ReservationService;
-import org.store.viarestaurant.viewModel.services.TablesService;
 
 public class TableComponent
 {
@@ -69,11 +60,13 @@ public class TableComponent
   private WorkersService workersService;
 
   private Button tableModalPrimaryButton;
+  private Button tableModalSecondaryButton;
   private ComboBox<String> tableModalWaiterComboBox;
   private final Map<String, Workers> waiterMap = new LinkedHashMap<>();
   private int currentTableId;
 
   private String labelSuffix = "";
+  private Reservation closestReservation;
 
   public void setLabelSuffix(String labelSuffix) {
       this.labelSuffix = labelSuffix;
@@ -108,7 +101,8 @@ public class TableComponent
       TextField maxSitting,
       Label error,
       ComboBox<String> waiterComboBox,
-      Button primaryButton)
+      Button primaryButton,
+      Button secondaryButton)
   {
     this.tableModalOverlay = overlay;
     this.tableModalTitle = title;
@@ -116,6 +110,7 @@ public class TableComponent
     this.tableModalInfo = info;
     this.tableModalWaiterComboBox = waiterComboBox;
     this.tableModalPrimaryButton = primaryButton;
+    this.tableModalSecondaryButton = secondaryButton;
     this.newTableModalOverlay = newOverlay;
     this.maxSittingField = maxSitting;
     this.newTableErrorLabel = error;
@@ -287,14 +282,32 @@ public class TableComponent
       tableModalInfo.setText("Table is currently occupied.");
       tableModalPrimaryButton.setText("Set Available");
       tableModalPrimaryButton.setOnAction(e -> setAvailable());
+      tableModalSecondaryButton.setVisible(false);
+      tableModalSecondaryButton.setManaged(false);
     }
     else if(reserved)
     {
-      tableModalStateBadge.setText("Reserved");
-      tableModalStateBadge.getStyleClass().add("badge-reserved");
-      tableModalInfo.setText("This table has a reservation today.");
-      tableModalPrimaryButton.setText("Seat Table");
-      tableModalPrimaryButton.setOnAction(e -> seatTable());
+        tableModalStateBadge.setText("Reserved");
+        tableModalStateBadge.getStyleClass().add("badge-reserved");
+
+        tableModalPrimaryButton.setText("Seat Table");
+        tableModalPrimaryButton.setOnAction(e -> seatTable());
+
+        tableModalSecondaryButton.setVisible(true);
+        tableModalSecondaryButton.setManaged(true);
+
+        tableModalInfo.setText("Loading reservation...");
+
+        closestReservation = null;
+
+        try
+        {
+            reservationService.getClosestReservation(tableId);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
     }
     else
     {
@@ -303,6 +316,8 @@ public class TableComponent
       tableModalInfo.setText("Ready for walk-ins and upcoming service.");
       tableModalPrimaryButton.setText("Seat Table");
       tableModalPrimaryButton.setOnAction(e -> seatTable());
+      tableModalSecondaryButton.setVisible(false);
+      tableModalSecondaryButton.setManaged(false);
 
     }
     tableModalOverlay.setVisible(true);
@@ -349,8 +364,29 @@ public class TableComponent
       refreshTableGrid();
     });
 
-      tablesService.onTablesCreatedResponse(response -> {
+    tablesService.onTablesCreatedResponse(response -> {
         loadTables();
+    });
+
+    reservationService.onClosestReservationLoaded(response -> {
+        closestReservation = response.getReservation();
+
+        if (closestReservation == null) return;
+
+        LocalDateTime reservationTime = closestReservation.getDateTime();
+
+        Duration duration = Duration.between(
+                LocalDateTime.now(),
+                reservationTime
+        );
+
+        boolean lessThan1h30 = duration.toMinutes() >= 0 && duration.toMinutes() <= 90;
+
+        tableModalInfo.setText("This table has a reservation today at " + closestReservation
+                .getDateTime()
+                .format(DateTimeFormatter.ofPattern("HH:mm")));
+
+        tableModalPrimaryButton.setDisable(lessThan1h30);
       });
     }
 
