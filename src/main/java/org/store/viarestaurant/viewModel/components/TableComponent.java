@@ -1,7 +1,5 @@
 package org.store.viarestaurant.viewModel.components;
-
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,10 +7,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.store.viarestaurant.model.entities.*;
 import org.store.viarestaurant.model.enums.WorkerRole;
-import org.store.viarestaurant.model.state.AvailableState;
+import javafx.scene.layout.*;
+import org.store.viarestaurant.model.entities.Reservation;
+import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.server.dto.ReservationDto.SeatTableRequest;
 import org.store.viarestaurant.server.dto.ReservationDto.SetTableAvailableRequest;
@@ -51,6 +51,12 @@ public class TableComponent
   private ComboBox<String> tableModalWaiterComboBox;
   private final Map<String, Workers> waiterMap = new LinkedHashMap<>();
   private int currentTableId;
+
+  private String labelSuffix = "";
+
+  public void setLabelSuffix(String labelSuffix) {
+      this.labelSuffix = labelSuffix;
+  }
   
 
 
@@ -112,7 +118,7 @@ public class TableComponent
       Button btn = tableButtonMap.get(table.getId());
       if (btn != null)
       {
-        btn.setText("Table " + table.getId());
+        btn.setText("Table " + table.getId() + labelSuffix);
         boolean reserved = reservedIds.contains(table.getId());
         boolean seated = table.getStatus().getName().equals("Seated");
         updateTableButton(btn, reserved, seated);
@@ -158,7 +164,11 @@ public class TableComponent
       GridPane.setVgrow(btn, Priority.ALWAYS);
       final int id = table.getId();
       btn.setOnAction(e -> {
-        openTableModal(id);
+          if (labelSuffix.isEmpty()){
+            openTableModal(id);
+          } else {
+              System.out.println("YES");
+          }
       });
       tableGrid.add(btn, i % 5, i / 5);
       tableButtonMap.put(id, btn);

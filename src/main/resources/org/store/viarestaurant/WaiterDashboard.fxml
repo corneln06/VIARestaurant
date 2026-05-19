@@ -94,14 +94,16 @@
                 </StackPane>
                 <AnchorPane fx:id="ordersListPage" managed="false" styleClass="page-surface" visible="false">
                     <children>
-                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
+                        <VBox spacing="20.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
+                              AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
-                                <Label styleClass="page-title" text="Orders" />
-                                <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll" VBox.vgrow="ALWAYS">
-                                    <content>
-                                        <FlowPane fx:id="ordersListFlow" hgap="16.0" prefWrapLength="800.0" vgap="16.0" />
-                                    </content>
-                                </ScrollPane>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label styleClass="page-title" text="Orders"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                </HBox>
+                                <GridPane fx:id="ordersTableGrid" hgap="18.0" vgap="18.0"/>
                             </children>
                         </VBox>
                     </children>

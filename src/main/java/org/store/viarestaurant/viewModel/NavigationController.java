@@ -55,6 +55,7 @@ public class NavigationController
     @FXML private Pane reservationOverlayPane;
 
     @FXML private GridPane tableGrid;
+    @FXML private GridPane ordersTableGrid;
     @FXML private StackPane tableModalOverlay;
     @FXML private Label tableModalTitle;
     @FXML private Label tableModalStateBadge;
@@ -145,8 +146,8 @@ public class NavigationController
             }
             case Waiter -> {
                 waiterController = new WaiterController();
+                waiterController.init(tableGrid, ordersTableGrid);
                 waiterController.initClient(client);
-                waiterController.init(tableGrid);
 
                 showTablesPage();
                 showWaiterTablesPage();
@@ -201,7 +202,7 @@ public class NavigationController
         setActive(btnTables, btnReservations, btnWorkers, btnMenu, btnBills, btnOrders);
         if (hostController != null) hostController.refreshTableGrid();
         if (managerController != null) {managerController.refreshTableGrid(); managerController.loadTables();}
-        if (waiterController != null) {waiterController.refreshTableGrid(); waiterController.loadtables();}
+        if (waiterController != null ) {waiterController.refreshTableGrid(); waiterController.loadtables();}
     }
 
     @FXML
@@ -249,6 +250,11 @@ public class NavigationController
     {
         showOnly(ordersListPage);
         setActive(btnOrders, btnBills, btnTables);
+
+        if (waiterController != null) {
+            waiterController.refreshTableGrid();
+            waiterController.loadtables();
+        }
     }
 
     @FXML
@@ -439,6 +445,5 @@ public class NavigationController
     private void seatTable(){
       if(hostController != null) hostController.seatTable();
     }
-  
 
 }
