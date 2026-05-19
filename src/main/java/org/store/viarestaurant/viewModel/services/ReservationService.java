@@ -73,4 +73,9 @@ public class ReservationService
   {
     client.setUpdateReservationListener(listener);
   }
+  public void onUpdatedMessage(
+      Consumer<TableUpdatedMessage> listener
+  ){
+    client.setUpdatedMessageListener(listener);
+  }
 }

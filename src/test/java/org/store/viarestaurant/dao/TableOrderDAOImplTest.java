@@ -1,6 +1,19 @@
 package org.store.viarestaurant.dao;
 
-import org.junit.jupiter.api.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.RestaurantTable;
@@ -8,13 +21,6 @@ import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.model.enums.MenuTypes;
 import org.store.viarestaurant.model.enums.WorkerRole;
-
-import java.awt.*;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
