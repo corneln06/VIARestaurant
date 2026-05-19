@@ -527,15 +527,22 @@ public class ServerConnection implements Runnable
     }
   }
 
-  private void handleGetClosestReservationRequest(GetClosestReservationRequest request) throws IOException {
-    try{
-        Reservation reservation = reservationDAO.getClosestReservationInTimeForTable(request.getTableId());
-        send(reservation);
+  private void handleGetClosestReservationRequest(
+      GetClosestReservationRequest request) throws IOException
+  {
+    try
+    {
+      Reservation reservation =
+          reservationDAO.getClosestReservationInTimeForTable(
+              request.getTableId()
+          );
+
+      send(new GetClosestReservationResponse(reservation));
     }
     catch(SQLException e)
     {
-        e.printStackTrace();
-        send(new MessageResponse(false, "Could not seat table"));
+      e.printStackTrace();
+      send(new GetClosestReservationResponse(null));
     }
   }
 
