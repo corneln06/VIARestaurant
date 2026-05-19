@@ -2,7 +2,9 @@ package org.store.viarestaurant.server.dto.ReservationDto;
 
 import org.store.viarestaurant.model.entities.RestaurantTable;
 
-public class TableCreatedMessage
+import java.io.Serializable;
+
+public class TableCreatedMessage implements Serializable
 {
   private RestaurantTable table;
 

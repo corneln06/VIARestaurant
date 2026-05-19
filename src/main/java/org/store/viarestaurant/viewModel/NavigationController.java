@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import javafx.event.ActionEvent;
 import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
@@ -92,6 +93,16 @@ public class NavigationController
 
     @FXML private Label modalTitle;
 
+    @FXML
+    private StackPane newTableOverlay;
+
+    @FXML
+    private TextField tableMaxSittingField;
+
+    @FXML
+    private Label newTableErrorLabel;
+
+
 
     private HostController hostController;
     private ManagerController managerController;
@@ -143,7 +154,7 @@ public class NavigationController
                         modalTitle
                 );
 
-                hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo, tableModalWaiterComboBox, tableModalPrimaryButton);
+                hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo, newTableOverlay,tableMaxSittingField,newTableErrorLabel , tableModalWaiterComboBox, tableModalPrimaryButton);
 
                 hostController.refreshSchedule();
                 showTablesPage();
@@ -194,7 +205,8 @@ public class NavigationController
 
                 managerController.refreshMenuTable();
 
-                managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,tableModalWaiterComboBox, tableModalPrimaryButton);
+                managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,
+                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton);
 
                 showTablesPage();
                 showMenuPage();
@@ -208,8 +220,11 @@ public class NavigationController
         showOnly(tablesPage);
         setActive(btnTables, btnReservations, btnWorkers, btnMenu, btnBills, btnOrders);
         if (hostController != null) hostController.refreshTableGrid();
-        if (managerController != null) {managerController.refreshTableGrid(); managerController.loadTables();}
-        if (waiterController != null ) {waiterController.refreshTableGrid(); waiterController.loadtables();}
+        if (managerController != null) {
+            managerController.closeNewTableModal();
+            managerController.refreshTableGrid();
+            managerController.loadTables();}
+        if (waiterController != null) {waiterController.refreshTableGrid(); waiterController.loadtables();}
     }
 
     @FXML
@@ -458,4 +473,19 @@ public class NavigationController
       if(hostController != null) hostController.seatTable();
     }
 
+
+    @FXML
+    private void closeNewTableModal() {
+        if (managerController != null) managerController.closeNewTableModal();
+    }
+
+    @FXML
+    private void createTable() {
+        if (managerController != null) managerController.createTable();
+    }
+
+    @FXML
+    private void openNewTableModal() {
+        if (managerController != null) managerController.openNewTableModal();
+    }
 }
