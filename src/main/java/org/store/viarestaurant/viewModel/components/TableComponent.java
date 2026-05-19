@@ -1,5 +1,6 @@
 package org.store.viarestaurant.viewModel.components;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,17 +10,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
-import org.store.viarestaurant.dao.TableOrderDAOImpl;
-import org.store.viarestaurant.dao.WorkersDAOImpl;
+
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.entities.Workers;
-import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.model.state.AvailableState;
-import org.store.viarestaurant.model.state.SeatedState;
 import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.ReservationDto.SeatTableRequest;
+import org.store.viarestaurant.server.dto.ReservationDto.SetTableAvailableRequest;
 import org.store.viarestaurant.viewModel.services.ReservationService;
 import org.store.viarestaurant.viewModel.services.TablesService;
 
@@ -31,6 +30,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
+
 
 public class TableComponent
 {
@@ -55,24 +55,13 @@ public class TableComponent
   
 
   // TO BE REMOVED ONCE BACKEND IS IN PLACE
-  private WorkersDAOImpl workersDAO;
-  private TableOrderDAOImpl tableOrderDAO;
-  private RestaurantTableDAOImpl tableDAO;
   // END OF TO BE REMOVED
 
   public void initGrid(GridPane tableGrid)
   {
     this.tableGrid = tableGrid;
     // TO BE REMOVED ONCE BACKEND IS IN PLACE
-    try
-    {
-      tableDAO = RestaurantTableDAOImpl.getInstance();
-      workersDAO = WorkersDAOImpl.getInstance();
-      tableOrderDAO = TableOrderDAOImpl.getInstance();
-    }catch (SQLException e)
-    {
-      e.printStackTrace();
-    }
+
     // END OF TO BE REMOVED
     configureTableGrid();
     buildTableGrid();
@@ -158,13 +147,8 @@ public class TableComponent
       GridPane.setVgrow(btn, Priority.ALWAYS);
       final int id = table.getId();
       btn.setOnAction(e -> {
-          try {
-            openTableModal(id);
-          } catch (SQLException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-          }
-        });
+        openTableModal(id);
+      });
       tableGrid.add(btn, i % 5, i / 5);
       tableButtonMap.put(id, btn);
       updateTableButton(btn, false, false);
@@ -180,46 +164,39 @@ public class TableComponent
     else btn.getStyleClass().add("table-available");
   }
 
-  private void openTableModal(int tableId) throws SQLException
+  private void openTableModal(int tableId)
   {
     currentTableId = tableId;
-    //populate waiter combo boc
-    waiterMap.clear();
-    tableModalWaiterComboBox.getItems().clear();
-    List<Workers> allWorkers = workersDAO.getAllWorkers();
-    for(Workers w : allWorkers) {
-      if(w.getRole() == WorkerRole.Waiter){
-        String label = w.getFirstName() + " " + w.getLastName();
-        waiterMap.put(label, w);
-        tableModalWaiterComboBox.getItems().add(label);
 
-
-      }
-    }
-    tableModalWaiterComboBox.getSelectionModel().clearSelection();
-    List<TableOrder> activeOrders = tableOrderDAO.getTableOrdersByTableId(tableId);
-    activeOrders.stream()
-        .filter(o -> !o.isPaid() && o.getWaiter() != null)
-        .findFirst()
-        .ifPresent(o -> {
-          String label = o.getWaiter().getFirstName() + " " + o.getWaiter().getLastName();
-          tableModalWaiterComboBox.setValue(label);
-        });
-    
-    if (tableModalOverlay == null) return;
-    try
+    if(tableModalOverlay == null)
     {
-      List<RestaurantTable> tables = tableDAO.getAllRestaurantTables();
+      return;
+    }
     RestaurantTable table = tables.stream()
-        .filter(t -> t.getId() == tableId).findFirst().orElse(null);
-    if (table == null) return;
+        .filter(t -> t.getId() == tableId)
+        .findFirst()
+        .orElse(null);
 
-    boolean reserved = reservations.stream().anyMatch(r -> r.getTable().getId() == tableId);
+    if(table == null)
+    {
+      return;
+    }
+    boolean reserved = reservations.stream()
+        .anyMatch(r ->
+            r.getTable() != null &&
+                r.getTable().getId() == tableId
+        );
 
     tableModalTitle.setText("Table " + tableId);
-    tableModalStateBadge.getStyleClass().removeAll("badge-available", "badge-reserved", "badge-unavailable");
+    tableModalStateBadge.getStyleClass().removeAll(
+        "badge-available",
+        "badge-reserved",
+        "badge-unavailable"
+    );
 
-    boolean seated = table.getStatus().getName().equals("Seated");
+    boolean seated =
+        table.getStatus() != null &&
+            table.getStatus().getName().equals("Seated");
 
     if (seated)
     {
@@ -248,10 +225,7 @@ public class TableComponent
     tableModalOverlay.setVisible(true);
     tableModalOverlay.setManaged(true);
     }
-    catch (SQLException e){
-      e.printStackTrace();
-    }
-  }
+
 
   public void initClient(Client client)
   {
@@ -275,34 +249,41 @@ public class TableComponent
     });
   }
 
-  //seating table function
-  public void seatTable(){
-    Workers waiter = waiterMap.get(tableModalWaiterComboBox.getValue());
-    if(waiter == null){
-      //if waiter not selected, no function
+  public void seatTable()
+  {
+    Workers waiter =
+        waiterMap.get(
+            tableModalWaiterComboBox.getValue()
+        );
+    if(waiter == null)
+    {
       return;
     }
-    try {
-        tableOrderDAO.createTableOrder(currentTableId, waiter.getId(), "", 0.0,
-        new ArrayList<>(), false);
-        tableDAO.updateTableState(currentTableId, new SeatedState());
-        closeTableModal();
-        refreshTableGrid();
-    } catch (SQLException e) {
-        e.printStackTrace();
+    try
+    {
+      client.send(
+          new SeatTableRequest(
+              currentTableId,
+              waiter.getId()
+          )
+      );
+    }
+    catch(IOException e)
+    {
+      e.printStackTrace();
     }
   }
 
   public void setAvailable()
   {
-    try {
-      TableOrder currentOrder = tableOrderDAO.getTableOrderByID(currentTableId);
-      currentOrder.setPaid(true);
-
-      tableDAO.updateTableState(currentTableId, new AvailableState());
-      closeTableModal();
-      refreshTableGrid();
-    } catch (SQLException e) {
+    try
+    {
+      client.send(
+          new SetTableAvailableRequest(currentTableId)
+      );
+    }
+    catch(IOException e)
+    {
       e.printStackTrace();
     }
   }

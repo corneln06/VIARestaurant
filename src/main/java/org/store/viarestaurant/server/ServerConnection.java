@@ -3,8 +3,11 @@ package org.store.viarestaurant.server;
 import org.store.viarestaurant.dao.*;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.model.enums.WorkerRole;
+import org.store.viarestaurant.model.state.AvailableState;
+import org.store.viarestaurant.model.state.SeatedState;
 import org.store.viarestaurant.server.dto.LoginRequest;
 import org.store.viarestaurant.server.dto.LoginResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
@@ -25,6 +28,7 @@ public class ServerConnection implements Runnable
   private final WorkersDAO workersDAO;
   private final RestaurantTableDAO restaurantTableDAO;
   private final ReservationDAO reservationDAO;
+  private final TableOrderDAO tableOrderDAO;
 
   private Workers currentUser;
 
@@ -40,6 +44,7 @@ public class ServerConnection implements Runnable
       this.workersDAO = WorkersDAOImpl.getInstance();
       this.reservationDAO = ReservationDAOImpl.getInstance();
       this.restaurantTableDAO = RestaurantTableDAOImpl.getInstance();
+      this.tableOrderDAO = TableOrderDAOImpl.getInstance();
     }
     catch(SQLException e)
     {
@@ -106,10 +111,17 @@ public class ServerConnection implements Runnable
           System.out.println("[SERVER] Update Reservation detected");
           handleUpdateReservation(request);
         }
+        else if (object instanceof GetWorkersRequest)
+        {
+          System.out.println("[SERVER] Get Workers detected ");
+          handleGetWorkers();
+        }
         else if(object instanceof DeleteReservationRequest request)
         {
           System.out.println("[SERVER] DeleteReservationRequest detected");
           handleDeleteReservation(request);
+        } else if (object instanceof SeatTableRequest request){
+            handleSeatTable(request);
         }
         else
         {
@@ -134,6 +146,10 @@ public class ServerConnection implements Runnable
 
       e.printStackTrace();
     }
+    catch (SQLException e)
+    {
+      throw new RuntimeException(e);
+    }
     finally
     {
       try
@@ -154,6 +170,19 @@ public class ServerConnection implements Runnable
     }
   }
 
+  private void handleGetWorkers() throws IOException {
+    try
+    {
+      send(new GetWorkersResponse(
+          workersDAO.getAllWorkers()
+      ));
+    }
+    catch(SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetWorkersResponse(new ArrayList<>()));
+    }
+  }
   private void handleGetTables() throws IOException{
       try
       {
@@ -433,5 +462,40 @@ public class ServerConnection implements Runnable
       ));
     }
   }
+  private void handleSetTableAvailable(SetTableAvailableRequest request)
+      throws IOException
+  {
+    try
+    {
+      TableOrder currentOrder =
+          tableOrderDAO.getTableOrderByID(request.getTableId());
+
+      if(currentOrder != null)
+      {
+        currentOrder.setPaid(true);
+        tableOrderDAO.updateTableOrder(currentOrder);
+      }
+
+      restaurantTableDAO.updateTableState(
+          request.getTableId(),
+          new AvailableState()
+      );
+
+      connectionPool.broadcast(
+          new TableUpdatedMessage(request.getTableId())
+      );
+    }
+    catch(SQLException e)
+    {
+      e.printStackTrace();
+    }
+  }
+  private void handleSeatTable(SeatTableRequest request) throws SQLException
+  {
+    tableOrderDAO.createTableOrder(request.getTableId(), request.getWaiterId(), "", 0.0, new ArrayList<>(), false);
+
+    restaurantTableDAO.updateTableState(request.getTableId(), new SeatedState());
+    connectionPool.broadcast(new TableUpdatedMessage(request.getTableId()));
+  };
 
 }

@@ -28,6 +28,7 @@ public class Client
   private Consumer<DeleteReservationResponse> deleteReservationListener;
   private Consumer<UpdateReservationResponse> updateReservationListener;
   private Consumer<ReservationDeletedMessage> reservationDeletedListener;
+  private Consumer<GetTablesResponse> workersListener;
 
   public void connect() throws IOException
   {
@@ -123,6 +124,9 @@ public class Client
     this.loginListener = listener;
   }
 
+  public void setWorkersListener(Consumer<GetTablesResponse> listener){
+    this.workersListener = listener;
+  }
   public void setReservationTablesListener(Consumer<GetTablesResponse> listener)
   {
     this.reservationTablesListener = listener;
