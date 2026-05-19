@@ -200,7 +200,7 @@ public class TableComponent
       final int id = table.getId();
       btn.setOnAction(e -> {
           if (labelSuffix.isEmpty()){
-              //delete try and catch after connecting
+              //delete try and catch after connecting but leave openTableModal(id);
               try {
                   openTableModal(id);
               } catch (SQLException ex) {
@@ -275,9 +275,11 @@ public class TableComponent
 
     if(seated)
     {
+        // connection hould be done here
       TableOrder currentOrder = tableOrderDAO.getCurrentTableOrderByTableId(tableId);
       Workers waiterAssigned = currentOrder.getWaiter();
       tableModalWaiterComboBox.getSelectionModel().select(waiterAssigned.getFirstName() + " " + waiterAssigned.getLastName());
+      //until here
       tableModalStateBadge.setText("Seated");
       tableModalStateBadge.getStyleClass().add("badge-unavailable");
       tableModalInfo.setText("Table is currently occupied.");
