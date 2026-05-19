@@ -1,5 +1,14 @@
 package org.store.viarestaurant.viewModel.components;
+
 import java.io.IOException;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+import org.store.viarestaurant.dao.ReservationDAOImpl;
+import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +37,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import org.store.viarestaurant.viewModel.services.WorkersService;
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.ReservationDto.TableCreateRequest;
+import org.store.viarestaurant.server.dto.ReservationDto.UpdateReservationRequest;
+import org.store.viarestaurant.viewModel.services.ReservationService;
+import org.store.viarestaurant.viewModel.services.TablesService;
 
 public class TableComponent
 {
@@ -39,6 +53,10 @@ public class TableComponent
   private Label tableModalStateBadge;
   private Label tableModalInfo;
   private Client client;
+
+  private StackPane newTableModalOverlay;
+  private TextField maxSittingField;
+  private Label newTableErrorLabel;
 
   private ReservationService reservationService;
   private TablesService tablesService;
@@ -57,16 +75,13 @@ public class TableComponent
   public void setLabelSuffix(String labelSuffix) {
       this.labelSuffix = labelSuffix;
   }
-  
+
 
 
 
   public void initGrid(GridPane tableGrid)
   {
     this.tableGrid = tableGrid;
-    // TO BE REMOVED ONCE BACKEND IS IN PLACE
-
-    // END OF TO BE REMOVED
     configureTableGrid();
     buildTableGrid();
   }
@@ -76,6 +91,9 @@ public class TableComponent
       Label title,
       Label badge,
       Label info,
+      StackPane newOverlay,
+      TextField maxSitting,
+      Label error,
       ComboBox<String> waiterComboBox,
       Button primaryButton)
   {
@@ -85,10 +103,16 @@ public class TableComponent
     this.tableModalInfo = info;
     this.tableModalWaiterComboBox = waiterComboBox;
     this.tableModalPrimaryButton = primaryButton;
+    this.newTableModalOverlay = newOverlay;
+    this.maxSittingField = maxSitting;
+    this.newTableErrorLabel = error;
   }
 
-  
   public void loadTables(){
+    if (tablesService == null) {
+      return;
+    }
+
     tablesService.loadTables();
   }
   public void loadData()
@@ -103,6 +127,8 @@ public class TableComponent
       throw new RuntimeException(e);
     }
   }
+
+
 
   public void refreshTableGrid()
   {
@@ -282,6 +308,15 @@ public class TableComponent
       workers = response.getWorkers();
 
     });
+
+    tablesService.onTablesCreated(response -> {
+      if (response.isSuccess()) {
+        closeNewTableModal();
+        loadTables();
+      } else{
+        showError(response.getMessage());
+      }
+    });
     reservationService.onUpdatedMessage(message ->
     {
       closeTableModal();
@@ -293,6 +328,24 @@ public class TableComponent
 
       refreshTableGrid();
     });
+
+      tablesService.onTablesCreatedResponse(response -> {
+        loadTables();
+      });
+    }
+
+
+
+
+  public void openNewTableModal() {
+    if (newTableModalOverlay == null) return;
+
+    maxSittingField.clear();
+
+    hideError();
+
+    newTableModalOverlay.setVisible(true);
+    newTableModalOverlay.setManaged(true);
   }
 
   public void seatTable()
@@ -334,4 +387,66 @@ public class TableComponent
       e.printStackTrace();
     }
   }
+
+  public void closeNewTableModal() {
+    if (newTableModalOverlay == null) return;
+
+    newTableModalOverlay.setVisible(false);
+    newTableModalOverlay.setManaged(false);
+  }
+
+  private void showError(String message) {
+    if (newTableErrorLabel == null) {
+      return;
+    }
+
+    newTableErrorLabel.setText(message);
+    newTableErrorLabel.setVisible(true);
+    newTableErrorLabel.setManaged(true);
+  }
+
+  private void hideError() {
+    if (newTableErrorLabel == null) {
+      return;
+    }
+
+    newTableErrorLabel.setVisible(false);
+    newTableErrorLabel.setManaged(false);
+  }
+
+  public void createTable() {
+    hideError();
+
+    String raw = maxSittingField.getText();
+
+    if (raw == null || raw.isBlank()) {
+      showError("Max seats required.");
+      return;
+    }
+
+    int maxSitters;
+
+    try {
+      maxSitters = Integer.parseInt(raw.trim());
+    } catch (NumberFormatException e) {
+      showError("Must be a number.");
+      return;
+    }
+
+    if (maxSitters <= 0 || maxSitters > 50) {
+      showError("Seats must be between 1 and 50.");
+      return;
+    }
+
+    try {
+      TableCreateRequest request = new TableCreateRequest(maxSitters);
+
+      tablesService.createTable(request);
+
+    } catch (Exception e) {
+      showError("Failed: " + e.getMessage());
+      e.printStackTrace();
+    }
+  }
 }
+

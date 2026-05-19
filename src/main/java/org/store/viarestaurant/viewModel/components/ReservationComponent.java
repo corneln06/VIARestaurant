@@ -11,6 +11,7 @@ import org.store.viarestaurant.server.dto.ReservationDto.DeleteReservationReques
 import org.store.viarestaurant.server.dto.ReservationDto.TableBookingRequest;
 import org.store.viarestaurant.server.dto.ReservationDto.UpdateReservationRequest;
 import org.store.viarestaurant.viewModel.services.ReservationService;
+import org.store.viarestaurant.viewModel.services.TablesService;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -32,6 +33,7 @@ public class ReservationComponent {
           DateTimeFormatter.ofPattern("HH:mm");
 
   private ReservationService reservationService;
+  private TablesService tablesService;
 
   private ArrayList<RestaurantTable> tables =
           new ArrayList<>();
@@ -90,8 +92,10 @@ public class ReservationComponent {
   public void initClient(Client client) {
     this.reservationService =
             new ReservationService(client);
+    this.tablesService = new TablesService(client);
 
-    reservationService.onTablesLoaded(response ->
+
+    tablesService.onTablesLoaded(response ->
     {
       tables = response.getTables();
       if (tableComboBox != null) {
