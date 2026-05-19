@@ -186,7 +186,7 @@ public class NavigationController
 
                 managerController.refreshMenuTable();
 
-                managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo);
+                managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,tableModalWaiterComboBox, tableModalPrimaryButton);
 
                 showTablesPage();
                 showMenuPage();

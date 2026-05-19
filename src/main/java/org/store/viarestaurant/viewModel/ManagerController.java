@@ -69,9 +69,11 @@ public class ManagerController
             StackPane overlay,
             Label title,
             Label badge,
-            Label info)
+            Label info,
+            ComboBox<String> waiterComboBox,
+            Button primaryButton)
     {
-        tableComponent.initModal(overlay, title, badge, info);
+        tableComponent.initModal(overlay, title, badge, info, waiterComboBox, primaryButton);
     }
 
   public void initClient(Client client)
