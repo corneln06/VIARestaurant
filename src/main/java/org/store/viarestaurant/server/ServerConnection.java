@@ -346,10 +346,10 @@ public class ServerConnection implements Runnable
               request.getMaxSitting());
       if(restaurantTable == null)
       {
-        send(new MessageResponse(false, "Cannot create a table"));
+        send(new TableCreateResponse(false, "Cannot create a table"));
         return;
       }
-      send(new MessageResponse(true, "Table created successfully"));
+      send(new TableCreateResponse(true, "Table created successfully"));
 
       connectionPool.broadcast(
           new TableCreatedMessage(restaurantTable)
@@ -358,7 +358,7 @@ public class ServerConnection implements Runnable
     catch(SQLException e)
     {
       e.printStackTrace();
-      send(new MessageResponse(false, "Database error while creating table"));
+      send(new TableCreateResponse(false, "Database error while creating table"));
     }
   }
 

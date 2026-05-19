@@ -273,9 +273,6 @@ public class TableComponent
       TableCreateRequest request = new TableCreateRequest(maxSitters);
 
       tablesService.createTable(request);
-//      closeNewTableModal();
-//
-//      tablesService.loadTables();
 
     } catch (Exception e) {
       showError("Failed: " + e.getMessage());

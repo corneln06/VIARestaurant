@@ -30,7 +30,7 @@ public class TablesService
     client.setTablesPageListener(listener);
   }
 
-  public void onTablesCreated(Consumer<MessageResponse> listener) {
+  public void onTablesCreated(Consumer<TableCreateResponse> listener) {
     client.setCreateTableListener(listener);
   }
 
