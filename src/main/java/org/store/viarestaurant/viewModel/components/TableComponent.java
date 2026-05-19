@@ -10,11 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
-import org.store.viarestaurant.model.entities.Reservation;
-import org.store.viarestaurant.model.entities.RestaurantTable;
-import org.store.viarestaurant.model.entities.TableOrder;
-import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.model.entities.*;
+import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.model.state.AvailableState;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.server.dto.ReservationDto.SeatTableRequest;
@@ -30,7 +27,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
-
+import org.store.viarestaurant.viewModel.services.WorkersService;
 
 public class TableComponent
 {
@@ -47,6 +44,8 @@ public class TableComponent
   private TablesService tablesService;
   private ArrayList<RestaurantTable> tables = new ArrayList<>();
   private List<Reservation> reservations = new ArrayList<>();
+  private ArrayList<Workers> workers = new ArrayList<>();
+  private WorkersService workersService;
 
   private Button tableModalPrimaryButton;
   private ComboBox<String> tableModalWaiterComboBox;
@@ -54,8 +53,7 @@ public class TableComponent
   private int currentTableId;
   
 
-  // TO BE REMOVED ONCE BACKEND IS IN PLACE
-  // END OF TO BE REMOVED
+
 
   public void initGrid(GridPane tableGrid)
   {
@@ -83,8 +81,21 @@ public class TableComponent
     this.tableModalPrimaryButton = primaryButton;
   }
 
+  
   public void loadTables(){
     tablesService.loadTables();
+  }
+  public void loadData()
+  {
+    try
+    {
+      reservationService.loadSchedule();
+      workersService.loadWorkers();
+    }
+    catch(IOException e)
+    {
+      throw new RuntimeException(e);
+    }
   }
 
   public void refreshTableGrid()
@@ -167,7 +178,22 @@ public class TableComponent
   private void openTableModal(int tableId)
   {
     currentTableId = tableId;
+    waiterMap.clear();
+    tableModalWaiterComboBox.getItems().clear();
 
+    for(Workers worker : workers)
+    {
+      if(worker.getRole() == WorkerRole.Waiter)
+      {
+        String label =
+            worker.getFirstName() + " " + worker.getLastName();
+
+        waiterMap.put(label, worker);
+        tableModalWaiterComboBox.getItems().add(label);
+      }
+    }
+
+    tableModalWaiterComboBox.getSelectionModel().clearSelection();
     if(tableModalOverlay == null)
     {
       return;
@@ -198,7 +224,7 @@ public class TableComponent
         table.getStatus() != null &&
             table.getStatus().getName().equals("Seated");
 
-    if (seated)
+    if(seated)
     {
       tableModalStateBadge.setText("Seated");
       tableModalStateBadge.getStyleClass().add("badge-unavailable");
@@ -206,7 +232,7 @@ public class TableComponent
       tableModalPrimaryButton.setText("Set Available");
       tableModalPrimaryButton.setOnAction(e -> setAvailable());
     }
-    else if (reserved)
+    else if(reserved)
     {
       tableModalStateBadge.setText("Reserved");
       tableModalStateBadge.getStyleClass().add("badge-reserved");
@@ -221,6 +247,7 @@ public class TableComponent
       tableModalInfo.setText("Ready for walk-ins and upcoming service.");
       tableModalPrimaryButton.setText("Seat Table");
       tableModalPrimaryButton.setOnAction(e -> seatTable());
+
     }
     tableModalOverlay.setVisible(true);
     tableModalOverlay.setManaged(true);
@@ -233,6 +260,7 @@ public class TableComponent
 
     tablesService = new TablesService(client);
     reservationService = new ReservationService(client);
+    workersService = new WorkersService(client);
 
     tablesService.onTablesLoaded(response ->
     {
@@ -240,7 +268,15 @@ public class TableComponent
       buildTableGrid();
       refreshTableGrid();
     });
+    workersService.onWorkersLoaded(response ->{
+      workers = response.getWorkers();
 
+    });
+    reservationService.onUpdatedMessage(message ->
+    {
+      closeTableModal();
+      loadData();
+    });
     reservationService.onReservationLoaded(response ->
     {
       this.reservations = response.getReservations();
@@ -272,6 +308,7 @@ public class TableComponent
     {
       e.printStackTrace();
     }
+    refreshTableGrid();
   }
 
   public void setAvailable()

@@ -2,7 +2,9 @@ package org.store.viarestaurant.model.entities;
 
 import org.store.viarestaurant.model.enums.WorkerRole;
 
-public class Waiter extends Workers
+import java.io.Serializable;
+
+public class Waiter extends Workers implements Serializable
 {
 //    private int id;
 //    private String firstName;

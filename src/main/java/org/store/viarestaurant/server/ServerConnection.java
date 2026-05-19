@@ -18,6 +18,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class ServerConnection implements Runnable
 {
@@ -123,6 +124,10 @@ public class ServerConnection implements Runnable
         } else if (object instanceof SeatTableRequest request){
             handleSeatTable(request);
         }
+        else if (object instanceof SetTableAvailableRequest request)
+        {
+          handleSetTableAvailable(request);
+        }
         else
         {
           System.out.println(
@@ -145,10 +150,6 @@ public class ServerConnection implements Runnable
           "[SERVER] Class not found");
 
       e.printStackTrace();
-    }
-    catch (SQLException e)
-    {
-      throw new RuntimeException(e);
     }
     finally
     {
@@ -184,11 +185,14 @@ public class ServerConnection implements Runnable
     }
   }
   private void handleGetTables() throws IOException{
-      try
+    System.out.println("IN");
+    try
       {
           if (currentUser.getRole() == WorkerRole.Waiter){
+            System.out.println("waiter");
               send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTablesByWaiter(currentUser.getId())));
           } else {
+            System.out.println("other");
               send(new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables()));
           }
       }
@@ -467,8 +471,9 @@ public class ServerConnection implements Runnable
   {
     try
     {
+
       TableOrder currentOrder =
-          tableOrderDAO.getTableOrderByID(request.getTableId());
+          tableOrderDAO.getTableOrdersByTableId(request.getTableId()).stream().filter(t -> !t.isPaid()).findFirst().orElse(null);
 
       if(currentOrder != null)
       {
@@ -490,12 +495,32 @@ public class ServerConnection implements Runnable
       e.printStackTrace();
     }
   }
-  private void handleSeatTable(SeatTableRequest request) throws SQLException
+  private void handleSeatTable(SeatTableRequest request) throws IOException
   {
-    tableOrderDAO.createTableOrder(request.getTableId(), request.getWaiterId(), "", 0.0, new ArrayList<>(), false);
+    try
+    {
+      tableOrderDAO.createTableOrder(
+          request.getTableId(),
+          request.getWaiterId(),
+          "",
+          0.0,
+          new ArrayList<>(),
+          false
+      );
+      restaurantTableDAO.updateTableState(
+          request.getTableId(),
+          new SeatedState()
+      );
 
-    restaurantTableDAO.updateTableState(request.getTableId(), new SeatedState());
-    connectionPool.broadcast(new TableUpdatedMessage(request.getTableId()));
-  };
+      connectionPool.broadcast(
+          new TableUpdatedMessage(request.getTableId())
+      );
+    }
+    catch(SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Could not seat table"));
+    }
+  }
 
 }
