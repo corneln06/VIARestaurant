@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import org.w3c.dom.Text;
 
 public class HostController
 {
@@ -63,14 +64,17 @@ public class HostController
   }
 
   public void initTableModal(
-      StackPane overlay,
-      Label title,
-      Label badge,
-      Label info,
+          StackPane overlay,
+          Label title,
+          Label badge,
+          Label info,
+          StackPane newOverlay,
+          TextField maxSitting,
+          Label error,
       ComboBox<String> waiterComboBox,
       Button primaryButton)
   {
-    tableComponent.initModal(overlay, title, badge, info, waiterComboBox, primaryButton);
+    tableComponent.initModal(overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton);
   }
 
   public void initClient(Client client)
@@ -85,6 +89,7 @@ public class HostController
   public void refreshSchedule()
   {
     reservationComponent.refreshSchedule();
+    tableComponent.loadTables();
   }
 
   public void openNewReservationModal()

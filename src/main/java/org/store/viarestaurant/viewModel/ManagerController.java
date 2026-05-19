@@ -70,10 +70,11 @@ public class ManagerController
             Label title,
             Label badge,
             Label info,
+            StackPane newTableOverlay , TextField  tableMaxSittingField, Label newTableErrorLabel,
             ComboBox<String> waiterComboBox,
             Button primaryButton)
     {
-        tableComponent.initModal(overlay, title, badge, info, waiterComboBox, primaryButton);
+        tableComponent.initModal(overlay, title, badge, info, newTableOverlay, tableMaxSittingField, newTableErrorLabel, waiterComboBox, primaryButton);
     }
 
   public void initClient(Client client)
@@ -129,4 +130,11 @@ public class ManagerController
   }
   
   public void createDish() { menuItemComponent.createDish();}
+
+  public void openNewTableModal() { tableComponent.openNewTableModal();}
+
+  public void closeNewTableModal() { tableComponent.closeNewTableModal(); }
+
+  public void createTable() { tableComponent.createTable();}
+
 }
