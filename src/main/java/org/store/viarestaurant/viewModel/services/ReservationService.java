@@ -17,7 +17,6 @@ public class ReservationService
 
   public void loadSchedule() throws IOException
   {
-    client.send(new GetTablesRequest());
     client.send(new GetReservationsRequest());
   }
 
@@ -42,11 +41,6 @@ public class ReservationService
     client.send(request);
   }
 
-  public void onTablesLoaded(
-      Consumer<GetTablesResponse> listener)
-  {
-    client.setReservationTablesListener(listener);
-  }
 
   public void onReservationLoaded(
       Consumer<GetReservationsResponse> listener)

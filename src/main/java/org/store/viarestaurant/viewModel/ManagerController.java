@@ -132,4 +132,8 @@ public class ManagerController
   public void openNewTableModal() { tableComponent.openNewTableModal();}
 
   public void closeNewTableModal() { tableComponent.closeNewTableModal(); }
+
+  public void createTable() { tableComponent.createTable();}
+
 }
+

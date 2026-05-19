@@ -2,6 +2,7 @@ package org.store.viarestaurant.viewModel.components;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import javafx.fxml.FXML;
@@ -19,6 +20,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.ReservationDto.TableCreateRequest;
+import org.store.viarestaurant.server.dto.ReservationDto.UpdateReservationRequest;
 import org.store.viarestaurant.viewModel.services.ReservationService;
 import org.store.viarestaurant.viewModel.services.TablesService;
 
@@ -62,14 +65,19 @@ public class TableComponent
     this.tableModalTitle = title;
     this.tableModalStateBadge = badge;
     this.tableModalInfo = info;
-    this.newTableModalOverlay = overlay;
+    this.newTableModalOverlay = newOverlay;
     this.maxSittingField = maxSitting;
     this.newTableErrorLabel = error;
   }
 
   public void loadTables(){
-    tablesService.loadTables();
-  }
+    if (tablesService == null) {
+      return;
+    }
+
+      tablesService.loadTables();
+    }
+
 
   public void refreshTableGrid()
   {
@@ -173,7 +181,7 @@ public class TableComponent
     this.client = client;
 
     tablesService = new TablesService(client);
-    reservationService = new ReservationService(client);
+//    reservationService = new ReservationService(client);
 
     tablesService.onTablesLoaded(response ->
     {
@@ -182,18 +190,30 @@ public class TableComponent
       refreshTableGrid();
     });
 
-    reservationService.onReservationLoaded(response ->
-    {
-      this.reservations = response.getReservations();
-
-      refreshTableGrid();
+    tablesService.onTablesCreated(response -> {
+      if (response.isSuccess()) {
+        closeNewTableModal();
+        loadTables();
+      } else{
+        showError(response.getMessage());
+      }
     });
+
+    tablesService.onTablesCreatedResponse(response -> {
+
+      loadTables();
+    });
+
+
+
   }
 
   public void openNewTableModal() {
     if (newTableModalOverlay == null) return;
 
-    maxSittingField.setText("4");
+    maxSittingField.clear();
+
+    hideError();
 
     newTableModalOverlay.setVisible(true);
     newTableModalOverlay.setManaged(true);
@@ -205,4 +225,62 @@ public class TableComponent
     newTableModalOverlay.setVisible(false);
     newTableModalOverlay.setManaged(false);
   }
+
+  private void showError(String message) {
+    if (newTableErrorLabel == null) {
+      return;
+    }
+
+    newTableErrorLabel.setText(message);
+    newTableErrorLabel.setVisible(true);
+    newTableErrorLabel.setManaged(true);
+  }
+
+  private void hideError() {
+    if (newTableErrorLabel == null) {
+      return;
+    }
+
+    newTableErrorLabel.setVisible(false);
+    newTableErrorLabel.setManaged(false);
+  }
+
+  public void createTable() {
+    hideError();
+
+    String raw = maxSittingField.getText();
+
+    if (raw == null || raw.isBlank()) {
+      showError("Max seats required.");
+      return;
+    }
+
+    int maxSitters;
+
+    try {
+      maxSitters = Integer.parseInt(raw.trim());
+    } catch (NumberFormatException e) {
+      showError("Must be a number.");
+      return;
+    }
+
+    if (maxSitters <= 0 || maxSitters > 50) {
+      showError("Seats must be between 1 and 50.");
+      return;
+    }
+
+    try {
+      TableCreateRequest request = new TableCreateRequest(maxSitters);
+
+      tablesService.createTable(request);
+//      closeNewTableModal();
+//
+//      tablesService.loadTables();
+
+    } catch (Exception e) {
+      showError("Failed: " + e.getMessage());
+      e.printStackTrace();
+    }
+  }
 }
+

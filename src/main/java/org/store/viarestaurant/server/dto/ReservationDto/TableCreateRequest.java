@@ -3,34 +3,29 @@ package org.store.viarestaurant.server.dto.ReservationDto;
 import org.store.viarestaurant.model.entities.InternalSchedule;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.TableOrder;
+import org.store.viarestaurant.model.state.AvailableState;
 import org.store.viarestaurant.model.state.TableState;
 
 import java.io.Serializable;
 
-public class TableCreateRequest implements Serializable
-{
+public class TableCreateRequest implements Serializable {
   private final Integer maxSitting;
   private final TableState state;
-  private final InternalSchedule internalSchedule;
+  //private final InternalSchedule internalSchedule;
 
-  public TableCreateRequest(Integer maxSitting, TableState state, InternalSchedule internalSchedule){
+  public TableCreateRequest(Integer maxSitting) { //, InternalSchedule internalSchedule
     this.maxSitting = maxSitting;
-    this.state = state;
-    this.internalSchedule = internalSchedule;
+    this.state = new AvailableState();
+    // this.internalSchedule = internalSchedule;
   }
 
-  public Integer getMaxSitting()
-  {
+  public Integer getMaxSitting() {
     return maxSitting;
   }
 
-  public TableState getState()
-  {
+  public TableState getState() {
     return state;
   }
 
-  public InternalSchedule getInternalSchedule()
-  {
-    return internalSchedule;
-  }
+  //public InternalSchedule getInternalSchedule(){return internalSchedule;}
 }

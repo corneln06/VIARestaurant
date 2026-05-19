@@ -206,7 +206,10 @@ public class NavigationController
         showOnly(tablesPage);
         setActive(btnTables, btnReservations, btnWorkers, btnMenu, btnBills, btnOrders);
         if (hostController != null) hostController.refreshTableGrid();
-        if (managerController != null) {managerController.refreshTableGrid(); managerController.loadTables();}
+        if (managerController != null) {
+            managerController.closeNewTableModal();
+            managerController.refreshTableGrid();
+            managerController.loadTables();}
         if (waiterController != null) {waiterController.refreshTableGrid(); waiterController.loadtables();}
     }
 
@@ -230,7 +233,7 @@ public class NavigationController
     private void showWorkersPage()
     {
 //        showOnly(reservationsPage);
-        setActive(btnWorkers, btnMenu, btnReservations, btnTables);
+//        setActive(btnWorkers, btnMenu, btnReservations, btnTables);
 
 //        if(hostController != null)
 //        {
@@ -444,14 +447,16 @@ public class NavigationController
 
     @FXML
     private void closeNewTableModal() {
-        if (managerController != null) managerController.openNewTableModal();
-    }
-
-    @FXML
-    private void closeNewTableModalAction(ActionEvent actionEvent) {
         if (managerController != null) managerController.closeNewTableModal();
     }
 
-    public void createTable(ActionEvent actionEvent) {
+    @FXML
+    private void createTable() {
+        if (managerController != null) managerController.createTable();
+    }
+
+    @FXML
+    private void openNewTableModal() {
+        if (managerController != null) managerController.openNewTableModal();
     }
 }

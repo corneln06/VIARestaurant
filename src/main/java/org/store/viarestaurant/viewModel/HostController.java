@@ -99,6 +99,7 @@ public class HostController
   public void refreshSchedule()
   {
     reservationComponent.refreshSchedule();
+    tableComponent.loadTables();
   }
 
   public void openNewReservationModal()

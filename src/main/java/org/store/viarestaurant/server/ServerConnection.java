@@ -111,7 +111,10 @@ public class ServerConnection implements Runnable
           System.out.println("[SERVER] DeleteReservationRequest detected");
           handleDeleteReservation(request);
         }
-        else
+        else if (object instanceof TableCreateRequest request) {
+          System.out.println("[SERVER] CreateTableRequest detected");
+          handleCreateTable(request);
+        } else
         {
           System.out.println(
               "[SERVER] Unknown object received");

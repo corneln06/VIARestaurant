@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 
 public class Client
 {
+  private Consumer<MessageResponse> createTableListener;
   private Socket socket;
   private ObjectOutputStream outToServer;
   private ObjectInputStream inFromServer;
@@ -89,9 +90,9 @@ public class Client
             {
               reservationCreatedListener.accept(message);
             }
-            else if (object instanceof TableCreatedMessage message && tableCreatedListener != null)
+            else if (object instanceof MessageResponse message && tableCreatedListener != null)
             {
-              tableCreatedListener.accept(message);
+              createTableListener.accept(message);
             }
             else if (object instanceof DeleteReservationResponse response && deleteReservationListener != null)
             {
@@ -155,4 +156,11 @@ public class Client
     this.updateReservationListener = listener;
   }
 
+  public void setCreateTableListener(Consumer<MessageResponse> listener) {
+    this.createTableListener = listener;
+  }
+
+  public void setTablesCreateListener(Consumer<TableCreatedMessage> listener) {
+    this.tableCreatedListener = listener;
+  }
 }

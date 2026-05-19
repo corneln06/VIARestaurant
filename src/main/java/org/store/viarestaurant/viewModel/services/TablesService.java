@@ -1,9 +1,7 @@
 package org.store.viarestaurant.viewModel.services;
 
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.ReservationDto.GetTablesRequest;
-import org.store.viarestaurant.server.dto.ReservationDto.GetTablesResponse;
-import org.store.viarestaurant.server.dto.ReservationDto.TableCreateRequest;
+import org.store.viarestaurant.server.dto.ReservationDto.*;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -20,13 +18,23 @@ public class TablesService
     try {
       client.send(new GetTablesRequest());
     } catch (IOException e)
-    {}
+    {
+      System.out.println("Something Wrong happened");
+    }
   }
   public void createTable(TableCreateRequest request) throws IOException{
     client.send(request);
   }
+
   public void onTablesLoaded(Consumer<GetTablesResponse> listener){
     client.setTablesPageListener(listener);
   }
 
+  public void onTablesCreated(Consumer<MessageResponse> listener) {
+    client.setCreateTableListener(listener);
+  }
+
+  public void onTablesCreatedResponse(Consumer<TableCreatedMessage> listener) {
+    client.setTablesCreateListener(listener);
+  }
 }
