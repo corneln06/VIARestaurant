@@ -346,16 +346,13 @@ public class ReservationDAOImpl implements ReservationDAO
                         rs.getInt("maxSitting")
                 );
 
-                Reservation response = new Reservation(
+                return new Reservation(
                         rs.getInt("id"),
                         rs.getString("customer"),
                         rs.getTimestamp("date").toLocalDateTime(),
                         rs.getInt("partySize"),
                         table
                 );
-                System.out.println(response);
-                System.out.println("++++++++++++++++++++++++++++++=");
-                return response;
             }
 
             return null;
