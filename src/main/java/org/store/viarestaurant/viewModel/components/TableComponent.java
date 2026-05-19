@@ -26,6 +26,7 @@ import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.viewModel.services.ReservationService;
+import org.store.viarestaurant.viewModel.services.TableOrderService;
 import org.store.viarestaurant.viewModel.services.TablesService;
 
 import javafx.scene.control.Button;
@@ -59,6 +60,7 @@ public class TableComponent
   private List<Reservation> reservations = new ArrayList<>();
   private ArrayList<Workers> workers = new ArrayList<>();
   private WorkersService workersService;
+  private TableOrderService tableOrderService;
 
   private Button tableModalPrimaryButton;
   private Button tableModalSecondaryButton;
@@ -73,22 +75,15 @@ public class TableComponent
       this.labelSuffix = labelSuffix;
   }
   // delete after connecting
-  private TableOrderDAOImpl tableOrderDAO;
+
   // end of delete
 
   public void initGrid(GridPane tableGrid)
   {
     this.tableGrid = tableGrid;
     //delete after connecting
-      try
-      {
-          tableOrderDAO = TableOrderDAOImpl.getInstance();
-      }
-        catch (SQLException e)
-        {
-        e.printStackTrace();
-    }
-      // end of delete
+
+    // end of delete
     configureTableGrid();
     buildTableGrid();
   }
@@ -206,6 +201,10 @@ public class TableComponent
               } catch (SQLException ex) {
                   throw new RuntimeException(ex);
               }
+              catch (IOException ex)
+              {
+                throw new RuntimeException(ex);
+              }
           } else {
               System.out.println("YES");
           }
@@ -225,7 +224,8 @@ public class TableComponent
     else btn.getStyleClass().add("table-available");
   }
 
-  private void openTableModal(int tableId) throws SQLException {
+  private void openTableModal(int tableId) throws SQLException, IOException
+  {
     currentTableId = tableId;
     waiterMap.clear();
     tableModalWaiterComboBox.getItems().clear();
@@ -276,10 +276,9 @@ public class TableComponent
     if(seated)
     {
         // connection hould be done here
-      TableOrder currentOrder = tableOrderDAO.getCurrentTableOrderByTableId(tableId);
-      Workers waiterAssigned = currentOrder.getWaiter();
-      tableModalWaiterComboBox.getSelectionModel().select(waiterAssigned.getFirstName() + " " + waiterAssigned.getLastName());
-      //until here
+      tableOrderService.loadTableOrder(tableId);
+      // until here
+
       tableModalStateBadge.setText("Seated");
       tableModalStateBadge.getStyleClass().add("badge-unavailable");
       tableModalInfo.setText("Table is currently occupied.");
@@ -335,6 +334,8 @@ public class TableComponent
     tablesService = new TablesService(client);
     reservationService = new ReservationService(client);
     workersService = new WorkersService(client);
+    tableOrderService = new TableOrderService(client);
+
 
     tablesService.onTablesLoaded(response ->
     {
@@ -369,6 +370,20 @@ public class TableComponent
 
     tablesService.onTablesCreatedResponse(response -> {
         loadTables();
+    });
+    tableOrderService.populateComboBoxForTables(response -> {
+      TableOrder currentOrder = response.getTableOrder();
+      if(currentOrder != null
+          && currentOrder.getWaiter() != null) {
+        Workers waiterAssigned =
+            currentOrder.getWaiter();
+
+        tableModalWaiterComboBox
+            .getSelectionModel()
+            .select(
+                waiterAssigned.getFirstName() + " " + waiterAssigned.getLastName()
+            );
+      }
     });
 
     reservationService.onClosestReservationLoaded(response -> {

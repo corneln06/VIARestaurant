@@ -132,10 +132,16 @@ public class ServerConnection implements Runnable
           System.out.println("[SERVER] CreateTableRequest detected");
           handleCreateTable(request);
         }
+        else if (object instanceof GetTableOrderRequest request)
+        {
+          System.out.println("[SERVER] GetTableOrderRequest detected");
+          populateComboBoxForEveryone(request);
+
+        }
         else if (object instanceof GetClosestReservationRequest request) {
             System.out.println("[SERVER] GetClosestReservationRequest detected");
             handleGetClosestReservationRequest(request);
-        } else
+        }else
         {
           System.out.println(
               "[SERVER] Unknown object received");
@@ -543,6 +549,19 @@ public class ServerConnection implements Runnable
     {
       e.printStackTrace();
       send(new GetClosestReservationResponse(null));
+    }
+  }
+  private void populateComboBoxForEveryone(GetTableOrderRequest request){
+    try
+    {
+      TableOrder tableOrder = tableOrderDAO.getCurrentTableOrderByTableId(request.getTableId());
+
+      send(new GetTableOrderResponse(tableOrder));
+      connectionPool.broadcast(new TableOrderUpdatedMessage(request.getTableId()));
+    }
+    catch (SQLException | IOException e)
+    {
+      throw new RuntimeException(e);
     }
   }
 
