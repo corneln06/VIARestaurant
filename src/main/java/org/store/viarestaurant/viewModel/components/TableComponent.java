@@ -1,25 +1,33 @@
 package org.store.viarestaurant.viewModel.components;
-
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
-
-import javafx.fxml.FXML;
-import org.store.viarestaurant.dao.ReservationDAOImpl;
-import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.store.viarestaurant.model.entities.*;
+import org.store.viarestaurant.model.enums.WorkerRole;
+import javafx.scene.layout.*;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.ReservationDto.SeatTableRequest;
+import org.store.viarestaurant.server.dto.ReservationDto.SetTableAvailableRequest;
+import org.store.viarestaurant.viewModel.services.ReservationService;
+import org.store.viarestaurant.viewModel.services.TablesService;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
-import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.viewModel.services.ReservationService;
-import org.store.viarestaurant.viewModel.services.TablesService;
+import org.store.viarestaurant.viewModel.services.WorkersService;
 
 public class TableComponent
 {
@@ -36,10 +44,29 @@ public class TableComponent
   private TablesService tablesService;
   private ArrayList<RestaurantTable> tables = new ArrayList<>();
   private List<Reservation> reservations = new ArrayList<>();
+  private ArrayList<Workers> workers = new ArrayList<>();
+  private WorkersService workersService;
+
+  private Button tableModalPrimaryButton;
+  private ComboBox<String> tableModalWaiterComboBox;
+  private final Map<String, Workers> waiterMap = new LinkedHashMap<>();
+  private int currentTableId;
+
+  private String labelSuffix = "";
+
+  public void setLabelSuffix(String labelSuffix) {
+      this.labelSuffix = labelSuffix;
+  }
+  
+
+
 
   public void initGrid(GridPane tableGrid)
   {
     this.tableGrid = tableGrid;
+    // TO BE REMOVED ONCE BACKEND IS IN PLACE
+
+    // END OF TO BE REMOVED
     configureTableGrid();
     buildTableGrid();
   }
@@ -48,12 +75,33 @@ public class TableComponent
       StackPane overlay,
       Label title,
       Label badge,
-      Label info)
+      Label info,
+      ComboBox<String> waiterComboBox,
+      Button primaryButton)
   {
     this.tableModalOverlay = overlay;
     this.tableModalTitle = title;
     this.tableModalStateBadge = badge;
     this.tableModalInfo = info;
+    this.tableModalWaiterComboBox = waiterComboBox;
+    this.tableModalPrimaryButton = primaryButton;
+  }
+
+  
+  public void loadTables(){
+    tablesService.loadTables();
+  }
+  public void loadData()
+  {
+    try
+    {
+      reservationService.loadSchedule();
+      workersService.loadWorkers();
+    }
+    catch(IOException e)
+    {
+      throw new RuntimeException(e);
+    }
   }
 
   public void refreshTableGrid()
@@ -70,8 +118,10 @@ public class TableComponent
       Button btn = tableButtonMap.get(table.getId());
       if (btn != null)
       {
-        btn.setText("Table " + table.getId());
-        updateTableButton(btn, reservedIds.contains(table.getId()));
+        btn.setText("Table " + table.getId() + labelSuffix);
+        boolean reserved = reservedIds.contains(table.getId());
+        boolean seated = table.getStatus().getName().equals("Seated");
+        updateTableButton(btn, reserved, seated);
       }
     }
   }
@@ -113,52 +163,114 @@ public class TableComponent
       GridPane.setHgrow(btn, Priority.ALWAYS);
       GridPane.setVgrow(btn, Priority.ALWAYS);
       final int id = table.getId();
-      btn.setOnAction(e -> openTableModal(id));
+      btn.setOnAction(e -> {
+          if (labelSuffix.isEmpty()){
+            openTableModal(id);
+          } else {
+              System.out.println("YES");
+          }
+      });
       tableGrid.add(btn, i % 5, i / 5);
       tableButtonMap.put(id, btn);
-      updateTableButton(btn, false);
+      updateTableButton(btn, false, false);
     }
     refreshTableGrid();
   }
 
-  private void updateTableButton(Button btn, boolean reserved)
+  private void updateTableButton(Button btn, boolean reserved, boolean seated)
   {
-    btn.getStyleClass().removeAll("table-available", "table-reserved");
-    btn.getStyleClass().add(reserved ? "table-reserved" : "table-available");
+    btn.getStyleClass().removeAll("table-available", "table-reserved", "table-unavailable");
+    if (seated) btn.getStyleClass().add("table-unavailable");
+    else if (reserved) btn.getStyleClass().add("table-reserved");
+    else btn.getStyleClass().add("table-available");
   }
 
   private void openTableModal(int tableId)
   {
-    if (tableModalOverlay == null) return;
-    RestaurantTable table = tables.stream()
-        .filter(t -> t.getId() == tableId).findFirst().orElse(null);
-    if (table == null) return;
+    currentTableId = tableId;
+    waiterMap.clear();
+    tableModalWaiterComboBox.getItems().clear();
 
-    boolean reserved = reservations.stream().anyMatch(r -> r.getTable().getId() == tableId);
+    for(Workers worker : workers)
+    {
+      if(worker.getRole() == WorkerRole.Waiter)
+      {
+        String label =
+            worker.getFirstName() + " " + worker.getLastName();
+
+        waiterMap.put(label, worker);
+        tableModalWaiterComboBox.getItems().add(label);
+      }
+    }
+
+    tableModalWaiterComboBox.getSelectionModel().clearSelection();
+    if(tableModalOverlay == null)
+    {
+      return;
+    }
+    RestaurantTable table = tables.stream()
+        .filter(t -> t.getId() == tableId)
+        .findFirst()
+        .orElse(null);
+
+    if(table == null)
+    {
+      return;
+    }
+    boolean reserved = reservations.stream()
+        .anyMatch(r ->
+            r.getTable() != null &&
+                r.getTable().getId() == tableId
+        );
 
     tableModalTitle.setText("Table " + tableId);
-    tableModalStateBadge.getStyleClass().removeAll("badge-available", "badge-reserved");
-    if (reserved)
+    tableModalStateBadge.getStyleClass().removeAll(
+        "badge-available",
+        "badge-reserved",
+        "badge-unavailable"
+    );
+
+    boolean seated =
+        table.getStatus() != null &&
+            table.getStatus().getName().equals("Seated");
+
+    if(seated)
+    {
+      tableModalStateBadge.setText("Seated");
+      tableModalStateBadge.getStyleClass().add("badge-unavailable");
+      tableModalInfo.setText("Table is currently occupied.");
+      tableModalPrimaryButton.setText("Set Available");
+      tableModalPrimaryButton.setOnAction(e -> setAvailable());
+    }
+    else if(reserved)
     {
       tableModalStateBadge.setText("Reserved");
       tableModalStateBadge.getStyleClass().add("badge-reserved");
       tableModalInfo.setText("This table has a reservation today.");
+      tableModalPrimaryButton.setText("Seat Table");
+      tableModalPrimaryButton.setOnAction(e -> seatTable());
     }
     else
     {
       tableModalStateBadge.setText("Available");
       tableModalStateBadge.getStyleClass().add("badge-available");
       tableModalInfo.setText("Ready for walk-ins and upcoming service.");
+      tableModalPrimaryButton.setText("Seat Table");
+      tableModalPrimaryButton.setOnAction(e -> seatTable());
+
     }
     tableModalOverlay.setVisible(true);
     tableModalOverlay.setManaged(true);
-  }
+    }
+
+
   public void initClient(Client client)
   {
     this.client = client;
 
     tablesService = new TablesService(client);
     reservationService = new ReservationService(client);
+    workersService = new WorkersService(client);
 
     tablesService.onTablesLoaded(response ->
     {
@@ -166,12 +278,60 @@ public class TableComponent
       buildTableGrid();
       refreshTableGrid();
     });
+    workersService.onWorkersLoaded(response ->{
+      workers = response.getWorkers();
 
+    });
+    reservationService.onUpdatedMessage(message ->
+    {
+      closeTableModal();
+      loadData();
+    });
     reservationService.onReservationLoaded(response ->
     {
       this.reservations = response.getReservations();
 
       refreshTableGrid();
     });
+  }
+
+  public void seatTable()
+  {
+    Workers waiter =
+        waiterMap.get(
+            tableModalWaiterComboBox.getValue()
+        );
+    if(waiter == null)
+    {
+      return;
+    }
+    try
+    {
+      client.send(
+          new SeatTableRequest(
+              currentTableId,
+              waiter.getId()
+          )
+      );
+    }
+    catch(IOException e)
+    {
+      e.printStackTrace();
+    }
+    refreshTableGrid();
+  }
+
+  public void setAvailable()
+  {
+    try
+    {
+      client.send(
+          new SetTableAvailableRequest(currentTableId)
+      );
+    }
+    catch(IOException e)
+    {
+      e.printStackTrace();
+    }
   }
 }

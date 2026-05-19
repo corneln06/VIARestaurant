@@ -15,15 +15,18 @@ public class TablesService
   public TablesService(Client client){
     this.client = client;
   }
-  public void loadTables() throws IOException
+  public void loadTables()
   {
-    client.send(new GetTablesRequest());
+    try {
+      client.send(new GetTablesRequest());
+    } catch (IOException e)
+    {}
   }
   public void createTable(TableCreateRequest request) throws IOException{
     client.send(request);
   }
   public void onTablesLoaded(Consumer<GetTablesResponse> listener){
-    client.setTablesPageListener(listener);;
+    client.setTablesPageListener(listener);
   }
 
 }

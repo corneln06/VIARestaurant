@@ -1,14 +1,19 @@
 package org.store.viarestaurant.dao;
 
-import org.store.viarestaurant.config.DatabaseConnection;
-import org.store.viarestaurant.model.entities.*;
-import org.store.viarestaurant.model.state.TableState;
-import org.store.viarestaurant.model.state.TableStateFactory;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import org.store.viarestaurant.config.DatabaseConnection;
+import org.store.viarestaurant.model.entities.RestaurantTable;
+import org.store.viarestaurant.model.entities.TableOrder;
+import org.store.viarestaurant.model.state.TableState;
+import org.store.viarestaurant.model.state.TableStateFactory;
 
 public class RestaurantTableDAOImpl implements RestaurantTableDAO {
 
@@ -65,6 +70,7 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
 
                 RestaurantTable restaurantTable =
                         new RestaurantTable(id, maxSitting);
+                restaurantTable.setState(TableStateFactory.fromString(rs.getString("status")));
 
                 finalList.add(restaurantTable);
             }
@@ -164,6 +170,17 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
                     .toList();
 
             return new ArrayList<>(filteredTables);
+        }
+    }
+
+    public void updateTableState(int tableId, TableState state) throws SQLException {
+        String sql = "UPDATE restauranttable SET status = ? WHERE id = ?";
+        try(Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setString(1,state.getName());
+            statement.setInt(2,tableId);
+            statement.executeUpdate();
         }
     }
 }

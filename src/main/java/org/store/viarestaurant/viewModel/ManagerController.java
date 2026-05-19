@@ -10,6 +10,8 @@ import org.store.viarestaurant.viewModel.components.MenuItemComponent;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
 import org.store.viarestaurant.viewModel.components.TableComponent;
 
+import java.io.IOException;
+
 public class ManagerController
 {
   private final ReservationComponent reservationComponent =
@@ -70,19 +72,27 @@ public class ManagerController
             StackPane overlay,
             Label title,
             Label badge,
-            Label info)
+            Label info,
+            ComboBox<String> waiterComboBox,
+            Button primaryButton)
     {
-        tableComponent.initModal(overlay, title, badge, info);
+        tableComponent.initModal(overlay, title, badge, info, waiterComboBox, primaryButton);
     }
 
   public void initClient(Client client)
   {
     reservationComponent.initClient(client);
+    tableComponent.initClient(client);
   }
 
   public void refreshSchedule()
   {
     reservationComponent.refreshSchedule();
+  }
+
+  public void loadTables()
+  {
+    tableComponent.loadTables();
   }
 
   public void openNewReservationModal()
