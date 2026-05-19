@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import javafx.event.ActionEvent;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.view.HelloApplication;
@@ -80,6 +81,16 @@ public class NavigationController
 
     @FXML private Label modalTitle;
 
+    @FXML
+    private StackPane newTableOverlay;
+
+    @FXML
+    private TextField tableMaxSittingField;
+
+    @FXML
+    private Label newTableErrorLabel;
+
+
 
     private HostController hostController;
     private ManagerController managerController;
@@ -132,7 +143,7 @@ public class NavigationController
 
                 );
 
-                hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo);
+                hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo, newTableOverlay,tableMaxSittingField,newTableErrorLabel);
 
                 hostController.refreshSchedule();
                 showTablesPage();
@@ -180,7 +191,8 @@ public class NavigationController
 
                 managerController.refreshMenuTable();
 
-                managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo);
+                managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,
+                        newTableOverlay,tableMaxSittingField,newTableErrorLabel);
 
                 showTablesPage();
                 showMenuPage();
@@ -428,5 +440,18 @@ public class NavigationController
     @FXML
     private void createDish() {
         if (managerController != null) managerController.createDish();
+    }
+
+    @FXML
+    private void closeNewTableModal() {
+        if (managerController != null) managerController.openNewTableModal();
+    }
+
+    @FXML
+    private void closeNewTableModalAction(ActionEvent actionEvent) {
+        if (managerController != null) managerController.closeNewTableModal();
+    }
+
+    public void createTable(ActionEvent actionEvent) {
     }
 }

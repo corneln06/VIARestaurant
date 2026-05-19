@@ -69,9 +69,10 @@ public class ManagerController
             StackPane overlay,
             Label title,
             Label badge,
-            Label info)
+            Label info,
+            StackPane newTableOverlay , TextField  tableMaxSittingField, Label newTableErrorLabel)
     {
-        tableComponent.initModal(overlay, title, badge, info);
+        tableComponent.initModal(overlay, title, badge, info, newTableOverlay, tableMaxSittingField, newTableErrorLabel);
     }
 
   public void initClient(Client client)
@@ -127,4 +128,8 @@ public class ManagerController
   }
   
   public void createDish() { menuItemComponent.createDish();}
+
+  public void openNewTableModal() { tableComponent.openNewTableModal();}
+
+  public void closeNewTableModal() { tableComponent.closeNewTableModal(); }
 }

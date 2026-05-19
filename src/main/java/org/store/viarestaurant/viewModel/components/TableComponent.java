@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
 import org.store.viarestaurant.dao.ReservationDAOImpl;
 import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
 import org.store.viarestaurant.model.entities.Reservation;
@@ -32,6 +33,10 @@ public class TableComponent
   private Label tableModalInfo;
   private Client client;
 
+  private StackPane newTableModalOverlay;
+  private TextField maxSittingField;
+  private Label newTableErrorLabel;
+
   private ReservationService reservationService;
   private TablesService tablesService;
   private ArrayList<RestaurantTable> tables = new ArrayList<>();
@@ -48,12 +53,18 @@ public class TableComponent
       StackPane overlay,
       Label title,
       Label badge,
-      Label info)
+      Label info,
+      StackPane newOverlay,
+      TextField maxSitting,
+      Label error)
   {
     this.tableModalOverlay = overlay;
     this.tableModalTitle = title;
     this.tableModalStateBadge = badge;
     this.tableModalInfo = info;
+    this.newTableModalOverlay = overlay;
+    this.maxSittingField = maxSitting;
+    this.newTableErrorLabel = error;
   }
 
   public void loadTables(){
@@ -177,5 +188,21 @@ public class TableComponent
 
       refreshTableGrid();
     });
+  }
+
+  public void openNewTableModal() {
+    if (newTableModalOverlay == null) return;
+
+    maxSittingField.setText("4");
+
+    newTableModalOverlay.setVisible(true);
+    newTableModalOverlay.setManaged(true);
+  }
+
+  public void closeNewTableModal() {
+    if (newTableModalOverlay == null) return;
+
+    newTableModalOverlay.setVisible(false);
+    newTableModalOverlay.setManaged(false);
   }
 }

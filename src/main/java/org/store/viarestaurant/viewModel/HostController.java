@@ -18,6 +18,7 @@ import org.store.viarestaurant.viewModel.components.TableComponent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -76,12 +77,15 @@ public class HostController
   }
 
   public void initTableModal(
-      StackPane overlay,
-      Label title,
-      Label badge,
-      Label info)
+          StackPane overlay,
+          Label title,
+          Label badge,
+          Label info,
+          StackPane newOverlay,
+          TextField maxSitting,
+          Label error)
   {
-    tableComponent.initModal(overlay, title, badge, info);
+    tableComponent.initModal(overlay, title, badge, info, newOverlay,maxSitting,error);
   }
 
   public void initClient(Client client)

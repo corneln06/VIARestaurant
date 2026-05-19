@@ -141,7 +141,7 @@
                                     <children>
                                         <Label styleClass="page-title" text="Tables"/>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Button onAction="#openNewReservationModal" fx:id="btnMenuBla"
+                                        <Button onAction="#openNewDishModal" fx:id="btnMenuBla"
                                                 text="+ New Table">
                                             <styleClass>
                                                 <String fx:value="btn-base"/>
@@ -175,6 +175,55 @@
                                                 text="Unavailable"/>
                                         <Button fx:id="tableModalSecondaryButton" styleClass="btn-base btn-warning"
                                                 text="Reserved"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+                <!-- Create Table Overlay -->
+                <StackPane fx:id="newTableOverlay"
+                           managed="false"
+                           visible="false"
+                           onMouseClicked="#closeNewTableModal"
+                           styleClass="modal-overlay">
+                    <children>
+                        <VBox maxWidth="400.0"
+                              spacing="16.0"
+                              onMouseClicked="#consumeModalClick">
+                            <styleClass>
+                                <String fx:value="modal-card"/>
+                                <String fx:value="modal-card-large"/>
+                            </styleClass>
+                            <children>
+                                <Label text="New Table"
+                                       styleClass="modal-title"/>
+                                <TextField fx:id="tableMaxSittingField"
+                                           promptText="Maximum sitting capacity"
+                                           styleClass="input-field"/>
+                                <Label fx:id="newTableErrorLabel"
+                                       visible="false"
+                                       managed="false"
+                                       wrapText="true"
+                                       styleClass="error-label"/>
+                                <HBox alignment="CENTER_RIGHT"
+                                      spacing="12.0">
+                                    <children>
+                                        <Button text="Cancel"
+                                                onAction="#closeNewTableModalAction">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-secondary"/>
+                                            </styleClass>
+                                        </Button>
+
+                                        <Button text="Create"
+                                                onAction="#createTable">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
                                     </children>
                                 </HBox>
                             </children>
