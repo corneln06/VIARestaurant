@@ -1,11 +1,14 @@
 package org.store.viarestaurant.viewModel.components;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import javafx.fxml.FXML;
-import org.store.viarestaurant.dao.ReservationDAOImpl;
 import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
 import org.store.viarestaurant.dao.TableOrderDAOImpl;
 import org.store.viarestaurant.dao.WorkersDAOImpl;
@@ -16,6 +19,9 @@ import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.model.state.AvailableState;
 import org.store.viarestaurant.model.state.SeatedState;
+import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.viewModel.services.ReservationService;
+import org.store.viarestaurant.viewModel.services.TablesService;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -25,9 +31,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
-import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.viewModel.services.ReservationService;
-import org.store.viarestaurant.viewModel.services.TablesService;
 
 public class TableComponent
 {
@@ -293,6 +296,9 @@ public class TableComponent
   public void setAvailable()
   {
     try {
+      TableOrder currentOrder = tableOrderDAO.getTableOrderByID(currentTableId);
+      currentOrder.setPaid(true);
+
       tableDAO.updateTableState(currentTableId, new AvailableState());
       closeTableModal();
       refreshTableGrid();
