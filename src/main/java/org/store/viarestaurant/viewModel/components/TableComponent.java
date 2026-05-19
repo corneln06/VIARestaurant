@@ -208,14 +208,6 @@ public class TableComponent
     currentTableId = tableId;
     waiterMap.clear();
     tableModalWaiterComboBox.getItems().clear();
-    try
-    {
-      reservationService.getClosestReservation(tableId);
-    }
-    catch (IOException e)
-    {
-      throw new RuntimeException(e);
-    }
 
     for(Workers worker : workers)
     {
