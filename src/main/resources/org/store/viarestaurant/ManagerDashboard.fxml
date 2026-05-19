@@ -108,7 +108,7 @@
                                 <CheckBox fx:id="isVegetarianCheckBox" text="Vegetarian" />
 
                                 <Label text="Allergies"/>
-                                <ListView fx:id="allergiesListView" prefHeight="120.0" />
+                                <ListView fx:id="allergiesListView" prefHeight="120.0" styleClass="allergy-list" />
 
                                 <Label fx:id="newDishErrorLabel" managed="false" styleClass="error-label" visible="false" wrapText="true" />
 
@@ -117,7 +117,7 @@
                                         <Button onAction="#closeNewDishModalAction" text="Cancel">
                                             <styleClass>
                                                 <String fx:value="btn-base"/>
-                                                <String fx:value="btn-danger"/>
+                                                <String fx:value="btn-secondary"/>
                                             </styleClass>
                                         </Button>
                                         <Button
@@ -128,7 +128,7 @@
                                         text="Delete">
                                             <styleClass>
                                                 <String fx:value="btn-base"/>
-                                                <String fx:value="btn-primary"/>
+                                                <String fx:value="btn-danger"/>
                                             </styleClass>
                                         </Button>
                                         <Button fx:id="submitDishButton" onAction="#createDish" text="Create">

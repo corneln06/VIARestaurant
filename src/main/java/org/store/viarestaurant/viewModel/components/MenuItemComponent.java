@@ -86,6 +86,29 @@ public class MenuItemComponent
 
     allergiesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+    allergiesListView.setCellFactory(lv -> {
+      ListCell<String> cell = new ListCell<>() {
+        @Override
+        protected void updateItem(String item, boolean empty) {
+          super.updateItem(item, empty);
+          setText(empty || item == null ? null : item);
+        }
+      };
+      cell.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+        lv.requestFocus();
+        if (!cell.isEmpty()) {
+          int index = cell.getIndex();
+          if (lv.getSelectionModel().isSelected(index)) {
+            lv.getSelectionModel().clearSelection(index);
+          } else {
+            lv.getSelectionModel().select(index);
+          }
+          event.consume();
+        }
+      });
+      return cell;
+    });
+
     table.setRowFactory(tv -> {
       TableRow<MenuItems> row = new TableRow<>();
       row.setOnMouseClicked(e -> {
@@ -107,6 +130,15 @@ public class MenuItemComponent
     isVegetarianCheckBox.setSelected(item.isVegetarian());
 
     populateAllergies();
+
+    allergiesListView.getSelectionModel().clearSelection();
+    for (String allergy : item.getAllergies()) {
+      int index = allergiesListView.getItems().indexOf(allergy);
+      if (index >= 0) {
+        allergiesListView.getSelectionModel().select(index);
+      }
+    }
+
     hideError();
     showOverlay(newDishOverlay);
   }
