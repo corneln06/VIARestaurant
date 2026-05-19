@@ -45,6 +45,7 @@ public class TableComponent
   private StackPane newTableModalOverlay;
   private TextField maxSittingField;
   private Label newTableErrorLabel;
+  private Label closestReservationLabel;
 
   private ReservationService reservationService;
   private TablesService tablesService;
@@ -82,7 +83,8 @@ public class TableComponent
       Label error,
       ComboBox<String> waiterComboBox,
       Button primaryButton,
-      Button secondaryButton)
+      Button secondaryButton,
+      Label closestReservationLabel)
   {
     this.tableModalOverlay = overlay;
     this.tableModalTitle = title;
@@ -94,6 +96,7 @@ public class TableComponent
     this.newTableModalOverlay = newOverlay;
     this.maxSittingField = maxSitting;
     this.newTableErrorLabel = error;
+    this.closestReservationLabel = closestReservationLabel;
   }
 
   public void loadTables(){
@@ -204,6 +207,15 @@ public class TableComponent
     currentTableId = tableId;
     waiterMap.clear();
     tableModalWaiterComboBox.getItems().clear();
+    try
+    {
+      closestReservationLabel.setText("Loading reservation...");
+      reservationService.getClosestReservation(tableId);
+    }
+    catch (IOException e)
+    {
+      throw new RuntimeException(e);
+    }
 
     for(Workers worker : workers)
     {
@@ -260,13 +272,8 @@ public class TableComponent
     }
     else if(reserved)
     {
-        Reservation algo;
-        try {
-            reservationService.getClosestReservation(tableId);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        tableModalStateBadge.setText("Reserved");
+
+      tableModalStateBadge.setText("Reserved");
       tableModalStateBadge.getStyleClass().add("badge-reserved");
       tableModalInfo.setText("This table has a reservation today.");
       tableModalPrimaryButton.setText("Seat Table");
@@ -337,8 +344,23 @@ public class TableComponent
         loadTables();
     });
 
-    reservationService.onClosestReservationLoaded(getClosestReservationResponse -> {
-        getClosestReservationResponse.getReservation();
+    reservationService.onClosestReservationLoaded(response -> {
+      Reservation reservation = response.getReservation();
+
+      if(reservation != null)
+      {
+        closestReservationLabel.setText(
+            reservation.getName()
+                + " - "
+                + reservation.getDateTime()
+        );
+      }
+      else
+      {
+        closestReservationLabel.setText(
+            "No upcoming reservation"
+        );
+      }
     });
     }
 

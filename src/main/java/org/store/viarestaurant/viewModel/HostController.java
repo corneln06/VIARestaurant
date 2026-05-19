@@ -72,9 +72,10 @@ public class HostController
           Label error,
           ComboBox<String> waiterComboBox,
           Button primaryButton,
-          Button secondaryButton)
+          Button secondaryButton,
+  Label label)
   {
-    tableComponent.initModal(overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton, secondaryButton);
+    tableComponent.initModal(overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton, secondaryButton, label);
   }
 
   public void initClient(Client client)

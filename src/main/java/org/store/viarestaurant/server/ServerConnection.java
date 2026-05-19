@@ -134,7 +134,7 @@ public class ServerConnection implements Runnable
         }
         else if (object instanceof GetClosestReservationRequest request) {
             System.out.println("[SERVER] GetClosestReservationRequest detected");
-            hangleGetClosestReservationRequest(request);
+            handleGetClosestReservationRequest(request);
         } else
         {
           System.out.println(
@@ -527,15 +527,22 @@ public class ServerConnection implements Runnable
     }
   }
 
-  private void hangleGetClosestReservationRequest(GetClosestReservationRequest request) throws IOException {
-    try{
-        Reservation reservation = reservationDAO.getClosestReservationInTimeForTable(request.getTableId());
-        send(reservation);
+  private void handleGetClosestReservationRequest(
+      GetClosestReservationRequest request) throws IOException
+  {
+    try
+    {
+      Reservation reservation =
+          reservationDAO.getClosestReservationInTimeForTable(
+              request.getTableId()
+          );
+
+      send(new GetClosestReservationResponse(reservation));
     }
     catch(SQLException e)
     {
-        e.printStackTrace();
-        send(new MessageResponse(false, "Could not seat table"));
+      e.printStackTrace();
+      send(new GetClosestReservationResponse(null));
     }
   }
 

@@ -43,6 +43,8 @@ public class NavigationController
     @FXML private Button btnBills;
     @FXML private Button btnMenu;
 
+    @FXML
+    private Label closestReservationLabel;
     @FXML private Button logOutButton;
     @FXML private AnchorPane tablesPage;
     @FXML private AnchorPane reservationsPage;
@@ -151,7 +153,7 @@ public class NavigationController
                         modalTitle
                 );
 
-                hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo, newTableOverlay,tableMaxSittingField,newTableErrorLabel , tableModalWaiterComboBox, tableModalPrimaryButton, tableModalSecondaryButton);
+                hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo, newTableOverlay,tableMaxSittingField,newTableErrorLabel , tableModalWaiterComboBox, tableModalPrimaryButton, tableModalSecondaryButton, closestReservationLabel);
 
                 hostController.refreshSchedule();
                 showTablesPage();
@@ -200,7 +202,7 @@ public class NavigationController
                 managerController.refreshMenuTable();
 
                 managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,
-                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton, tableModalSecondaryButton);
+                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton, tableModalSecondaryButton, closestReservationLabel);
 
                 showTablesPage();
                 showMenuPage();

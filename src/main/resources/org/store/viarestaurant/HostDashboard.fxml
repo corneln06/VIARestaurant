@@ -119,6 +119,10 @@
                                         <Label fx:id="tableModalInfo" styleClass="muted-label"
                                                text="Ready for walk-ins and upcoming service." wrapText="true"/>
                                     </children>
+                                    <Label fx:id="closestReservationLabel"
+                                           styleClass="muted-label"
+                                           text="No upcoming reservation"
+                                           wrapText="true"/>
                                 </VBox>
                                 <VBox spacing="6.0">
                                     <Label text="Assign Waiter" styleClass="muted-label"/>
