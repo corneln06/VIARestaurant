@@ -2,6 +2,7 @@ package org.store.viarestaurant.viewModel.services;
 
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.server.dto.AllergyDTO.*;
+import org.store.viarestaurant.server.dto.MessageResponse;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -40,7 +41,7 @@ public class AllergyService
         client.send(new UpdateAllergyRequest(id, name));
     }
 
-    public void onAllergyUpdated(Consumer<UpdateAllergyResponse> listener)
+    public void onAllergyUpdated(Consumer<MessageResponse> listener)
     {
         client.setUpdateAllergyListener(listener);
     }
@@ -50,7 +51,7 @@ public class AllergyService
         client.send(new DeleteAllergyRequest(id));
     }
 
-    public void onAllergyDeleted(Consumer<DeleteAllergyResponse> listener)
+    public void onAllergyDeleted(Consumer<MessageResponse> listener)
     {
         client.setDeleteAllergyListener(listener);
     }
