@@ -10,13 +10,15 @@ public class Reservation  implements Serializable
     private LocalDateTime dateTime;
     private int partySize;
     private RestaurantTable restaurantTable;
+    private boolean isSeated;
 
-    public Reservation(int id, String name, LocalDateTime dateTime, int partySize, RestaurantTable restaurantTable) {
+    public Reservation(int id, String name, LocalDateTime dateTime, int partySize, RestaurantTable restaurantTable, boolean isSeated) {
         this.id = id;
         this.name = name;
         this.dateTime = dateTime;
         this.partySize = partySize;
         this.restaurantTable = restaurantTable;
+        this.isSeated = isSeated;
     }
 
     public RestaurantTable getTable() {
@@ -53,5 +55,13 @@ public class Reservation  implements Serializable
 
     public int getId() {
         return id;
+    }
+
+    public boolean isSeated() {
+        return isSeated;
+    }
+
+    public void setSeated(boolean isSeated) {
+        this.isSeated = isSeated;
     }
 }
