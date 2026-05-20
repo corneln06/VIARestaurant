@@ -1,7 +1,9 @@
 package org.store.viarestaurant.viewModel.services;
 
 import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableUpdatedMessage;
 
 import java.io.IOException;
 import java.util.function.Consumer;
