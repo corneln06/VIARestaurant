@@ -112,22 +112,32 @@ public class ServerConnection implements Runnable {
         } else if (object instanceof TableCreateRequest request) {
           System.out.println("[SERVER] CreateTableRequest detected");
           handleCreateTable(request);
+        }
+        else if (object instanceof CreateAllergyRequest request)
+        {
+          System.out.println("[SERVER] CreateAllergyRequest detected");
+          handleCreateAllergy(request);
+        }
+        else if (object instanceof GetAllergiesRequest)
+        {
+          System.out.println("[SERVER] GetAllergiesRequest detected");
+          handleGetAllergies();
+        }
+        else if (object instanceof UpdateAllergyRequest request)
+        {
+          System.out.println("[SERVER] UpdateAllergyRequest detected");
+          handleUpdateAllergy(request);
+        }
+        else if (object instanceof DeleteAllergyRequest request)
+        {
+          System.out.println("[SERVER] DeleteAllergyRequest detected");
+          handleDeleteAllergy(request);
         } else if (object instanceof GetClosestReservationRequest request) {
           System.out.println("[SERVER] GetClosestReservationRequest detected");
           handleGetClosestReservationRequest(request);
-        } else if (object instanceof CreateAllergyRequest request) {
-          System.out.println("[SERVER] CreateAllergyRequest detected");
-          handleCreateAllergy(request);
-        } else if (object instanceof GetAllergiesRequest) {
-          System.out.println("[SERVER] GetAllergiesRequest detected");
-          handleGetAllergies();
-        } else if (object instanceof UpdateAllergyRequest request) {
-          System.out.println("[SERVER] UpdateAllergyRequest detected");
-          handleUpdateAllergy(request);
-        } else if (object instanceof DeleteAllergyRequest request) {
-          System.out.println("[SERVER] DeleteAllergyRequest detected");
-          handleDeleteAllergy(request);
-        } else {
+        }
+        else
+        {
           System.out.println(
               "[SERVER] Unknown object received");
         }
@@ -160,20 +170,78 @@ public class ServerConnection implements Runnable {
     }
   }
 
-  private void handleDeleteAllergy(DeleteAllergyRequest request) throws IOException {
-    try {
+  private void handleDeleteAllergy(DeleteAllergyRequest request) throws IOException
+  {
+    try
+    {
       allergyDAO.delete(request.getId());
 
       send(new MessageResponse(true, "Allergy deleted successfully"));
 
       connectionPool.broadcast(
-          new GetAllergiesResponse(
-              allergyDAO.getAllAllergies()));
-    } catch (SQLException e) {
+              new GetAllergiesResponse(
+                      allergyDAO.getAllAllergies()
+              )
+      );
+    }
+    catch (SQLException e)
+    {
       e.printStackTrace();
       send(new MessageResponse(false, "Database error while deleting allergy"));
     }
   }
+  private void handleUpdateAllergy(UpdateAllergyRequest request) throws IOException
+  {
+    try
+    {
+      Allergy allergy = new Allergy(
+              request.getId(),
+              request.getName()
+      );
+
+      allergyDAO.updateAllergy(allergy);
+
+      send(new MessageResponse(true, "Allergy updated successfully"));
+
+      connectionPool.broadcast(
+              new GetAllergiesResponse(
+                      allergyDAO.getAllAllergies()
+              )
+      );
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while updating allergy"));
+    }
+  }
+
+  private void handleCreateAllergy(CreateAllergyRequest request) throws IOException {
+    try {
+      Allergy allergy = allergyDAO.createAllergy(request.getName());
+
+      if (allergy == null)
+      {
+        send(new MessageResponse(false, "Cannot create an Allergy"));
+        return;
+      }
+      send(new MessageResponse(true, "Allergy created successfully"));
+
+      connectionPool.broadcast(
+              new CreateAllergyResponse(allergy)
+      );
+      connectionPool.broadcast(
+              new GetAllergiesResponse(
+                      allergyDAO.getAllAllergies()
+              ));
+    }
+    catch(SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while creating allergy"));
+    }
+  }
+
 
   private void handleUpdateAllergy(UpdateAllergyRequest request) throws IOException {
     try {
@@ -194,26 +262,6 @@ public class ServerConnection implements Runnable {
     }
   }
 
-  private void handleCreateAllergy(CreateAllergyRequest request) throws IOException {
-    try {
-      Allergy allergy = allergyDAO.createAllergy(request.getName());
-
-      if (allergy == null) {
-        send(new MessageResponse(false, "Cannot create an Allergy"));
-        return;
-      }
-      send(new MessageResponse(true, "Allergy created successfully"));
-
-      connectionPool.broadcast(
-          new CreateAllergyResponse(allergy));
-      connectionPool.broadcast(
-          new GetAllergiesResponse(
-              allergyDAO.getAllAllergies()));
-    } catch (SQLException e) {
-      e.printStackTrace();
-      send(new MessageResponse(false, "Database error while creating allergy"));
-    }
-  }
 
   private void handleGetWorkers() throws IOException {
     try {
@@ -493,6 +541,20 @@ public class ServerConnection implements Runnable {
       send(new MessageResponse(false, "Could not seat table"));
     }
   }
+  private void handleGetAllergies() throws IOException
+  {
+    try
+    {
+      send(new GetAllergiesResponse(
+              allergyDAO.getAllAllergies()
+      ));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetAllergiesResponse(new ArrayList<>()));
+    }
+  }
 
   private void handleSetTableReserved(SetTableReservedRequest request)
       throws IOException {
@@ -521,14 +583,5 @@ public class ServerConnection implements Runnable {
     }
   }
 
-  private void handleGetAllergies() throws IOException {
-    try {
-      send(new GetAllergiesResponse(
-          allergyDAO.getAllAllergies()));
-    } catch (SQLException e) {
-      e.printStackTrace();
-      send(new GetAllergiesResponse(new ArrayList<>()));
-    }
-  }
 
 }
