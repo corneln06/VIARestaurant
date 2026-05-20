@@ -34,30 +34,31 @@ public class ManagerController
   }
 
   public void initModal(
-          StackPane overlay,
-          TextField guestName,
-          DatePicker datePicker,
-          TextField timeField,
-          TextField partySize,
-          ComboBox<String> tableCombo,
-          Label errorLabel,
-          StackPane overlayNewDish,
-          TextField nameField,
-          ComboBox<String> typeCombo,
-          TextField priceField,
-          CheckBox vegetarianCheckBox,
-          ListView<String> allergiesList,
-          Label errorLabelNewDish,
-          TableView<Object> table,
-          Button submit,
-          Button delete,
-          Label title,
-          Button toggleButton,
-          Button primaryButton,
-          StackPane allergyOverlay,
-          TextField allergyNameField,
-          Label allergyErrorLabel, Button createAllergyButton, Button deleteAllergyButton,
-          Label allergyModalTitle)
+      StackPane overlay,
+      TextField guestName,
+      DatePicker datePicker,
+      TextField timeField,
+      TextField partySize,
+      ComboBox<String> tableCombo,
+      Label errorLabel,
+      StackPane overlayNewDish,
+      TextField nameField,
+      ComboBox<String> typeCombo,
+      TextField priceField,
+      CheckBox vegetarianCheckBox,
+      ListView<String> allergiesList,
+      Label errorLabelNewDish,
+      TableView<Object> table,
+      Button submit,
+      Button delete,
+      Label title,
+      Button submitDishButton,
+      Button deleteDishButton,
+      Label dishModalTitle,
+      Button toggleButton, Button primaryButton,
+      StackPane allergyOverlay, TextField allergyNameField,
+      Label allergyErrorLabel, Button createAllergyButton, Button deleteAllergyButton,
+      Label allergyModalTitle)
   {
     reservationComponent.initModal(
         overlay, guestName, datePicker, timeField,
@@ -67,7 +68,8 @@ public class ManagerController
     menuItemComponent.initModal(
         overlayNewDish, nameField, typeCombo, priceField,
         vegetarianCheckBox, allergiesList, errorLabelNewDish, table,
-            toggleButton, primaryButton
+        submitDishButton, deleteDishButton, dishModalTitle,
+        toggleButton, primaryButton
     );
     menuItemComponent.initAllergyModal( allergyOverlay,
             allergyNameField,
@@ -154,6 +156,7 @@ public class ManagerController
   
   public void createDish() { menuItemComponent.createDish();}
 
+  public void deleteDish() { menuItemComponent.deleteDish();}
   public void openNewTableModal() { tableComponent.openNewTableModal();}
 
   public void closeNewTableModal() { tableComponent.closeNewTableModal(); }

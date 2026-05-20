@@ -83,6 +83,7 @@ public class HostController
     reservationComponent.initClient(client);
     tableComponent.initClient(client);
     tableComponent.loadData();
+    tableComponent.loadTables();
   }
 
   //InitClient for Tables missing TODO
@@ -91,6 +92,7 @@ public class HostController
   {
     reservationComponent.refreshSchedule();
     tableComponent.loadTables();
+
   }
 
   public void openNewReservationModal()

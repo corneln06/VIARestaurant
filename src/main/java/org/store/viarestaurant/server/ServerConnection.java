@@ -12,8 +12,11 @@ import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersRequest;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
+import org.store.viarestaurant.server.dto.MenuItemDTO.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,6 +35,7 @@ public class ServerConnection implements Runnable {
   private final ReservationDAO reservationDAO;
   private final TableOrderDAO tableOrderDAO;
   private final AllergyDAO allergyDAO;
+  private final MenuItemDAO menuItemDAO;
 
   private Workers currentUser;
 
@@ -47,7 +51,10 @@ public class ServerConnection implements Runnable {
       this.restaurantTableDAO = RestaurantTableDAOImpl.getInstance();
       this.tableOrderDAO = TableOrderDAOImpl.getInstance();
       this.allergyDAO = AllergyDAOImpl.getInstance();
-    } catch (SQLException e) {
+      this.menuItemDAO = MenuItemDAOImpl.getInstance();
+    }
+    catch(SQLException e)
+    {
       throw new IOException("Could not initialize ReservationDAO", e);
     }
 
@@ -113,6 +120,12 @@ public class ServerConnection implements Runnable {
           System.out.println("[SERVER] CreateTableRequest detected");
           handleCreateTable(request);
         }
+        else if (object instanceof GetTableOrderRequest request)
+        {
+          System.out.println("[SERVER] GetTableOrderRequest detected");
+          populateComboBoxForEveryone(request);
+
+        }
         else if (object instanceof CreateAllergyRequest request)
         {
           System.out.println("[SERVER] CreateAllergyRequest detected");
@@ -148,6 +161,26 @@ public class ServerConnection implements Runnable {
         }
 
 
+        else if (object instanceof GetMenuItemsRequest)
+        {
+          System.out.println("[SERVER] GetMenuItemsRequest detected");
+          handleGetMenuItems();
+        }
+        else if (object instanceof CreateMenuItemRequest request)
+        {
+          System.out.println("[SERVER] CreateMenuItemRequest detected");
+          handleCreateMenuItem(request);
+        }
+        else if (object instanceof UpdateMenuItemRequest request)
+        {
+          System.out.println("[SERVER] UpdateMenuItemRequest detected");
+          handleUpdateMenuItem(request);
+        }
+        else if (object instanceof DeleteMenuItemRequest request)
+        {
+          System.out.println("[SERVER] DeleteMenuItemRequest detected");
+          handleDeleteMenuItem(request);
+        }
         else
         {
           System.out.println(
@@ -281,6 +314,75 @@ public class ServerConnection implements Runnable {
     {
       e.printStackTrace();
       send(new MessageResponse(false, "Database error while creating allergy"));
+    }
+  }
+
+  private void handleGetMenuItems() throws IOException
+  {
+    try
+    {
+      send(new GetMenuItemsResponse(menuItemDAO.getAllMenuItems()));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetMenuItemsResponse(new ArrayList<>()));
+    }
+  }
+
+  private void handleCreateMenuItem(CreateMenuItemRequest request) throws IOException
+  {
+    try
+    {
+      MenuItems menuItem = menuItemDAO.createMenuItem(
+          request.getName(), request.getType(), request.getPrice(),
+          request.isVegetarian(), request.getAllergies()
+      );
+      send(new MessageResponse(true, "Menu item created successfully"));
+      connectionPool.broadcast(new CreateMenuItemResponse(menuItem));
+      connectionPool.broadcast(new GetMenuItemsResponse(menuItemDAO.getAllMenuItems()));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while creating menu item"));
+    }
+  }
+
+  private void handleUpdateMenuItem(UpdateMenuItemRequest request) throws IOException
+  {
+    try
+    {
+      menuItemDAO.updateMenuItem(new org.store.viarestaurant.model.entities.MenuItems(
+          request.getId(), request.getName(), request.getType(),
+          request.getPrice(), request.isVegetarian(), request.getAllergies()
+      ));
+      send(new MessageResponse(true, "Menu item updated successfully"));
+      connectionPool.broadcast(
+          new GetMenuItemsResponse(menuItemDAO.getAllMenuItems())
+      );
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while updating menu item"));
+    }
+  }
+
+  private void handleDeleteMenuItem(DeleteMenuItemRequest request) throws IOException
+  {
+    try
+    {
+      menuItemDAO.delete(request.getId());
+      send(new MessageResponse(true, "Menu item deleted successfully"));
+      connectionPool.broadcast(
+          new GetMenuItemsResponse(menuItemDAO.getAllMenuItems())
+      );
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while deleting menu item"));
     }
   }
 
@@ -601,6 +703,19 @@ public class ServerConnection implements Runnable {
     } catch (SQLException e) {
       e.printStackTrace();
       send(new GetClosestReservationResponse(null));
+    }
+  }
+  private void populateComboBoxForEveryone(GetTableOrderRequest request){
+    try
+    {
+      TableOrder tableOrder = tableOrderDAO.getCurrentTableOrderByTableId(request.getTableId());
+
+      send(new GetTableOrderResponse(tableOrder));
+      connectionPool.broadcast(new TableOrderUpdatedMessage(request.getTableId()));
+    }
+    catch (SQLException | IOException e)
+    {
+      throw new RuntimeException(e);
     }
   }
 
