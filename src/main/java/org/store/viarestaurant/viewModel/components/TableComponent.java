@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.store.viarestaurant.dao.TableOrderDAO;
-import org.store.viarestaurant.dao.TableOrderDAOImpl;
 import org.store.viarestaurant.model.entities.*;
 import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.model.entities.Reservation;
@@ -77,16 +75,10 @@ public class TableComponent
   public void setLabelSuffix(String labelSuffix) {
       this.labelSuffix = labelSuffix;
   }
-  // delete after connecting
-
-  // end of delete
 
   public void initGrid(GridPane tableGrid)
   {
     this.tableGrid = tableGrid;
-    //delete after connecting
-
-    // end of delete
     configureTableGrid();
     buildTableGrid();
   }

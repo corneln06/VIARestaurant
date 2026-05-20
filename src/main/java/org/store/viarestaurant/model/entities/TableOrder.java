@@ -1,9 +1,5 @@
 package org.store.viarestaurant.model.entities;
 
-// import java.util.ArrayList;
-
-import javafx.concurrent.Worker;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 

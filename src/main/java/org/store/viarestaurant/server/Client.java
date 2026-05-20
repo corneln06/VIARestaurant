@@ -10,6 +10,7 @@ import org.store.viarestaurant.server.dto.RestaurantTableDTO.GetTablesResponse;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreateResponse;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreatedMessage;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableUpdatedMessage;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;

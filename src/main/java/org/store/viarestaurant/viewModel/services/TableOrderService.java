@@ -1,8 +1,8 @@
 package org.store.viarestaurant.viewModel.services;
 
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.ReservationDto.GetTableOrderRequest;
-import org.store.viarestaurant.server.dto.ReservationDto.GetTableOrderResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
 
 import java.io.IOException;
 import java.util.function.Consumer;

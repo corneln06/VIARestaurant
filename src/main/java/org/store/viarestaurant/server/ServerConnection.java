@@ -12,6 +12,8 @@ import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersRequest;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
