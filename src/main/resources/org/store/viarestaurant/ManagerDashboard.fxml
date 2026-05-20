@@ -243,8 +243,8 @@
                 </AnchorPane>
 
                 <StackPane fx:id="newTableOverlay"
-                           managed="false"
                            visible="false"
+                           managed="false"
                            onMouseClicked="#closeNewTableModal"
                            styleClass="modal-overlay">
                     <children>

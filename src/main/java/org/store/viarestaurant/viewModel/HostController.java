@@ -1,6 +1,7 @@
 package org.store.viarestaurant.viewModel;
 
 
+import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
 import org.store.viarestaurant.viewModel.components.TableComponent;
@@ -74,7 +75,7 @@ public class HostController
           Button primaryButton,
           Button secondaryButton)
   {
-    tableComponent.initModal(overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton, secondaryButton,null, null);
+    tableComponent.initModal(WorkerRole.Host,overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton, secondaryButton,null, null,null);
   }
 
   public void initClient(Client client)

@@ -7,13 +7,7 @@ import javafx.scene.control.TextField;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.model.entities.Reservation;
@@ -65,9 +59,11 @@ public class TableComponent
   private int currentTableId;
 
   private String labelSuffix = "";
+  private WorkerRole role;
   private boolean isTableEditMode= false;
   private RestaurantTable editingTable;
   private Reservation closestReservation;
+  private Label newTableTitle;
 
   public void setLabelSuffix(String labelSuffix) {
       this.labelSuffix = labelSuffix;
@@ -81,6 +77,7 @@ public class TableComponent
   }
 
   public void initModal(
+          WorkerRole role,
       StackPane overlay,
       Label title,
       Label badge,
@@ -92,9 +89,11 @@ public class TableComponent
       Button primaryButton,
       Button secondaryButton,
       Button deleteTable,
-      Button submitTable
+      Button submitTable,
+      Label modalTitle
       )
   {
+    this.role = role;
     this.tableModalOverlay = overlay;
     this.tableModalTitle = title;
     this.tableModalStateBadge = badge;
@@ -107,6 +106,7 @@ public class TableComponent
     this.newTableErrorLabel = error;
     this.deleteButton = deleteTable;
     this.submitButton = submitTable;
+    this.newTableTitle= modalTitle;
   }
 
   public void loadTables(){
@@ -198,13 +198,13 @@ public class TableComponent
   }
 
   private void handleTableClick(RestaurantTable table) {
-      if(labelSuffix.isEmpty())
+      if(role.equals(WorkerRole.Host))
       {
         openTableModal(table.getId());
       }
       else
       {
-        openTableModalDetails(table);
+        openManagerOverlay(table);
       }
 
   }
@@ -221,8 +221,9 @@ public class TableComponent
   {
     currentTableId = tableId;
     waiterMap.clear();
-    tableModalWaiterComboBox.getItems().clear();
-
+    if (tableModalWaiterComboBox != null) {
+      tableModalWaiterComboBox.getItems().clear();
+    }
     try
     {
         reservationService.getClosestReservation(tableId);
@@ -240,11 +241,15 @@ public class TableComponent
             worker.getFirstName() + " " + worker.getLastName();
 
         waiterMap.put(label, worker);
-        tableModalWaiterComboBox.getItems().add(label);
+        if (tableModalWaiterComboBox != null) {
+          tableModalWaiterComboBox.getItems().clear();
+        }
       }
     }
 
-    tableModalWaiterComboBox.getSelectionModel().clearSelection();
+    if (tableModalWaiterComboBox != null) {
+      tableModalWaiterComboBox.getItems().clear();
+    }
     if(tableModalOverlay == null)
     {
       return;
@@ -341,6 +346,7 @@ public class TableComponent
     tablesService.onTablesLoaded(response ->
     {
       tables = response.getTables();
+      tables.sort(Comparator.comparingInt(RestaurantTable::getId));
       buildTableGrid();
       refreshTableGrid();
     });
@@ -357,6 +363,24 @@ public class TableComponent
         showError(response.getMessage());
       }
     });
+
+    tablesService.onTablesDeleted(response -> {
+      if (response.isSuccess()) {
+        closeNewTableModal();
+        loadTables();
+      } else {
+        showError(response.getMessage());
+      }
+    });
+    tablesService.onTablesUpdated(response -> {
+      if (response.isSuccess()) {
+        closeNewTableModal();
+        loadTables();
+      } else {
+        showError(response.getMessage());
+      }
+    });
+
     reservationService.onUpdatedMessage(message ->
     {
       closeTableModal();
@@ -393,23 +417,6 @@ public class TableComponent
 
         tableModalPrimaryButton.setDisable(lessThan1h30);
       });
-
-      tablesService.onTablesDeleted(response -> {
-        if (response.isSuccess()) {
-          closeTableModal();
-          loadTables();
-        } else {
-          showError(response.getMessage());
-        }
-      });
-    tablesService.onTablesUpdated(response -> {
-      if (response.isSuccess()) {
-        closeTableModal();
-        loadTables();
-      } else {
-        showError(response.getMessage());
-      }
-    });
     }
 
 
@@ -425,6 +432,7 @@ public class TableComponent
     setTableEditMode(false);
     hideError();
 
+    newTableTitle.setText("New Table");
     submitButton.setText("Create");
 
     deleteButton.setVisible(false);
@@ -490,6 +498,11 @@ public class TableComponent
 
   public void closeNewTableModal() {
     if (newTableModalOverlay == null) return;
+
+
+    deleteButton.setVisible(false);
+    deleteButton.setManaged(false);
+
 
     newTableModalOverlay.setVisible(false);
     newTableModalOverlay.setManaged(false);
@@ -588,17 +601,18 @@ public class TableComponent
 
   }
 
-  public void openTableModalDetails(RestaurantTable table) {
-    if (newTableModalOverlay == null) return;
-
+  private void openManagerOverlay(RestaurantTable table) {
     editingTable = table;
+
     maxSittingField.setText(String.valueOf(table.getMaxSitting()));
 
     setTableEditMode(true);
     hideError();
 
-    submitButton.setText("Apply");
 
+    newTableTitle.setText("Table "+ editingTable.getId() +" details");
+
+    submitButton.setText("Apply");
     deleteButton.setVisible(true);
     deleteButton.setManaged(true);
 

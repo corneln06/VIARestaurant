@@ -182,49 +182,36 @@ public class ServerConnection implements Runnable {
     }
   }
 
-  private void handleUpdateTable(UpdateTableRequest request) throws IOException{
+  private void handleUpdateTable(UpdateTableRequest request) throws IOException {
     try {
-
       RestaurantTable table = new RestaurantTable(request.getId(), request.getMaxSitting());
-
       restaurantTableDAO.updateRestaurantTable(table);
 
+      send(new UpdateTableResponse(true, "Table updated successfully"));
 
       connectionPool.broadcast(
-              new GetTablesResponse(
-                      restaurantTableDAO.getAllRestaurantTables()
-              )
+              new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables())
       );
-
-    }  catch (SQLException e)
-    {
+    } catch (SQLException e) {
       e.printStackTrace();
-      send(new MessageResponse(false, "Database error while updating Table"));
+      send(new UpdateTableResponse(false, "Database error while updating Table"));
     }
-
-
   }
 
   private void handleDeleteTable(DeleteTableRequest request) throws IOException {
-    try{
+    try {
       restaurantTableDAO.deleteRestaurantTableByID(request.getRestaurantTableid());
 
-      send(new MessageResponse(true, "Table deleted successfully"));
+      send(new DeleteTableResponse(true, "Table deleted successfully"));
 
       connectionPool.broadcast(
-              new GetTablesResponse(
-                      restaurantTableDAO.getAllRestaurantTables()
-              )
+              new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables())
       );
-    }
-    catch (SQLException e)
-    {
+    } catch (SQLException e) {
       e.printStackTrace();
-      send(new MessageResponse(false, "Database error while deleting Table"));
+      send(new DeleteTableResponse(false, "Database error while deleting Table"));
     }
-
   }
-
   private void handleDeleteAllergy(DeleteAllergyRequest request) throws IOException
   {
     try

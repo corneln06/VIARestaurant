@@ -128,10 +128,6 @@ public class NavigationController
             );
         }
     }
-    public void initClient(Client client)
-    {
-        this.client = client;
-    }
     private void showDefaultPage(Workers worker)
     {
         switch (worker.getRole())
@@ -183,8 +179,6 @@ public class NavigationController
             case Manager -> {
                 managerController = new ManagerController();
 
-                managerController.initClient(client);
-
                 managerController.init(
                         reservationGrid,
                         reservationOverlayPane, tableGrid
@@ -234,10 +228,17 @@ public class NavigationController
                         newTableDeleteButton,
                         newTableSubmitButton,newTableModalTitle);
 
+                managerController.initClient(client);
+
                 showTablesPage();
                 showMenuPage();
             }
         }
+    }
+
+    public void initClient(Client client)
+    {
+        this.client = client;
     }
 
     @FXML

@@ -39,11 +39,11 @@ public class TablesService
     client.setTablesCreateListener(listener);
   }
 
-  public void onTablesUpdated(Consumer<MessageResponse> listener)
+  public void onTablesUpdated(Consumer<UpdateTableResponse> listener)
   {
     client.setUpdateTableListener(listener);
   }
-  public void onTablesDeleted(Consumer<MessageResponse> listener)
+  public void onTablesDeleted(Consumer<DeleteTableResponse> listener)
   {
     client.setDeleteTableListener(listener);
   }

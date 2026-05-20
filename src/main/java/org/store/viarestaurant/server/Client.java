@@ -6,10 +6,7 @@ import org.store.viarestaurant.server.dto.AllergyDTO.GetAllergiesResponse;
 import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.GetTablesResponse;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreateResponse;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreatedMessage;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableUpdatedMessage;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;
@@ -42,8 +39,8 @@ public class Client
   private List<Consumer<GetTablesResponse>> tablesPageListener = new ArrayList<>();
   private Consumer<TableCreatedMessage> tableCreatedListener;
   private Consumer<TableUpdatedMessage> updatedMessageListener;
-  private Consumer<MessageResponse> updateTableListener;
-  private Consumer<MessageResponse> deleteTableListener;
+  private Consumer<UpdateTableResponse> updateTableListener;
+  private Consumer<DeleteTableResponse> deleteTableListener;
 
   private Consumer<GetWorkersResponse> workersListener;
 
@@ -119,6 +116,14 @@ public class Client
             {
               tableCreatedListener.accept(message);
             }
+            else if (object instanceof UpdateTableResponse response && updateTableListener != null)
+            {
+              updateTableListener.accept(response);
+            }
+            else if (object instanceof DeleteTableResponse response && deleteTableListener != null)
+            {
+              deleteTableListener.accept(response);
+            }
             else if (object instanceof TableUpdatedMessage response)
             {
               updatedMessageListener.accept(response);
@@ -160,14 +165,7 @@ public class Client
             {
               deleteAllergyListener.accept(response);
             }
-            else if (object instanceof MessageResponse response && updateTableListener != null)
-            {
-              updateTableListener.accept(response);
-            }
-            else if (object instanceof MessageResponse response && deleteTableListener != null)
-            {
-              deleteTableListener.accept(response);
-            }
+
 
           });
         }
@@ -243,11 +241,11 @@ public class Client
 
   public void setDeleteAllergyListener(Consumer<MessageResponse> listener) { this.deleteAllergyListener = listener; }
 
-    public void setUpdateTableListener(Consumer<MessageResponse> updateTableListener) {
+    public void setUpdateTableListener(Consumer<UpdateTableResponse> updateTableListener) {
         this.updateTableListener = updateTableListener;
     }
 
-    public void setDeleteTableListener(Consumer<MessageResponse> deleteTableListener) {
+    public void setDeleteTableListener(Consumer<DeleteTableResponse> deleteTableListener) {
         this.deleteTableListener = deleteTableListener;
     }
 }
