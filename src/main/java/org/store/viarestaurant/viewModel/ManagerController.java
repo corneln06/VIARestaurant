@@ -9,8 +9,6 @@ import org.store.viarestaurant.viewModel.components.MenuItemComponent;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
 import org.store.viarestaurant.viewModel.components.TableComponent;
 
-import java.io.IOException;
-
 public class ManagerController
 {
   private final ReservationComponent reservationComponent =
@@ -57,7 +55,7 @@ public class ManagerController
           Button primaryButton,
           StackPane allergyOverlay,
           TextField allergyNameField,
-          Label allergyErrorLabel)
+          Label allergyErrorLabel, Button createAllergyButton, Button deleteAllergyButton)
   {
     reservationComponent.initModal(
         overlay, guestName, datePicker, timeField,
@@ -71,7 +69,9 @@ public class ManagerController
     );
     menuItemComponent.initAllergyModal( allergyOverlay,
             allergyNameField,
-            allergyErrorLabel);
+            allergyErrorLabel,
+            createAllergyButton,
+            deleteAllergyButton);
   }
 
   public void initTableModal(
@@ -159,4 +159,7 @@ public class ManagerController
     menuItemComponent.createAllergy();
   }
 
+  public void deleteAllergy() {
+    menuItemComponent.deleteAllergy();
+  }
 }

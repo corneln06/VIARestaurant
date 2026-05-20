@@ -36,8 +36,18 @@ public class MenuItemComponent
 
   private AllergyService allergyService;
 
+  private Allergy selectedAllergy;
+  private boolean editingAllergy = false;
+
+  private Button createAllergyButton;
+  private Button deleteAllergyButton;
+
+
   private boolean showingAllergies = false;
 
+  ///////////////////////////////////
+  ////////////// INITIALIZATIONS
+  /// //////////////////////////
   public void initModal(
       StackPane overlay,
       TextField nameField,
@@ -63,6 +73,7 @@ public class MenuItemComponent
     this.primaryButton = primaryB;
 
     configureMenuColumns();
+    initAllergyRowDoubleClick();
 
     dishTypeComboBox.getItems().setAll(
         "Starter", "Main", "Dessert", "Beverage", "AlcoholicBeverage"
@@ -88,12 +99,16 @@ public class MenuItemComponent
   public void initAllergyModal(
           StackPane overlay,
           TextField nameField,
-          Label errorLabel
+          Label errorLabel,
+          Button createAllergyButton,
+          Button deleteAllergyButton
   )
   {
     this.newAllergyOverlay = overlay;
     this.allergyNameField = nameField;
     this.newAllergyErrorLabel = errorLabel;
+    this.createAllergyButton = createAllergyButton;
+    this.deleteAllergyButton = deleteAllergyButton;
   }
 
   public void initClient(Client client)
@@ -132,17 +147,25 @@ public class MenuItemComponent
       }
     });
   }
-
-  public void refreshMenuTable()
+  private void initAllergyRowDoubleClick()
   {
+    menuTable.setRowFactory(tv -> {
+      TableRow<Object> row = new TableRow<>();
 
-    try {
-      configureMenuColumns();
-      menuTable.getItems().setAll(MenuItemDAOImpl.getInstance().getAllMenuItems());
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
+      row.setOnMouseClicked(event -> {
+        if (event.getClickCount() == 2 && !row.isEmpty() && showingAllergies)
+        {
+          Allergy allergy = (Allergy) row.getItem();
+          openEditAllergyModal(allergy);
+        }
+      });
+
+      return row;
+    });
   }
+/////////////////////////////////////
+/// ////////// OPEN / CLOSE MODALS
+/// //////////////////////////////////
 
   private void openNewDishModal()
   {
@@ -170,7 +193,18 @@ public class MenuItemComponent
 
   private void openNewAllergyModal()
   {
+    selectedAllergy = null;
+    setEditingAllergy(false);
+
     allergyNameField.clear();
+
+    createAllergyButton.setText("Create");
+    createAllergyButton.setVisible(true);
+    createAllergyButton.setManaged(true);
+
+    deleteAllergyButton.setVisible(false);
+    deleteAllergyButton.setManaged(false);
+
     hideAllergyError();
     showOverlay(newAllergyOverlay);
   }
@@ -183,6 +217,29 @@ public class MenuItemComponent
   {
     hideOverlay(newAllergyOverlay);
   }
+
+  private void openEditAllergyModal(Allergy allergy)
+  {
+    this.selectedAllergy = allergy;
+    setEditingAllergy(true);
+
+    allergyNameField.setText(allergy.getName());
+
+
+    createAllergyButton.setText("Apply");
+    createAllergyButton.setVisible(true);
+    createAllergyButton.setManaged(true);
+
+    deleteAllergyButton.setVisible(true);
+    deleteAllergyButton.setManaged(true);
+
+    hideAllergyError();
+    showOverlay(newAllergyOverlay);
+  }
+
+  //////////////////////////////////////////////
+  /// //////////// CREATE ITEMS
+  /// ////////////////////////////////////////
 
   public void createDish()
   {
@@ -229,13 +286,64 @@ public class MenuItemComponent
 
     try
     {
-      allergyService.createAllergy(name);
+      if (editingAllergy)
+      {
+        allergyService.updateAllergy(selectedAllergy.getId(), name);
+      }
+      else
+      {
+        allergyService.createAllergy(name);
+      }
+
       closeNewAllergyModal();
     }
     catch (IOException e)
     {
       showAllergyError("Network error: " + e.getMessage());
     }
+  }
+
+  /////////////////////////////////
+  /// ////////// DELETE ITEMS
+  /// ///////////////////////////////
+
+
+  public void deleteAllergy()
+  {
+    if (selectedAllergy == null)
+    {
+      showAllergyError("No allergy selected");
+      return;
+    }
+
+    try
+    {
+      allergyService.deleteAllergy(selectedAllergy.getId());
+      closeNewAllergyModal();
+    }
+    catch (IOException e)
+    {
+      showAllergyError("Network error: " + e.getMessage());
+    }
+  }
+  //////////////////////////////////////////////
+  /// ///////// TABLE LOAD
+  ///////////////////////////////////////
+
+  public void refreshMenuTable()
+  {
+
+    try {
+      configureMenuColumns();
+      menuTable.getItems().setAll(MenuItemDAOImpl.getInstance().getAllMenuItems());
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+  private void loadAllergyTable() throws IOException
+  {
+    configureAllergyColumns();
+    allergyService.loadAllergies();
   }
 
   private void populateAllergies()
@@ -249,68 +357,11 @@ public class MenuItemComponent
     }
   }
 
-  private void showOverlay(StackPane overlay)
-  {
-    overlay.setVisible(true);
-    overlay.setManaged(true);
-  }
 
-  private void hideOverlay(StackPane overlay)
-  {
-    overlay.setVisible(false);
-    overlay.setManaged(false);
-  }
 
-  private void showError(String message)
-  {
-    newDishErrorLabel.setText(message);
-    newDishErrorLabel.setVisible(true);
-    newDishErrorLabel.setManaged(true);
-  }
-
-  private void hideError()
-  {
-    newDishErrorLabel.setVisible(false);
-    newDishErrorLabel.setManaged(false);
-  }
-
-  public boolean isShowingAllergies() {
-    return showingAllergies;
-  }
-
-  public void setShowingAllergies(boolean showingAllergies) {
-    this.showingAllergies = showingAllergies;
-  }
-
-  public void toggleMenuView()
-  {
-    setShowingAllergies(!showingAllergies);
-
-    try
-    {
-      if (showingAllergies)
-      {
-        loadAllergyTable();
-        toggleButton.setText("Show Menu");
-        primaryButton.setText("+ New Allergy");
-      }
-      else
-      {
-        refreshMenuTable();
-        toggleButton.setText("Show Allergies");
-        primaryButton.setText("+ New Dish");
-      }
-    }
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
-  }
-  private void loadAllergyTable() throws IOException
-  {
-    configureAllergyColumns();
-    allergyService.loadAllergies();
-  }
+  ////////////////////////////////////////////
+  /// //////////// TABLE CONFIGURATIONS
+  /// ////////////////////////////////////////
 
   @SuppressWarnings("unchecked")
 private void configureMenuColumns()
@@ -381,6 +432,66 @@ private void configureMenuColumns()
             null);
   }
 
+  ///////////////////////////
+  /// ////// UI HELPERS
+/////////////////////////////////
+
+  private void showOverlay(StackPane overlay)
+  {
+    overlay.setVisible(true);
+    overlay.setManaged(true);
+  }
+
+  private void hideOverlay(StackPane overlay)
+  {
+    overlay.setVisible(false);
+    overlay.setManaged(false);
+  }
+
+
+  public void toggleMenuView()
+  {
+    setShowingAllergies(!showingAllergies);
+
+    try
+    {
+      if (showingAllergies)
+      {
+        loadAllergyTable();
+        toggleButton.setText("Show Menu");
+        primaryButton.setText("+ New Allergy");
+      }
+      else
+      {
+        refreshMenuTable();
+        toggleButton.setText("Show Allergies");
+        primaryButton.setText("+ New Dish");
+      }
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+
+  ///////////////////////////
+  ////////////// ERRORS
+  //////////////////////////
+
+  private void showError(String message)
+  {
+    newDishErrorLabel.setText(message);
+    newDishErrorLabel.setVisible(true);
+    newDishErrorLabel.setManaged(true);
+  }
+
+  private void hideError()
+  {
+    newDishErrorLabel.setVisible(false);
+    newDishErrorLabel.setManaged(false);
+  }
+
   private void showAllergyError(String msg)
   {
     newAllergyErrorLabel.setText(msg);
@@ -393,4 +504,23 @@ private void configureMenuColumns()
     newAllergyErrorLabel.setVisible(false);
     newAllergyErrorLabel.setManaged(false);
   }
+
+  ///////////////////////////////////////
+  ////////// BOOLEANS CHECKERS SETTERS
+  //////////////////////////////////////
+
+  public boolean isShowingAllergies() {
+    return showingAllergies;
+  }
+
+  public void setShowingAllergies(boolean showingAllergies) {
+    this.showingAllergies = showingAllergies;
+  }
+
+  public boolean isEditingAllergy() {
+    return editingAllergy;
+  }
+  public void setEditingAllergy(boolean edit) { this.editingAllergy = edit; }
+
+
 }

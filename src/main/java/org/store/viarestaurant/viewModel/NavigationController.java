@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javafx.event.ActionEvent;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.view.HelloApplication;
@@ -96,6 +95,9 @@ public class NavigationController
     @FXML private StackPane newAllergyOverlay;
     @FXML private TextField allergyNameField;
     @FXML private Label newAllergyErrorLabel;
+
+    @FXML private Button deleteAllergyButton;
+    @FXML private Button createAllergyButton;
 
 
     private HostController hostController;
@@ -204,7 +206,9 @@ public class NavigationController
                         modalTitle,
                         toggleMenuViewButton,
                         menuPrimaryActionButton,
-                        newAllergyOverlay, allergyNameField, newAllergyErrorLabel);
+                        newAllergyOverlay, allergyNameField, newAllergyErrorLabel,
+                        createAllergyButton,
+                        deleteAllergyButton);
 
                 managerController.refreshMenuTable();
 
@@ -511,4 +515,12 @@ public class NavigationController
             managerController.createAllergy();
         }
     }
+
+    public void deleteAllergy() {
+        if(managerController != null)
+        {
+            managerController.deleteAllergy();
+        }
+    }
+
 }

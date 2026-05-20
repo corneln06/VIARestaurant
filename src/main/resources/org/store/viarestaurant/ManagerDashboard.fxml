@@ -154,12 +154,17 @@
                            visible="false"
                            onMouseClicked="#closeNewAllergyModal"
                            styleClass="modal-overlay">
-
                     <children>
                         <VBox maxWidth="360.0"
+                              maxHeight="240.0"
                               spacing="14.0"
                               onMouseClicked="#consumeModalClick"
                               styleClass="modal-card modal-card-medium">
+                            <styleClass>
+                                <String fx:value="modal-card"/>
+                                <String fx:value="modal-card-medium"/>
+                            </styleClass>
+
 
                             <children>
                                 <Label text="New Allergy" styleClass="modal-title"/>
@@ -176,13 +181,36 @@
 
                                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
                                     <children>
+
                                         <Button text="Cancel"
                                                 onAction="#closeNewAllergyModal"
-                                                styleClass="btn-base btn-secondary"/>
+                                                styleClass="btn-base btn-secondary">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-secondary"/>
+                                            </styleClass>
+                                        </Button>
+                                        <Button text="Delete"
+                                                onAction="#deleteAllergy"
+                                                styleClass="btn-base btn-danger"
+                                                fx:id="deleteAllergyButton"
+                                                visible="false"
+                                                managed="false">
+                                        <styleClass>
+                                            <String fx:value="btn-base"/>
+                                            <String fx:value="btn-danger"/>
+                                        </styleClass>
+                                        </Button>
 
                                         <Button text="Create"
                                                 onAction="#createAllergy"
-                                                styleClass="btn-base btn-primary"/>
+                                                fx:id="createAllergyButton"
+                                                styleClass="btn-base btn-primary">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
                                     </children>
                                 </HBox>
                             </children>
