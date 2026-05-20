@@ -24,7 +24,9 @@ import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.ReservationDto.*;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.SeatTableRequest;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.SetTableAvailableRequest;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.SetTableReservedRequest;
 import org.store.viarestaurant.viewModel.services.ReservationService;
 import org.store.viarestaurant.viewModel.services.TableOrderService;
 import org.store.viarestaurant.viewModel.services.TablesService;
@@ -38,6 +40,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import org.store.viarestaurant.viewModel.services.WorkersService;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreateRequest;
 
 public class TableComponent
 {
@@ -226,6 +229,15 @@ public class TableComponent
     waiterMap.clear();
     tableModalWaiterComboBox.getItems().clear();
 
+    try
+    {
+        reservationService.getClosestReservation(tableId);
+    }
+    catch (IOException e)
+    {
+        throw new RuntimeException(e);
+    }
+
     for(Workers worker : workers)
     {
       if(worker.getRole() == WorkerRole.Waiter)
@@ -282,6 +294,11 @@ public class TableComponent
       tableModalPrimaryButton.setOnAction(e -> setAvailable());
       tableModalSecondaryButton.setVisible(false);
       tableModalSecondaryButton.setManaged(false);
+      closestReservation = null;
+
+      if (closestReservation != null){
+          tableModalPrimaryButton.setOnAction(e -> setReserved());
+      }
     }
     else if(reserved)
     {
@@ -458,6 +475,20 @@ public class TableComponent
       e.printStackTrace();
     }
     refreshTableGrid();
+  }
+
+  public void setReserved()
+  {
+      try
+      {
+          client.send(
+                  new SetTableReservedRequest(currentTableId)
+          );
+      }
+      catch(IOException e)
+      {
+          e.printStackTrace();
+      }
   }
 
   public void closeNewTableModal() {

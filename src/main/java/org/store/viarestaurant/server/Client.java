@@ -1,8 +1,16 @@
 package org.store.viarestaurant.server;
 
 import javafx.application.Platform;
-import org.store.viarestaurant.server.dto.LoginResponse;
+import org.store.viarestaurant.server.dto.AllergyDTO.CreateAllergyResponse;
+import org.store.viarestaurant.server.dto.AllergyDTO.GetAllergiesResponse;
+import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
+import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.GetTablesResponse;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreateResponse;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreatedMessage;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableUpdatedMessage;
+import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -33,6 +41,10 @@ public class Client
   private Consumer<TableUpdatedMessage> updatedMessageListener;
   private Consumer<GetClosestReservationResponse> closestReservationListener;
   private Consumer<GetTableOrderResponse> tableOrderResponseListener;
+  private Consumer<CreateAllergyResponse> createdAllergyListener;
+  private Consumer<GetAllergiesResponse> getAllergiesListener;
+  private Consumer<MessageResponse> updateAllergyListener;
+  private Consumer<MessageResponse> deleteAllergyListener;
 
   public void connect() throws IOException
   {
@@ -94,7 +106,7 @@ public class Client
             {
               reservationCreatedListener.accept(message);
             }
-            else if (object instanceof TableCreateResponse message && tableCreatedListener != null)
+            else if (object instanceof TableCreateResponse message && createTableListener != null)
             {
               createTableListener.accept(message);
             } else if (object instanceof TableCreatedMessage message && tableCreatedListener != null)
@@ -130,6 +142,23 @@ public class Client
             {
                 closestReservationListener.accept(message);
             }
+            else if (object instanceof CreateAllergyResponse response && createdAllergyListener != null)
+            {
+              createdAllergyListener.accept(response);
+            }
+            else if (object instanceof GetAllergiesResponse response && getAllergiesListener != null)
+            {
+              getAllergiesListener.accept(response);
+            }
+            else if (object instanceof MessageResponse response && updateAllergyListener != null)
+            {
+              updateAllergyListener.accept(response);
+            }
+            else if (object instanceof MessageResponse response && deleteAllergyListener != null)
+            {
+              deleteAllergyListener.accept(response);
+            }
+
           });
         }
       }
@@ -195,5 +224,14 @@ public class Client
   }
 
   public void setClosestReservationListener(Consumer<GetClosestReservationResponse> listener){this.closestReservationListener = listener;}
+  
   public void setTableOrderListener(Consumer<GetTableOrderResponse> listener){this.tableOrderResponseListener = listener;}
+  
+  public void setAllergyCreatedListener(Consumer<CreateAllergyResponse> listener) { this.createdAllergyListener = listener; }
+
+  public void setGetAllergiesListener(Consumer<GetAllergiesResponse> listener) { this.getAllergiesListener = listener; }
+
+  public void setUpdateAllergyListener(Consumer<MessageResponse> listener) { this.updateAllergyListener = listener; }
+
+  public void setDeleteAllergyListener(Consumer<MessageResponse> listener) { this.deleteAllergyListener = listener; }
 }

@@ -1,4 +1,4 @@
-package org.store.viarestaurant.server.dto.ReservationDto;
+package org.store.viarestaurant.server.dto.TableOrderDTO;
 
 import org.store.viarestaurant.model.entities.TableOrder;
 
