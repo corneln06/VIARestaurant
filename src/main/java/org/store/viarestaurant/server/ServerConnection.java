@@ -18,6 +18,8 @@ import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderRequest;
 import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterRequest;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersRequest;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
@@ -183,6 +185,11 @@ public class ServerConnection implements Runnable
         {
           System.out.println("[SERVER] AddItemsToOrderRequest detected");
           handleAddItemsToOrder(request);
+        }
+        else if (object instanceof PayOrderRequest request)
+        {
+          System.out.println("[SERVER] PayOrderRequest detected");
+          handlePayOrder(request);
         }
         else
         {
@@ -691,7 +698,20 @@ public class ServerConnection implements Runnable
       Map<Integer, TableOrder> seen = new LinkedHashMap<>();
       for (TableOrder o : all)
       {
-        if (!o.isPaid()) seen.putIfAbsent(o.getId(), o);
+        if (o.isPaid()) continue;
+        TableOrder existing = seen.get(o.getId());
+        if (existing == null)
+        {
+          seen.put(o.getId(), o);
+        }
+        else if (o.getMenuItems() != null)
+        {
+          for (String name : o.getMenuItems())
+          {
+            if (name != null && !name.isBlank() && !existing.getMenuItems().contains(name))
+              existing.addMenuItems(name);
+          }
+        }
       }
 
       send(new GetOrdersByWaiterResponse(new ArrayList<>(seen.values())));
@@ -738,6 +758,22 @@ public class ServerConnection implements Runnable
     {
       e.printStackTrace();
       send(new AddItemsToOrderResponse(false, "Database error: " + e.getMessage(), 0.0));
+    }
+  }
+
+  private void handlePayOrder(PayOrderRequest request) throws IOException
+  {
+    try
+    {
+      TableOrder order = tableOrderDAO.getTableOrderByID(request.getTableOrderId());
+      order.setPaid(true);
+      tableOrderDAO.updateTableOrder(order);
+      send(new PayOrderResponse(true));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new PayOrderResponse(false));
     }
   }
 

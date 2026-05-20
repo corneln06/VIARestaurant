@@ -12,43 +12,55 @@ import java.util.*;
 
 public class OrdersComponent
 {
+  // List page — table picker
+  private FlowPane ordersTableFlow;
+
+  // Detail page — menu grid + order summary
   private TilePane menuItemsPane;
-  private FlowPane stagedItemsFlow;
-  private Button addToOrderButton;
-  private StackPane orderPickerOverlay;
-  private ComboBox<String> orderComboBox;
-  private Label orderPickerErrorLabel;
+  private Label    selectedOrderTableLabel;
+  private VBox     orderSummaryLinesBox;
+  private Label    orderSubtotalLabel;
+  private Label    roundLabel;
+  private Button   sendToKitchenButton;
+
+  private Runnable navigateToDetail;
+  private Runnable navigateToList;
 
   private OrdersService ordersService;
   private int currentWaiterId;
 
-  private List<MenuItems> allMenuItems = new ArrayList<>();
-  private List<MenuItems> stagedItems  = new ArrayList<>();
-  private List<TableOrder> openOrders  = new ArrayList<>();
-  private final Map<String, TableOrder> orderDisplayMap = new LinkedHashMap<>();
-  private String activeFilter = "All";
+  private List<MenuItems>  allMenuItems = new ArrayList<>();
+  private List<MenuItems>  stagedItems  = new ArrayList<>();
+  private List<TableOrder> openOrders   = new ArrayList<>();
+  private TableOrder       selectedOrder;
+  private String           activeFilter = "All";
 
   public void init(
+      FlowPane ordersTableFlow,
       TilePane menuItemsPane,
-      FlowPane stagedItemsFlow,
-      Button addToOrderButton,
-      StackPane orderPickerOverlay,
-      ComboBox<String> orderComboBox,
-      Label orderPickerErrorLabel,
+      Label selectedOrderTableLabel,
+      VBox orderSummaryLinesBox,
+      Label orderSubtotalLabel,
+      Label roundLabel,
+      Button sendToKitchenButton,
       ToggleButton filterAllBtn,
       ToggleButton filterStartersBtn,
       ToggleButton filterMainsBtn,
       ToggleButton filterDessertsBtn,
-      ToggleButton filterDrinksBtn)
+      ToggleButton filterDrinksBtn,
+      Runnable navigateToDetail,
+      Runnable navigateToList)
   {
-    this.menuItemsPane        = menuItemsPane;
-    this.stagedItemsFlow      = stagedItemsFlow;
-    this.addToOrderButton     = addToOrderButton;
-    this.orderPickerOverlay   = orderPickerOverlay;
-    this.orderComboBox        = orderComboBox;
-    this.orderPickerErrorLabel = orderPickerErrorLabel;
+    this.ordersTableFlow          = ordersTableFlow;
+    this.menuItemsPane            = menuItemsPane;
+    this.selectedOrderTableLabel  = selectedOrderTableLabel;
+    this.orderSummaryLinesBox     = orderSummaryLinesBox;
+    this.orderSubtotalLabel       = orderSubtotalLabel;
+    this.roundLabel               = roundLabel;
+    this.sendToKitchenButton      = sendToKitchenButton;
+    this.navigateToDetail         = navigateToDetail;
+    this.navigateToList           = navigateToList;
 
-    // Only one filter chip active at a time — ToggleGroup handles mutual exclusion.
     ToggleGroup filterGroup = new ToggleGroup();
     filterAllBtn.setToggleGroup(filterGroup);
     filterStartersBtn.setToggleGroup(filterGroup);
@@ -65,26 +77,31 @@ public class OrdersComponent
 
     ordersService.onMenuItemsLoaded(response -> {
       allMenuItems = new ArrayList<>(response.getMenuItems());
-      buildMenuGrid(activeFilter);
+      // Grid is not built until the waiter selects a table.
     });
 
     ordersService.onOrdersByWaiterLoaded(response -> {
       openOrders = new ArrayList<>(response.getOrders());
-      populateOrderComboBox();
+      buildTableList();
     });
 
-    // On success: clear the cart and close the picker.
-    // On failure: show the error message inside the picker modal.
     ordersService.onItemsAdded(response -> {
       if (response.isSuccess())
       {
         stagedItems.clear();
-        buildStagedPanel();
-        closeOrderPicker();
+        // Re-fetch so the summary reflects the updated bill.
+        ordersService.loadOrdersByWaiter(currentWaiterId);
+        if (selectedOrder != null) buildOrderSummary();
       }
-      else
+    });
+
+    ordersService.onOrderPaid(response -> {
+      if (response.isSuccess())
       {
-        showPickerError(response.getMessage());
+        selectedOrder = null;
+        stagedItems.clear();
+        ordersService.loadOrdersByWaiter(currentWaiterId);
+        navigateToList.run();
       }
     });
   }
@@ -92,6 +109,8 @@ public class OrdersComponent
   // Called by WaiterController when the Orders tab is shown.
   public void loadData()
   {
+    selectedOrder = null;
+    stagedItems.clear();
     ordersService.loadMenuItems();
     ordersService.loadOrdersByWaiter(currentWaiterId);
   }
@@ -100,10 +119,55 @@ public class OrdersComponent
   public void applyFilter(String filter)
   {
     this.activeFilter = filter;
-    buildMenuGrid(filter);
+    buildDetailMenuGrid(filter);
   }
 
-  private void buildMenuGrid(String filter)
+  // ── List page ─────────────────────────────────────────────────────────────
+
+  private void buildTableList()
+  {
+    if (ordersTableFlow == null) return;
+    ordersTableFlow.getChildren().clear();
+    for (TableOrder order : openOrders)
+      ordersTableFlow.getChildren().add(buildTableCard(order));
+  }
+
+  private VBox buildTableCard(TableOrder order)
+  {
+    VBox card = new VBox(8);
+    card.getStyleClass().add("order-table-card");
+
+    Label tableLabel = new Label("Table " + order.getTable().getId());
+    tableLabel.getStyleClass().add("card-title");
+
+    Label orderLabel = new Label("Order #" + order.getId());
+    orderLabel.getStyleClass().add("card-subtitle");
+
+    Label billLabel = new Label(String.format("DKK %.2f", order.getBill()));
+    billLabel.getStyleClass().add("muted-label");
+
+    card.getChildren().addAll(tableLabel, orderLabel, billLabel);
+    card.setOnMouseClicked(e -> selectOrder(order));
+    return card;
+  }
+
+  private void selectOrder(TableOrder order)
+  {
+    this.selectedOrder = order;
+    this.activeFilter  = "All";
+    stagedItems.clear();
+
+    selectedOrderTableLabel.setText("Table " + order.getTable().getId());
+    roundLabel.setText("Round " + (order.getMenuItems().size() + 1));
+
+    buildDetailMenuGrid("All");
+    buildOrderSummary();
+    navigateToDetail.run();
+  }
+
+  // ── Detail page ───────────────────────────────────────────────────────────
+
+  private void buildDetailMenuGrid(String filter)
   {
     if (menuItemsPane == null) return;
     menuItemsPane.getChildren().clear();
@@ -131,9 +195,8 @@ public class OrdersComponent
   {
     VBox card = new VBox(6);
     card.getStyleClass().add("menu-item-tile");
-    card.setPrefWidth(180);
+    card.setPrefWidth(200);
 
-    // Highlight the card if this item is already in the staged list.
     boolean staged = stagedItems.stream().anyMatch(s -> s.getId() == item.getId());
     if (staged) card.getStyleClass().add("menu-item-tile-staged");
 
@@ -152,111 +215,66 @@ public class OrdersComponent
     return card;
   }
 
-  // Clicking a card toggles the item in/out of the staged list.
-  // Rebuilding the grid refreshes the highlight on all cards.
   private void toggleStaged(MenuItems item)
   {
     boolean alreadyIn = stagedItems.stream().anyMatch(s -> s.getId() == item.getId());
     if (alreadyIn) stagedItems.removeIf(s -> s.getId() == item.getId());
     else           stagedItems.add(item);
 
-    buildStagedPanel();
-    buildMenuGrid(activeFilter);
+    buildDetailMenuGrid(activeFilter);
+    buildOrderSummary();
   }
 
-  private void buildStagedPanel()
+  private void buildOrderSummary()
   {
-    stagedItemsFlow.getChildren().clear();
+    if (selectedOrder == null || orderSummaryLinesBox == null) return;
+    orderSummaryLinesBox.getChildren().clear();
 
-    for (MenuItems item : stagedItems)
+    // Already-ordered items from the TableOrder
+    for (String name : selectedOrder.getMenuItems())
     {
-      HBox chip = new HBox(8);
-      chip.getStyleClass().add("staged-chip");
-
-      Label nameLabel = new Label(item.getName());
-      nameLabel.getStyleClass().add("staged-chip-label");
-
-      Label removeBtn = new Label("×");
-      removeBtn.getStyleClass().add("staged-chip-remove");
-      removeBtn.setOnMouseClicked(e -> {
-        e.consume(); // prevent the click from bubbling to the card
-        toggleStaged(item);
-      });
-
-      chip.getChildren().addAll(nameLabel, removeBtn);
-      stagedItemsFlow.getChildren().add(chip);
+      Label row = new Label(name);
+      row.getStyleClass().add("summary-line");
+      orderSummaryLinesBox.getChildren().add(row);
     }
 
-    // Disable the button when there's nothing staged.
-    addToOrderButton.setDisable(stagedItems.isEmpty());
-  }
-
-  // Opens the order picker modal. Refreshes the order list first so it
-  // reflects any tables that were seated after the Orders tab was opened.
-  public void openOrderPicker()
-  {
-    if (stagedItems.isEmpty()) return;
-    hidePickerError();
-    orderComboBox.getSelectionModel().clearSelection();
-    ordersService.loadOrdersByWaiter(currentWaiterId);
-    orderPickerOverlay.setVisible(true);
-    orderPickerOverlay.setManaged(true);
-  }
-
-  public void closeOrderPicker()
-  {
-    if (orderPickerOverlay == null) return;
-    orderPickerOverlay.setVisible(false);
-    orderPickerOverlay.setManaged(false);
-  }
-
-  private void populateOrderComboBox()
-  {
-    orderDisplayMap.clear();
-    orderComboBox.getItems().clear();
-
-    for (TableOrder order : openOrders)
+    // Staged (to be sent) items — with a separator and remove button
+    if (!stagedItems.isEmpty())
     {
-      String label = "Table " + order.getTable().getId()
-          + "  (Order #" + order.getId() + ")";
-      orderDisplayMap.put(label, order);
-      orderComboBox.getItems().add(label);
-    }
-  }
+      orderSummaryLinesBox.getChildren().add(new Separator());
+      for (MenuItems item : stagedItems)
+      {
+        HBox row = new HBox(8);
+        Label nameLbl = new Label(item.getName());
+        nameLbl.getStyleClass().add("summary-line");
 
-  public void confirmAddToOrder()
-  {
-    hidePickerError();
-    String selected = orderComboBox.getValue();
-    if (selected == null)
-    {
-      showPickerError("Please select an order.");
-      return;
-    }
-    TableOrder order = orderDisplayMap.get(selected);
-    if (order == null)
-    {
-      showPickerError("Invalid order selection.");
-      return;
+        Label removeBtn = new Label("×");
+        removeBtn.getStyleClass().add("staged-chip-remove");
+        removeBtn.setOnMouseClicked(e -> { e.consume(); toggleStaged(item); });
+
+        row.getChildren().addAll(nameLbl, removeBtn);
+        orderSummaryLinesBox.getChildren().add(row);
+      }
     }
 
+    double stagedTotal = stagedItems.stream().mapToDouble(MenuItems::getPrice).sum();
+    orderSubtotalLabel.setText(String.format("DKK %.2f", selectedOrder.getBill() + stagedTotal));
+    sendToKitchenButton.setDisable(stagedItems.isEmpty());
+  }
+
+  public void payOrder()
+  {
+    if (selectedOrder == null) return;
+    ordersService.payOrder(selectedOrder.getId());
+  }
+
+  // Called from NavigationController → WaiterController when "Send to Kitchen" is clicked.
+  public void sendToKitchen()
+  {
+    if (selectedOrder == null || stagedItems.isEmpty()) return;
     ArrayList<String> names = new ArrayList<>();
     for (MenuItems item : stagedItems) names.add(item.getName());
-
-    ordersService.addItemsToOrder(order.getId(), names);
-    // Success path is handled in the onItemsAdded callback.
-  }
-
-  private void showPickerError(String message)
-  {
-    orderPickerErrorLabel.setText(message);
-    orderPickerErrorLabel.setVisible(true);
-    orderPickerErrorLabel.setManaged(true);
-  }
-
-  private void hidePickerError()
-  {
-    orderPickerErrorLabel.setVisible(false);
-    orderPickerErrorLabel.setManaged(false);
+    ordersService.addItemsToOrder(selectedOrder.getId(), names);
+    // Success path handled in the onItemsAdded callback.
   }
 }

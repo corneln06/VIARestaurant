@@ -13,6 +13,7 @@ import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreatedMessage
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableUpdatedMessage;
 import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;
@@ -50,6 +51,7 @@ public class Client
   private List<Consumer<GetMenuItemsResponse>>      menuItemsListeners    = new ArrayList<>();
   private List<Consumer<GetOrdersByWaiterResponse>> waiterOrdersListeners = new ArrayList<>();
   private List<Consumer<AddItemsToOrderResponse>>   addItemsListeners     = new ArrayList<>();
+  private Consumer<PayOrderResponse>                payOrderListener;
 
   public void connect() throws IOException
   {
@@ -167,6 +169,10 @@ public class Client
             {
               for (var c : addItemsListeners) c.accept(response);
             }
+            else if (object instanceof PayOrderResponse response && payOrderListener != null)
+            {
+              payOrderListener.accept(response);
+            }
 
           });
         }
@@ -250,5 +256,9 @@ public class Client
 
   public void setAddItemsListener(Consumer<AddItemsToOrderResponse> listener) {
     addItemsListeners.add(listener);
+  }
+
+  public void setPayOrderListener(Consumer<PayOrderResponse> listener) {
+    this.payOrderListener = listener;
   }
 }

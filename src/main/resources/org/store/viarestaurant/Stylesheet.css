@@ -164,6 +164,7 @@
     -fx-font-weight: bold;
     -fx-cursor: hand;
     -fx-border-width: 0;
+    -fx-border-radius: 10px;
 }
 
 .btn-base:hover {
@@ -172,6 +173,13 @@
 
 .btn-primary {
     -fx-background-color: #52aecf;
+    -fx-text-fill: white;
+}
+
+.btn-pay {
+    -fx-border-width: 2px;
+    -fx-border-color: #00000010;
+    -fx-background-color: #52cf84;
     -fx-text-fill: white;
 }
 
@@ -448,4 +456,15 @@
 
 .staged-chip-remove:hover {
     -fx-text-fill: #c00;
+}
+
+.order-table-card {
+    -fx-cursor: hand;
+    -fx-background-color: white;
+    -fx-background-radius: 14px;
+    -fx-padding: 18px;
+    -fx-border-color: #e2e7f3;
+    -fx-border-radius: 14px;
+    -fx-min-width: 160px;
+    -fx-effect: dropshadow(gaussian, rgba(39, 52, 105, 0.08), 12, 0.1, 0, 3);
 }

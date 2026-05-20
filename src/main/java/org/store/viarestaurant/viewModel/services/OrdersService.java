@@ -7,6 +7,8 @@ import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderRequest;
 import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterRequest;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,5 +72,22 @@ public class OrdersService
   public void onItemsAdded(Consumer<AddItemsToOrderResponse> listener)
   {
     client.setAddItemsListener(listener);
+  }
+
+  public void payOrder(int tableOrderId)
+  {
+    try
+    {
+      client.send(new PayOrderRequest(tableOrderId));
+    }
+    catch (IOException e)
+    {
+      System.out.println("OrdersService: failed to pay order");
+    }
+  }
+
+  public void onOrderPaid(Consumer<PayOrderResponse> listener)
+  {
+    client.setPayOrderListener(listener);
   }
 }
