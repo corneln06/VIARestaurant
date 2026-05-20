@@ -2,9 +2,7 @@ package org.store.viarestaurant.server;
 
 import javafx.application.Platform;
 import org.store.viarestaurant.server.dto.AllergyDTO.CreateAllergyResponse;
-import org.store.viarestaurant.server.dto.AllergyDTO.DeleteAllergyResponse;
 import org.store.viarestaurant.server.dto.AllergyDTO.GetAllergiesResponse;
-import org.store.viarestaurant.server.dto.AllergyDTO.UpdateAllergyResponse;
 import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
@@ -43,8 +41,8 @@ public class Client
   private Consumer<TableUpdatedMessage> updatedMessageListener;
   private Consumer<CreateAllergyResponse> createdAllergyListener;
   private Consumer<GetAllergiesResponse> getAllergiesListener;
-  private Consumer<UpdateAllergyResponse> updateAllergyListener;
-  private Consumer<DeleteAllergyResponse> deleteAllergyListener;
+  private Consumer<MessageResponse> updateAllergyListener;
+  private Consumer<MessageResponse> deleteAllergyListener;
 
   public void connect() throws IOException
   {
@@ -142,11 +140,11 @@ public class Client
             {
               getAllergiesListener.accept(response);
             }
-            else if (object instanceof UpdateAllergyResponse response && updateAllergyListener != null)
+            else if (object instanceof MessageResponse response && updateAllergyListener != null)
             {
               updateAllergyListener.accept(response);
             }
-            else if (object instanceof DeleteAllergyResponse response && deleteAllergyListener != null)
+            else if (object instanceof MessageResponse response && deleteAllergyListener != null)
             {
               deleteAllergyListener.accept(response);
             }
@@ -219,7 +217,7 @@ public class Client
 
   public void setGetAllergiesListener(Consumer<GetAllergiesResponse> listener) { this.getAllergiesListener = listener; }
 
-  public void setUpdateAllergyListener(Consumer<UpdateAllergyResponse> listener) { this.updateAllergyListener = listener; }
+  public void setUpdateAllergyListener(Consumer<MessageResponse> listener) { this.updateAllergyListener = listener; }
 
-  public void setDeleteAllergyListener(Consumer<DeleteAllergyResponse> listener) { this.deleteAllergyListener = listener; }
+  public void setDeleteAllergyListener(Consumer<MessageResponse> listener) { this.deleteAllergyListener = listener; }
 }
