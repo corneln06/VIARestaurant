@@ -28,17 +28,24 @@ public class Client
   private ObjectInputStream inFromServer;
 
   private Consumer<LoginResponse> loginListener;
+
   private Consumer<GetTablesResponse> reservationTablesListener;
   private List<Consumer<GetReservationsResponse>> reservationsListener = new ArrayList<>();
   private Consumer<MessageResponse> createReservationListener;
   private Consumer<ReservationCreatedMessage> reservationCreatedListener;
-  private List<Consumer<GetTablesResponse>> tablesPageListener = new ArrayList<>();
-  private Consumer<TableCreatedMessage> tableCreatedListener;
+
   private Consumer<DeleteReservationResponse> deleteReservationListener;
   private Consumer<UpdateReservationResponse> updateReservationListener;
   private Consumer<ReservationDeletedMessage> reservationDeletedListener;
-  private Consumer<GetWorkersResponse> workersListener;
+
+  private List<Consumer<GetTablesResponse>> tablesPageListener = new ArrayList<>();
+  private Consumer<TableCreatedMessage> tableCreatedListener;
   private Consumer<TableUpdatedMessage> updatedMessageListener;
+  private Consumer<MessageResponse> updateTableListener;
+  private Consumer<MessageResponse> deleteTableListener;
+
+  private Consumer<GetWorkersResponse> workersListener;
+
   private Consumer<CreateAllergyResponse> createdAllergyListener;
   private Consumer<GetAllergiesResponse> getAllergiesListener;
   private Consumer<MessageResponse> updateAllergyListener;
@@ -148,6 +155,14 @@ public class Client
             {
               deleteAllergyListener.accept(response);
             }
+            else if (object instanceof MessageResponse response && updateTableListener != null)
+            {
+              updateTableListener.accept(response);
+            }
+            else if (object instanceof MessageResponse response && deleteTableListener != null)
+            {
+              deleteTableListener.accept(response);
+            }
 
           });
         }
@@ -220,4 +235,12 @@ public class Client
   public void setUpdateAllergyListener(Consumer<MessageResponse> listener) { this.updateAllergyListener = listener; }
 
   public void setDeleteAllergyListener(Consumer<MessageResponse> listener) { this.deleteAllergyListener = listener; }
+
+    public void setUpdateTableListener(Consumer<MessageResponse> updateTableListener) {
+        this.updateTableListener = updateTableListener;
+    }
+
+    public void setDeleteTableListener(Consumer<MessageResponse> deleteTableListener) {
+        this.deleteTableListener = deleteTableListener;
+    }
 }

@@ -155,6 +155,18 @@ public class ServerConnection implements Runnable
           System.out.println("[SERVER] DeleteAllergyRequest detected");
           handleDeleteAllergy(request);
         }
+        else if (object instanceof DeleteTableRequest request)
+        {
+          System.out.println("[SERVER] DeleteAllergyRequest detected");
+          handleDeleteTable(request);
+        }
+        else if (object instanceof UpdateTableRequest request)
+        {
+          System.out.println("[SERVER] DeleteAllergyRequest detected");
+          handleUpdateTable(request);
+        }
+
+
         else
         {
           System.out.println(
@@ -196,6 +208,49 @@ public class ServerConnection implements Runnable
         e.printStackTrace();
       }
     }
+  }
+
+  private void handleUpdateTable(UpdateTableRequest request) throws IOException{
+    try {
+
+      RestaurantTable table = new RestaurantTable(request.getId(), request.getMaxSitting());
+
+      restaurantTableDAO.updateRestaurantTable(table);
+
+
+      connectionPool.broadcast(
+              new GetTablesResponse(
+                      restaurantTableDAO.getAllRestaurantTables()
+              )
+      );
+
+    }  catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while updating Table"));
+    }
+
+
+  }
+
+  private void handleDeleteTable(DeleteTableRequest request) throws IOException {
+    try{
+      restaurantTableDAO.deleteRestaurantTableByID(request.getRestaurantTableid());
+
+      send(new MessageResponse(true, "Table deleted successfully"));
+
+      connectionPool.broadcast(
+              new GetTablesResponse(
+                      restaurantTableDAO.getAllRestaurantTables()
+              )
+      );
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while deleting Table"));
+    }
+
   }
 
   private void handleDeleteAllergy(DeleteAllergyRequest request) throws IOException

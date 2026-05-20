@@ -83,9 +83,12 @@ public class ManagerController
             Label info,
             StackPane newTableOverlay , TextField  tableMaxSittingField, Label newTableErrorLabel,
             ComboBox<String> waiterComboBox,
-            Button primaryButton)
+            Button primaryButton,
+            Button deleteTable,
+            Button submitTable
+  )
     {
-        tableComponent.initModal(overlay, title, badge, info, newTableOverlay, tableMaxSittingField, newTableErrorLabel, waiterComboBox, primaryButton);
+        tableComponent.initModal(overlay, title, badge, info, newTableOverlay, tableMaxSittingField, newTableErrorLabel, waiterComboBox, primaryButton, deleteTable,submitTable);
     }
 
   public void initClient(Client client)
@@ -164,4 +167,6 @@ public class ManagerController
   public void deleteAllergy() {
     menuItemComponent.deleteAllergy();
   }
+
+  public void deleteTable() { tableComponent.deleteTable(); }
 }

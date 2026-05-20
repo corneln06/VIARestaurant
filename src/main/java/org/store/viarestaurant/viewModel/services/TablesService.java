@@ -1,6 +1,7 @@
 package org.store.viarestaurant.viewModel.services;
 
 import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
 
 import java.io.IOException;
@@ -36,5 +37,22 @@ public class TablesService
 
   public void onTablesCreatedResponse(Consumer<TableCreatedMessage> listener) {
     client.setTablesCreateListener(listener);
+  }
+
+  public void onTablesUpdated(Consumer<MessageResponse> listener)
+  {
+    client.setUpdateTableListener(listener);
+  }
+  public void onTablesDeleted(Consumer<MessageResponse> listener)
+  {
+    client.setDeleteTableListener(listener);
+  }
+
+  public void deleteTable(DeleteTableRequest request) throws IOException {
+    client.send(request);
+  }
+
+  public void updateTable(UpdateTableRequest request) throws IOException{
+    client.send(request);
   }
 }

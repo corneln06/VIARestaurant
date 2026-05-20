@@ -74,7 +74,7 @@ public class HostController
       ComboBox<String> waiterComboBox,
       Button primaryButton)
   {
-    tableComponent.initModal(overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton);
+    tableComponent.initModal(overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton, null, null);
   }
 
   public void initClient(Client client)

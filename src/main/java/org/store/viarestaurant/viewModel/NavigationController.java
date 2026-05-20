@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import javafx.event.ActionEvent;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.view.HelloApplication;
@@ -89,6 +90,8 @@ public class NavigationController
     @FXML private StackPane newTableOverlay;
     @FXML private TextField tableMaxSittingField;
     @FXML private Label newTableErrorLabel;
+    @FXML private Button newTableDeleteButton;
+    @FXML private Button newTableSubmitButton;
 
     @FXML private Button toggleMenuViewButton;
     @FXML private Button menuPrimaryActionButton;
@@ -216,7 +219,9 @@ public class NavigationController
                 managerController.refreshMenuTable();
 
                 managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,
-                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton);
+                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton,
+                        newTableDeleteButton, newTableSubmitButton
+                );
 
                 showTablesPage();
                 showMenuPage();
@@ -526,4 +531,11 @@ public class NavigationController
         }
     }
 
+    public void deleteTable(ActionEvent actionEvent) {
+        if(managerController != null)
+        {
+            managerController.deleteTable();
+        }
+
+    }
 }
