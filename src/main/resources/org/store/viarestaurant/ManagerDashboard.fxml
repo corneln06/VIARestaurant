@@ -22,6 +22,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.PasswordField?>
 <BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="app-shell" xmlns="http://javafx.com/javafx/24.0.1"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.store.viarestaurant.viewModel.NavigationController">
     <left>
@@ -430,6 +431,87 @@
                         </VBox>
                     </children>
                 </StackPane>
+
+                <AnchorPane fx:id="workersPage" managed="false" styleClass="page-surface" visible="false">
+                    <children>
+                        <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
+                              AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label styleClass="page-title" text="Workers"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button fx:id="btnNewWorker" onAction="#openNewWorkerModal" text="+ New Worker">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                                <TableView fx:id="workersTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    </columnResizePolicy>
+                                    <columns>
+                                        <TableColumn fx:id="workerFirstNameColumn" text="First Name"/>
+                                        <TableColumn fx:id="workerLastNameColumn" text="Last Name"/>
+                                        <TableColumn fx:id="workerRoleColumn" text="Role"/>
+                                        <TableColumn fx:id="workerEmailColumn" text="Email"/>
+                                        <TableColumn fx:id="workerPasswordColumn" text="Password"/>
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+
+                <StackPane fx:id="newWorkerOverlay" managed="false" visible="false" onMouseClicked="#closeNewWorkerModal" styleClass="modal-overlay">
+                    <children>
+                        <VBox maxWidth="440.0" maxHeight="420.0" spacing="14.0" onMouseClicked="#consumeModalClick">
+                            <styleClass>
+                                <String fx:value="modal-card"/>
+                                <String fx:value="modal-card-large"/>
+                            </styleClass>
+                            <children>
+                                <Label fx:id="workerModalTitle" styleClass="modal-title" text="New Worker"/>
+                                <HBox spacing="12.0">
+                                    <children>
+                                        <TextField fx:id="workerFirstNameField" promptText="First name" styleClass="input-field" HBox.hgrow="ALWAYS"/>
+                                        <TextField fx:id="workerLastNameField" promptText="Last name" styleClass="input-field" HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                </HBox>
+                                <ComboBox fx:id="workerRoleComboBox" maxWidth="Infinity" promptText="Role"/>
+                                <TextField fx:id="workerEmailField" promptText="Email" styleClass="input-field"/>
+                                <PasswordField fx:id="workerPasswordField" promptText="Password" styleClass="input-field"/>
+                                <Label fx:id="newWorkerErrorLabel" managed="false" styleClass="error-label" visible="false" wrapText="true"/>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <children>
+                                        <Button onAction="#closeNewWorkerModalAction" text="Cancel">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-secondary"/>
+                                            </styleClass>
+                                        </Button>
+                                        <Button fx:id="deleteWorkerButton" onAction="#deleteWorker" text="Delete" visible="false" managed="false">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-danger"/>
+                                            </styleClass>
+                                        </Button>
+                                        <Button fx:id="submitWorkerButton" onAction="#createWorker" text="Create">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+
             </children>
         </StackPane>
     </center>

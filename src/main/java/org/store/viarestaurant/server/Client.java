@@ -13,6 +13,7 @@ import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreateResponse
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreatedMessage;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableUpdatedMessage;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
+import org.store.viarestaurant.server.dto.WorkersDTO.CreateWorkerResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;
@@ -52,6 +53,9 @@ public class Client
   private Consumer<MessageResponse> updateMenuItemListener;
   private Consumer<MessageResponse> deleteMenuItemListener;
   private Consumer<CreateMenuItemResponse> createdMenuItemListener;
+  private Consumer<CreateWorkerResponse> workerCreatedListener;
+  private Consumer<MessageResponse> deleteWorkerListener;
+  private Consumer<MessageResponse> updateWorkerListener;
 
   public void connect() throws IOException
   {
@@ -181,6 +185,18 @@ public class Client
             {
               deleteMenuItemListener.accept(response);
             }
+            else if (object instanceof CreateWorkerResponse response && workerCreatedListener != null)
+            {
+              workerCreatedListener.accept(response);
+            }
+            else if (object instanceof MessageResponse response && deleteWorkerListener != null)
+            {
+              deleteWorkerListener.accept(response);
+            }
+            else if (object instanceof MessageResponse response && updateWorkerListener != null)
+            {
+              updateWorkerListener.accept(response);
+            }
           });
         }
       }
@@ -264,4 +280,19 @@ public class Client
   public void setMenuItemCreatedListener(Consumer<CreateMenuItemResponse> listener) { this.createdMenuItemListener = listener; }
   public void setUpdateMenuItemListener(Consumer<MessageResponse> listener) { this.updateMenuItemListener = listener; }
   public void setDeleteMenuItemListener(Consumer<MessageResponse> listener) { this.deleteMenuItemListener = listener; }
+
+  public void setWorkerCreatedListener(Consumer<CreateWorkerResponse> listener)
+  {
+    this.workerCreatedListener = listener;
+  }
+
+  public void setDeleteWorkerListener(Consumer<MessageResponse> listener)
+  {
+    this.deleteWorkerListener = listener;
+  }
+
+  public void setUpdateWorkerListener(Consumer<MessageResponse> listener)
+  {
+    this.updateWorkerListener = listener;
+  }
 }

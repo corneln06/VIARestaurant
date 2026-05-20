@@ -69,7 +69,7 @@ public class WorkersDAOImpl implements WorkersDAO
     ArrayList<Workers> workers = new ArrayList<>();
     try(Connection connection = getConnection()){
       PreparedStatement statement = connection.prepareStatement(
-          "SELECT id, firstName, lastName, email, rol from workers"
+          "SELECT id, firstName, lastName, email, rol, password from workers"
       );
       ResultSet rs = statement.executeQuery();
       while(rs.next()){
@@ -78,13 +78,14 @@ public class WorkersDAOImpl implements WorkersDAO
         String firstName = rs.getString("firstName");
         String lastName = rs.getString("lastName");
         String email = rs.getString("email");
+        String password = rs.getString("password");
 
         WorkerRole workerRole = WorkerRole.valueOf(rs.getString("rol"));
         Workers worker;
         switch (workerRole){
-          case Waiter -> worker = new Waiter(id, firstName, lastName, email);
-          case Host -> worker = new Host(id, firstName, lastName, email);
-          case Manager -> worker = new Manager(id, firstName, lastName, email);
+          case Waiter -> worker = new Waiter(id, firstName, lastName, email, password);
+          case Host -> worker = new Host(id, firstName, lastName, email, password);
+          case Manager -> worker = new Manager(id, firstName, lastName, email, password);
           default -> throw new SQLException("Unknown role: " + workerRole);
         }
         workers.add(worker);
