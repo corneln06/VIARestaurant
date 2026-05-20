@@ -95,6 +95,8 @@ public class NavigationController
     @FXML private StackPane newAllergyOverlay;
     @FXML private TextField allergyNameField;
     @FXML private Label newAllergyErrorLabel;
+    @FXML private Label allergyModalTitle;
+
 
     @FXML private Button deleteAllergyButton;
     @FXML private Button createAllergyButton;
@@ -208,7 +210,8 @@ public class NavigationController
                         menuPrimaryActionButton,
                         newAllergyOverlay, allergyNameField, newAllergyErrorLabel,
                         createAllergyButton,
-                        deleteAllergyButton);
+                        deleteAllergyButton,
+                        allergyModalTitle);
 
                 managerController.refreshMenuTable();
 

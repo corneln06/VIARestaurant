@@ -44,6 +44,7 @@ public class MenuItemComponent
 
 
   private boolean showingAllergies = false;
+  private Label allergyModalTitle;
 
   ///////////////////////////////////
   ////////////// INITIALIZATIONS
@@ -101,7 +102,8 @@ public class MenuItemComponent
           TextField nameField,
           Label errorLabel,
           Button createAllergyButton,
-          Button deleteAllergyButton
+          Button deleteAllergyButton,
+          Label allergyModalTitle
   )
   {
     this.newAllergyOverlay = overlay;
@@ -109,6 +111,7 @@ public class MenuItemComponent
     this.newAllergyErrorLabel = errorLabel;
     this.createAllergyButton = createAllergyButton;
     this.deleteAllergyButton = deleteAllergyButton;
+    this.allergyModalTitle = allergyModalTitle;
   }
 
   public void initClient(Client client)
@@ -198,6 +201,7 @@ public class MenuItemComponent
 
     allergyNameField.clear();
 
+    allergyModalTitle.setText("New Allergy");
     createAllergyButton.setText("Create");
     createAllergyButton.setVisible(true);
     createAllergyButton.setManaged(true);
@@ -225,7 +229,7 @@ public class MenuItemComponent
 
     allergyNameField.setText(allergy.getName());
 
-
+    allergyModalTitle.setText("Allergy "+ selectedAllergy.getId() + " details");
     createAllergyButton.setText("Apply");
     createAllergyButton.setVisible(true);
     createAllergyButton.setManaged(true);

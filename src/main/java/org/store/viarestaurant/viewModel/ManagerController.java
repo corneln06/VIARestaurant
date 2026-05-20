@@ -55,7 +55,8 @@ public class ManagerController
           Button primaryButton,
           StackPane allergyOverlay,
           TextField allergyNameField,
-          Label allergyErrorLabel, Button createAllergyButton, Button deleteAllergyButton)
+          Label allergyErrorLabel, Button createAllergyButton, Button deleteAllergyButton,
+          Label allergyModalTitle)
   {
     reservationComponent.initModal(
         overlay, guestName, datePicker, timeField,
@@ -71,7 +72,8 @@ public class ManagerController
             allergyNameField,
             allergyErrorLabel,
             createAllergyButton,
-            deleteAllergyButton);
+            deleteAllergyButton,
+            allergyModalTitle);
   }
 
   public void initTableModal(
