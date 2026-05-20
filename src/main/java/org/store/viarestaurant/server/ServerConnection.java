@@ -1,16 +1,18 @@
 package org.store.viarestaurant.server;
 
 import org.store.viarestaurant.dao.*;
-import org.store.viarestaurant.model.entities.Reservation;
-import org.store.viarestaurant.model.entities.RestaurantTable;
-import org.store.viarestaurant.model.entities.TableOrder;
-import org.store.viarestaurant.model.entities.Workers;
+import org.store.viarestaurant.model.entities.*;
 import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.model.state.AvailableState;
 import org.store.viarestaurant.model.state.SeatedState;
-import org.store.viarestaurant.server.dto.LoginRequest;
-import org.store.viarestaurant.server.dto.LoginResponse;
+import org.store.viarestaurant.server.dto.AllergyDTO.*;
+import org.store.viarestaurant.server.dto.LoginDTO.LoginRequest;
+import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
+import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
+import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersRequest;
+import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,7 +20,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Optional;
 
 public class ServerConnection implements Runnable
 {
@@ -30,6 +31,7 @@ public class ServerConnection implements Runnable
   private final RestaurantTableDAO restaurantTableDAO;
   private final ReservationDAO reservationDAO;
   private final TableOrderDAO tableOrderDAO;
+  private final AllergyDAO allergyDAO;
 
   private Workers currentUser;
 
@@ -46,6 +48,7 @@ public class ServerConnection implements Runnable
       this.reservationDAO = ReservationDAOImpl.getInstance();
       this.restaurantTableDAO = RestaurantTableDAOImpl.getInstance();
       this.tableOrderDAO = TableOrderDAOImpl.getInstance();
+      this.allergyDAO = AllergyDAOImpl.getInstance();
     }
     catch(SQLException e)
     {
@@ -131,7 +134,28 @@ public class ServerConnection implements Runnable
         else if (object instanceof TableCreateRequest request) {
           System.out.println("[SERVER] CreateTableRequest detected");
           handleCreateTable(request);
-        } else
+        }
+        else if (object instanceof CreateAllergyRequest request)
+        {
+          System.out.println("[SERVER] CreateAllergyRequest detected");
+          handleCreateAllergy(request);
+        }
+        else if (object instanceof GetAllergiesRequest)
+        {
+          System.out.println("[SERVER] GetAllergiesRequest detected");
+          handleGetAllergies();
+        }
+        else if (object instanceof UpdateAllergyRequest request)
+        {
+          System.out.println("[SERVER] UpdateAllergyRequest detected");
+          handleUpdateAllergy(request);
+        }
+        else if (object instanceof DeleteAllergyRequest request)
+        {
+          System.out.println("[SERVER] DeleteAllergyRequest detected");
+          handleDeleteAllergy(request);
+        }
+        else
         {
           System.out.println(
               "[SERVER] Unknown object received");
@@ -171,6 +195,78 @@ public class ServerConnection implements Runnable
       {
         e.printStackTrace();
       }
+    }
+  }
+
+  private void handleDeleteAllergy(DeleteAllergyRequest request) throws IOException
+  {
+    try
+    {
+      allergyDAO.delete(request.getId());
+
+      send(new MessageResponse(true, "Allergy deleted successfully"));
+
+      connectionPool.broadcast(
+              new GetAllergiesResponse(
+                      allergyDAO.getAllAllergies()
+              )
+      );
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while deleting allergy"));
+    }
+  }
+  private void handleUpdateAllergy(UpdateAllergyRequest request) throws IOException
+  {
+    try
+    {
+      Allergy allergy = new Allergy(
+              request.getId(),
+              request.getName()
+      );
+
+      allergyDAO.updateAllergy(allergy);
+
+      send(new MessageResponse(true, "Allergy updated successfully"));
+
+      connectionPool.broadcast(
+              new GetAllergiesResponse(
+                      allergyDAO.getAllAllergies()
+              )
+      );
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while updating allergy"));
+    }
+  }
+
+  private void handleCreateAllergy(CreateAllergyRequest request) throws IOException {
+    try {
+      Allergy allergy = allergyDAO.createAllergy(request.getName());
+
+      if (allergy == null)
+      {
+        send(new MessageResponse(false, "Cannot create an Allergy"));
+        return;
+      }
+      send(new MessageResponse(true, "Allergy created successfully"));
+
+      connectionPool.broadcast(
+              new CreateAllergyResponse(allergy)
+      );
+      connectionPool.broadcast(
+              new GetAllergiesResponse(
+                      allergyDAO.getAllAllergies()
+              ));
+    }
+    catch(SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while creating allergy"));
     }
   }
 
@@ -523,6 +619,20 @@ public class ServerConnection implements Runnable
     {
       e.printStackTrace();
       send(new MessageResponse(false, "Could not seat table"));
+    }
+  }
+  private void handleGetAllergies() throws IOException
+  {
+    try
+    {
+      send(new GetAllergiesResponse(
+              allergyDAO.getAllAllergies()
+      ));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetAllergiesResponse(new ArrayList<>()));
     }
   }
 
