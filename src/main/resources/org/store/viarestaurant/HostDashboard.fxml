@@ -132,8 +132,17 @@
                                                 <String fx:value="btn-secondary"/>
                                             </styleClass>
                                         </Button>
-                                        <Button fx:id="tableModalPrimaryButton" onAction="#seatTable" styleClass="btn-base btn-primary"
+                                        <Button fx:id="tableModalPrimaryButton" onAction="#seatTable"
                                                 text="Seat Table">
+
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+
+                                        </Button>
+                                        <Button fx:id="tableModalSecondaryButton" onAction="#seatTable"
+                                                text="Seat Reservation" visible="false">
 
                                             <styleClass>
                                                 <String fx:value="btn-base"/>

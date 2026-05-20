@@ -319,7 +319,47 @@ public class ReservationDAOImpl implements ReservationDAO
       return reservation;
     }
   }
-  private boolean hasConflict(
+
+    @Override
+    public Reservation getClosestReservationInTimeForTable(int tableId) throws SQLException
+    {
+        String sql = """
+      SELECT r.id, r.customer, r.date, r.partySize, t.id AS tableId, t.maxSitting
+      FROM reservations r
+      JOIN restauranttable t ON r.tableId = t.id
+      WHERE r.tableId = ?
+        AND r.date >= CURRENT_TIMESTAMP
+      ORDER BY r.date ASC
+      LIMIT 1
+      """;
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql))
+        {
+            statement.setInt(1, tableId);
+
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+            {
+                RestaurantTable table = new RestaurantTable(
+                        rs.getInt("tableId"),
+                        rs.getInt("maxSitting")
+                );
+
+                return new Reservation(
+                        rs.getInt("id"),
+                        rs.getString("customer"),
+                        rs.getTimestamp("date").toLocalDateTime(),
+                        rs.getInt("partySize"),
+                        table
+                );
+            }
+
+            return null;
+        }
+    }
+
+    private boolean hasConflict(
           Reservation newRes,
           Reservation existing
   ) {

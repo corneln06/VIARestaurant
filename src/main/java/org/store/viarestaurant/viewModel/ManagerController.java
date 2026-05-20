@@ -84,11 +84,12 @@ public class ManagerController
             StackPane newTableOverlay , TextField  tableMaxSittingField, Label newTableErrorLabel,
             ComboBox<String> waiterComboBox,
             Button primaryButton,
+            Button secondaryButton,
             Button deleteTable,
             Button submitTable
   )
     {
-        tableComponent.initModal(overlay, title, badge, info, newTableOverlay, tableMaxSittingField, newTableErrorLabel, waiterComboBox, primaryButton, deleteTable,submitTable);
+        tableComponent.initModal(overlay, title, badge, info, newTableOverlay, tableMaxSittingField, newTableErrorLabel, waiterComboBox, primaryButton, secondaryButton,deleteTable,submitTable);
     }
 
   public void initClient(Client client)
