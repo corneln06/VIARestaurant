@@ -39,6 +39,7 @@ public class Client
   private Consumer<ReservationDeletedMessage> reservationDeletedListener;
   private Consumer<GetWorkersResponse> workersListener;
   private Consumer<TableUpdatedMessage> updatedMessageListener;
+  private Consumer<GetClosestReservationResponse> closestReservationListener;
   private Consumer<CreateAllergyResponse> createdAllergyListener;
   private Consumer<GetAllergiesResponse> getAllergiesListener;
   private Consumer<MessageResponse> updateAllergyListener;
@@ -132,6 +133,10 @@ public class Client
             {
               reservationDeletedListener.accept(message);
             }
+            else if (object instanceof GetClosestReservationResponse message && closestReservationListener != null)
+            {
+                closestReservationListener.accept(message);
+            }
             else if (object instanceof CreateAllergyResponse response && createdAllergyListener != null)
             {
               createdAllergyListener.accept(response);
@@ -213,6 +218,8 @@ public class Client
     this.tableCreatedListener = listener;
   }
 
+  public void setClosestReservationListener(Consumer<GetClosestReservationResponse> listener){this.closestReservationListener = listener;}
+  
   public void setAllergyCreatedListener(Consumer<CreateAllergyResponse> listener) { this.createdAllergyListener = listener; }
 
   public void setGetAllergiesListener(Consumer<GetAllergiesResponse> listener) { this.getAllergiesListener = listener; }

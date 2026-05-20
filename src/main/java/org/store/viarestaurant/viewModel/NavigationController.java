@@ -78,6 +78,7 @@ public class NavigationController
 
     @FXML private ComboBox<String> tableModalWaiterComboBox;
     @FXML private Button tableModalPrimaryButton;
+    @FXML private Button tableModalSecondaryButton;
 
     protected Client client;
 
@@ -161,7 +162,8 @@ public class NavigationController
                         tableMaxSittingField,
                         newTableErrorLabel,
                         tableModalWaiterComboBox,
-                        tableModalPrimaryButton
+                        tableModalPrimaryButton,
+                        tableModalSecondaryButton
                 );
 
                 hostController.refreshSchedule();
@@ -216,7 +218,7 @@ public class NavigationController
                 managerController.refreshMenuTable();
 
                 managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,
-                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton);
+                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton, tableModalSecondaryButton);
 
                 showTablesPage();
                 showMenuPage();
