@@ -137,7 +137,7 @@ public class TableComponent
 
     for (Reservation r : reservations)
     {
-      reservedIds.add(r.getTable().getId());
+      if (!r.isSeated())reservedIds.add(r.getTable().getId());
     }
     for (RestaurantTable table : tables)
     {
@@ -287,9 +287,9 @@ public class TableComponent
       tableModalSecondaryButton.setManaged(false);
       closestReservation = null;
 
-      if (closestReservation != null && !closestReservation.isSeated()){
-          tableModalPrimaryButton.setOnAction(e -> setReserved());
-      }
+//      if (closestReservation != null && !closestReservation.isSeated()){
+//          tableModalPrimaryButton.setOnAction(e -> setReserved());
+//      }
     }
     else if(reserved)
     {
