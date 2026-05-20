@@ -242,27 +242,6 @@ public class ServerConnection implements Runnable {
     }
   }
 
-
-  private void handleUpdateAllergy(UpdateAllergyRequest request) throws IOException {
-    try {
-      Allergy allergy = new Allergy(
-          request.getId(),
-          request.getName());
-
-      allergyDAO.updateAllergy(allergy);
-
-      send(new MessageResponse(true, "Allergy updated successfully"));
-
-      connectionPool.broadcast(
-          new GetAllergiesResponse(
-              allergyDAO.getAllAllergies()));
-    } catch (SQLException e) {
-      e.printStackTrace();
-      send(new MessageResponse(false, "Database error while updating allergy"));
-    }
-  }
-
-
   private void handleGetWorkers() throws IOException {
     try {
       send(new GetWorkersResponse(
