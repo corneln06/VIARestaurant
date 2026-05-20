@@ -92,6 +92,7 @@ public class NavigationController
     @FXML private Label newTableErrorLabel;
     @FXML private Button newTableDeleteButton;
     @FXML private Button newTableSubmitButton;
+    @FXML private Label newTableModalTitle;
 
     @FXML private Button toggleMenuViewButton;
     @FXML private Button menuPrimaryActionButton;
@@ -219,8 +220,19 @@ public class NavigationController
 
                 managerController.refreshMenuTable();
 
-                managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,
-                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton, tableModalSecondaryButton, newTableDeleteButton, newTableSubmitButton);
+                managerController.initTableModal(
+                        tableModalOverlay,
+                        tableModalTitle,
+                        tableModalStateBadge,
+                        tableModalInfo,
+                        newTableOverlay,
+                        tableMaxSittingField,
+                        newTableErrorLabel,
+                        tableModalWaiterComboBox,
+                        tableModalPrimaryButton,
+                        tableModalSecondaryButton,
+                        newTableDeleteButton,
+                        newTableSubmitButton,newTableModalTitle);
 
                 showTablesPage();
                 showMenuPage();
