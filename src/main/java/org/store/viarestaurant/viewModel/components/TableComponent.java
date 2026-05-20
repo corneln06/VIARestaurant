@@ -190,7 +190,6 @@ public class TableComponent
       final int id = table.getId();
       btn.setOnAction(e -> {
           if (labelSuffix.isEmpty()){
-              //delete try and catch after connecting but leave openTableModal(id);
               try {
                   openTableModal(id);
               } catch (SQLException | IOException ex) {
@@ -275,9 +274,7 @@ public class TableComponent
 
     if(seated)
     {
-        // connection hould be done here
       tableOrderService.loadTableOrder(tableId);
-      // until here
 
       tableModalStateBadge.setText("Seated");
       tableModalStateBadge.getStyleClass().add("badge-unavailable");
