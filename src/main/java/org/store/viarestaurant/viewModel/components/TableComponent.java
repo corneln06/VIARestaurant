@@ -198,12 +198,8 @@ public class TableComponent
               //delete try and catch after connecting but leave openTableModal(id);
               try {
                   openTableModal(id);
-              } catch (SQLException ex) {
+              } catch (SQLException | IOException ex) {
                   throw new RuntimeException(ex);
-              }
-              catch (IOException ex)
-              {
-                throw new RuntimeException(ex);
               }
           } else {
               System.out.println("YES");
@@ -360,6 +356,7 @@ public class TableComponent
     {
       closeTableModal();
       loadData();
+      loadTables();
     });
     reservationService.onReservationLoaded(response ->
     {
@@ -460,6 +457,7 @@ public class TableComponent
     {
       e.printStackTrace();
     }
+    refreshTableGrid();
   }
 
   public void closeNewTableModal() {

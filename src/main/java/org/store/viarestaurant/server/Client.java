@@ -101,7 +101,7 @@ public class Client
             {
               tableCreatedListener.accept(message);
             }
-            else if (object instanceof TableUpdatedMessage response)
+            else if (object instanceof TableUpdatedMessage response && updatedMessageListener !=null)
             {
               updatedMessageListener.accept(response);
             }
