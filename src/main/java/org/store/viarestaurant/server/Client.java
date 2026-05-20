@@ -10,6 +10,7 @@ import org.store.viarestaurant.server.dto.RestaurantTableDTO.GetTablesResponse;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreateResponse;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreatedMessage;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableUpdatedMessage;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class Client
   private Consumer<GetWorkersResponse> workersListener;
   private Consumer<TableUpdatedMessage> updatedMessageListener;
   private Consumer<GetClosestReservationResponse> closestReservationListener;
+  private Consumer<GetTableOrderResponse> tableOrderResponseListener;
   private Consumer<CreateAllergyResponse> createdAllergyListener;
   private Consumer<GetAllergiesResponse> getAllergiesListener;
   private Consumer<MessageResponse> updateAllergyListener;
@@ -112,7 +114,7 @@ public class Client
             {
               tableCreatedListener.accept(message);
             }
-            else if (object instanceof TableUpdatedMessage response)
+            else if (object instanceof TableUpdatedMessage response && updatedMessageListener !=null)
             {
               updatedMessageListener.accept(response);
             }
@@ -120,6 +122,10 @@ public class Client
                 && workersListener != null)
             {
               workersListener.accept(response);
+            }
+            else if (object instanceof GetTableOrderResponse response && tableOrderResponseListener != null)
+            {
+              tableOrderResponseListener.accept(response);
             }
             else if (object instanceof DeleteReservationResponse response && deleteReservationListener != null)
             {
@@ -219,6 +225,8 @@ public class Client
   }
 
   public void setClosestReservationListener(Consumer<GetClosestReservationResponse> listener){this.closestReservationListener = listener;}
+  
+  public void setTableOrderListener(Consumer<GetTableOrderResponse> listener){this.tableOrderResponseListener = listener;}
   
   public void setAllergyCreatedListener(Consumer<CreateAllergyResponse> listener) { this.createdAllergyListener = listener; }
 

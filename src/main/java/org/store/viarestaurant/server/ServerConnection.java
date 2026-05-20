@@ -12,6 +12,8 @@ import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersRequest;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
@@ -112,6 +114,12 @@ public class ServerConnection implements Runnable {
         } else if (object instanceof TableCreateRequest request) {
           System.out.println("[SERVER] CreateTableRequest detected");
           handleCreateTable(request);
+        }
+        else if (object instanceof GetTableOrderRequest request)
+        {
+          System.out.println("[SERVER] GetTableOrderRequest detected");
+          populateComboBoxForEveryone(request);
+
         }
         else if (object instanceof CreateAllergyRequest request)
         {
@@ -559,6 +567,19 @@ public class ServerConnection implements Runnable {
     } catch (SQLException e) {
       e.printStackTrace();
       send(new GetClosestReservationResponse(null));
+    }
+  }
+  private void populateComboBoxForEveryone(GetTableOrderRequest request){
+    try
+    {
+      TableOrder tableOrder = tableOrderDAO.getCurrentTableOrderByTableId(request.getTableId());
+
+      send(new GetTableOrderResponse(tableOrder));
+      connectionPool.broadcast(new TableOrderUpdatedMessage(request.getTableId()));
+    }
+    catch (SQLException | IOException e)
+    {
+      throw new RuntimeException(e);
     }
   }
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javafx.scene.control.TextField;
 
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.store.viarestaurant.model.entities.*;
 import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
@@ -24,6 +26,7 @@ import org.store.viarestaurant.server.dto.RestaurantTableDTO.SeatTableRequest;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.SetTableAvailableRequest;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.SetTableReservedRequest;
 import org.store.viarestaurant.viewModel.services.ReservationService;
+import org.store.viarestaurant.viewModel.services.TableOrderService;
 import org.store.viarestaurant.viewModel.services.TablesService;
 
 import javafx.scene.control.Button;
@@ -58,6 +61,7 @@ public class TableComponent
   private List<Reservation> reservations = new ArrayList<>();
   private ArrayList<Workers> workers = new ArrayList<>();
   private WorkersService workersService;
+  private TableOrderService tableOrderService;
 
   private Button tableModalPrimaryButton;
   private Button tableModalSecondaryButton;
@@ -186,7 +190,11 @@ public class TableComponent
       final int id = table.getId();
       btn.setOnAction(e -> {
           if (labelSuffix.isEmpty()){
-            openTableModal(id);
+              try {
+                  openTableModal(id);
+              } catch (SQLException | IOException ex) {
+                  throw new RuntimeException(ex);
+              }
           } else {
               System.out.println("YES");
           }
@@ -206,7 +214,7 @@ public class TableComponent
     else btn.getStyleClass().add("table-available");
   }
 
-  private void openTableModal(int tableId)
+  private void openTableModal(int tableId) throws SQLException, IOException
   {
     currentTableId = tableId;
     waiterMap.clear();
@@ -266,6 +274,8 @@ public class TableComponent
 
     if(seated)
     {
+      tableOrderService.loadTableOrder(tableId);
+
       tableModalStateBadge.setText("Seated");
       tableModalStateBadge.getStyleClass().add("badge-unavailable");
       tableModalInfo.setText("Table is currently occupied.");
@@ -326,6 +336,8 @@ public class TableComponent
     tablesService = new TablesService(client);
     reservationService = new ReservationService(client);
     workersService = new WorkersService(client);
+    tableOrderService = new TableOrderService(client);
+
 
     tablesService.onTablesLoaded(response ->
     {
@@ -350,6 +362,7 @@ public class TableComponent
     {
       closeTableModal();
       loadData();
+      loadTables();
     });
     reservationService.onReservationLoaded(response ->
     {
@@ -360,6 +373,20 @@ public class TableComponent
 
     tablesService.onTablesCreatedResponse(response -> {
         loadTables();
+    });
+    tableOrderService.populateComboBoxForTables(response -> {
+      TableOrder currentOrder = response.getTableOrder();
+      if(currentOrder != null
+          && currentOrder.getWaiter() != null) {
+        Workers waiterAssigned =
+            currentOrder.getWaiter();
+
+        tableModalWaiterComboBox
+            .getSelectionModel()
+            .select(
+                waiterAssigned.getFirstName() + " " + waiterAssigned.getLastName()
+            );
+      }
     });
 
     reservationService.onClosestReservationLoaded(response -> {
@@ -436,6 +463,7 @@ public class TableComponent
     {
       e.printStackTrace();
     }
+    refreshTableGrid();
   }
 
   public void setReserved()
