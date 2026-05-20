@@ -4,13 +4,13 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import org.store.viarestaurant.dao.AllergyDAOImpl;
-import org.store.viarestaurant.dao.MenuItemDAOImpl;
 import org.store.viarestaurant.model.entities.Allergy;
 import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.enums.MenuTypes;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.server.dto.AllergyDTO.GetAllergiesRequest;
 import org.store.viarestaurant.viewModel.services.AllergyService;
+import org.store.viarestaurant.viewModel.services.MenuItemService;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -35,7 +35,7 @@ public class MenuItemComponent
   private Label newAllergyErrorLabel;
 
   private AllergyService allergyService;
-  private TableView<MenuItems> menuTable;
+  private MenuItemService menuItemService;
   private boolean isEditMode = false;
   private MenuItems editingMenuItem;
   private Button submitDishButton;
@@ -63,11 +63,10 @@ public class MenuItemComponent
       CheckBox vegetarianCheckBox,
       ListView<String> allergiesList,
       Label errorLabel,
-      TableView<MenuItems> table,
+      TableView<Object> table,
       Button submitButton,
       Button deleteButton,
-      Label modalTitle)
-      TableView<Object> table,
+      Label modalTitle,
       Button toggleB,
       Button primaryB
   )
@@ -131,16 +130,6 @@ public class MenuItemComponent
       });
       return cell;
     });
-
-    table.setRowFactory(tv -> {
-      TableRow<MenuItems> row = new TableRow<>();
-      row.setOnMouseClicked(e -> {
-        if (e.getClickCount() == 2 && !row.isEmpty()){
-          openMenuAsForm(row.getItem());
-        }
-      });
-      return row;
-    });
   }
 
   private void openMenuAsForm(MenuItems item)
@@ -186,6 +175,7 @@ public class MenuItemComponent
   public void initClient(Client client)
   {
     this.allergyService = new AllergyService(client);
+    this.menuItemService = new MenuItemService(client);
 
     this.allergyService.onAllergiesLoaded(response ->
     {
@@ -218,20 +208,34 @@ public class MenuItemComponent
         e.printStackTrace();
       }
     });
+    this.menuItemService.onMenuItemsLoaded(response ->
+        menuTable.getItems().setAll(response.getMenuItems()));
+
+    this.menuItemService.onMenuItemCreated(response -> {
+      try { refreshMenuTable(); } catch (Exception e) { e.printStackTrace(); }
+    });
+
+    this.menuItemService.onMenuItemUpdated(response -> {
+      try { refreshMenuTable(); } catch (Exception e) { e.printStackTrace(); }
+    });
+
+    this.menuItemService.onMenuItemDeleted(response -> {
+      try { refreshMenuTable(); } catch (Exception e) { e.printStackTrace(); }
+    });
   }
   private void initAllergyRowDoubleClick()
   {
     menuTable.setRowFactory(tv -> {
       TableRow<Object> row = new TableRow<>();
-
       row.setOnMouseClicked(event -> {
-        if (event.getClickCount() == 2 && !row.isEmpty() && showingAllergies)
-        {
-          Allergy allergy = (Allergy) row.getItem();
-          openEditAllergyModal(allergy);
+        if (event.getClickCount() == 2 && !row.isEmpty()) {
+          if (showingAllergies) {
+            openEditAllergyModal((Allergy) row.getItem());
+          } else {
+            openMenuAsForm((MenuItems) row.getItem());
+          }
         }
       });
-
       return row;
     });
   }
@@ -342,23 +346,21 @@ public class MenuItemComponent
         MenuItems updated = new MenuItems(
             editingMenuItem.getId(), name, MenuTypes.valueOf(typeStr), price, isVegetarian, allergies
         );
-        MenuItemDAOImpl.getInstance().updateMenuItem(updated);
+        menuItemService.updateMenuItem(editingMenuItem.getId(), name, MenuTypes.valueOf(typeStr), price, isVegetarian, allergies);
         closeNewDishModal();
-        refreshMenuTable();
       }
-      catch (SQLException e){
-        showError("Database Error: " + e.getMessage());
+      catch (IOException e){
+        showError("Connection Error: " + e.getMessage());
       }
       return;
     }
     try {
-      MenuItemDAOImpl.getInstance().createMenuItem(
+      menuItemService.createMenuItem(
           name, MenuTypes.valueOf(typeStr), price, isVegetarian, allergies
       );
       closeNewDishModal();
-      refreshMenuTable();
-    } catch (SQLException e) {
-      showError("Database error: " + e.getMessage());
+    } catch (IOException e) {
+      showError("Connection error: " + e.getMessage());
     }
   }
 
@@ -420,13 +422,14 @@ public class MenuItemComponent
 
   public void refreshMenuTable()
   {
-
+    configureMenuColumns();
     try {
-      configureMenuColumns();
-      menuTable.getItems().setAll(MenuItemDAOImpl.getInstance().getAllMenuItems());
-    } catch (SQLException e) {
+      menuItemService.loadMenuItems();
+    }
+    catch (IOException e){
       e.printStackTrace();
     }
+
   }
   private void loadAllergyTable() throws IOException
   {
@@ -593,14 +596,12 @@ private void configureMenuColumns()
       return;
     }
     try {
-      MenuItemDAOImpl.getInstance().delete(editingMenuItem.getId());
+      menuItemService.deleteMenuItem(editingMenuItem.getId());
       closeNewDishModal();
-      refreshMenuTable();
     }
-    catch (SQLException e){
-      showError("Database error: " + e.getMessage());
+    catch (IOException e){
+      showError("Connection error: " + e.getMessage());
     }
-
   }
 
   private void showAllergyError(String msg)

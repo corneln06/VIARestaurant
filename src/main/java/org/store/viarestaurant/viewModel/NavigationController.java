@@ -189,38 +189,35 @@ public class NavigationController
                         reservationOverlayPane, tableGrid
                 );
 
-                managerController.initModal(
-                        //Reservation Modal props
-                        newReservationOverlay,
-                        guestNameField,
-                        reservationDatePicker,
-                        reservationTimeField,
-                        partySizeField,
-                        tableComboBox,
-                        newReservationErrorLabel,
-                        // Menu Modal props
-                        newDishOverlay,
-                        dishNameField,
-                        dishTypeComboBox,
-                        dishPriceField,
-                        isVegetarianCheckBox,
-                        allergiesListView,
-                        newDishErrorLabel,
-                        menuTable,
-                        submitReservationButton,
-                        deleteReservationButton,
-                        modalTitle,
-                        submitDishButton,
-                        deleteDishButton,
-                        dishModalTitle
-                );
-                        modalTitle,
-                        toggleMenuViewButton,
-                        menuPrimaryActionButton,
-                        newAllergyOverlay, allergyNameField, newAllergyErrorLabel,
-                        createAllergyButton,
-                        deleteAllergyButton,
-                        allergyModalTitle);
+              managerController.initModal(
+                  newReservationOverlay,
+                  guestNameField,
+                  reservationDatePicker,
+                  reservationTimeField,
+                  partySizeField,
+                  tableComboBox,
+                  newReservationErrorLabel,
+                  newDishOverlay,
+                  dishNameField,
+                  dishTypeComboBox,
+                  dishPriceField,
+                  isVegetarianCheckBox,
+                  allergiesListView,
+                  newDishErrorLabel,
+                  menuTable,
+                  submitReservationButton,
+                  deleteReservationButton,
+                  modalTitle,
+                  submitDishButton,
+                  deleteDishButton,
+                  dishModalTitle,
+                  toggleMenuViewButton,
+                  menuPrimaryActionButton,
+                  newAllergyOverlay, allergyNameField, newAllergyErrorLabel,
+                  createAllergyButton,
+                  deleteAllergyButton,
+                  allergyModalTitle
+              );
 
                 managerController.refreshMenuTable();
 
