@@ -1,14 +1,9 @@
 package org.store.viarestaurant.viewModel.components;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.*;
 
-import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-import org.store.viarestaurant.dao.ReservationDAOImpl;
-import org.store.viarestaurant.dao.RestaurantTableDAOImpl;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,15 +11,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.store.viarestaurant.model.entities.*;
+
 import org.store.viarestaurant.model.enums.WorkerRole;
-import javafx.scene.layout.*;
 import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.ReservationDto.SeatTableRequest;
-import org.store.viarestaurant.server.dto.ReservationDto.SetTableAvailableRequest;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.SeatTableRequest;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.SetTableAvailableRequest;
 import org.store.viarestaurant.viewModel.services.ReservationService;
 import org.store.viarestaurant.viewModel.services.TablesService;
 
@@ -37,11 +31,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import org.store.viarestaurant.viewModel.services.WorkersService;
-import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.ReservationDto.TableCreateRequest;
-import org.store.viarestaurant.server.dto.ReservationDto.UpdateReservationRequest;
-import org.store.viarestaurant.viewModel.services.ReservationService;
-import org.store.viarestaurant.viewModel.services.TablesService;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreateRequest;
 
 public class TableComponent
 {

@@ -1,12 +1,9 @@
 package org.store.viarestaurant.viewModel;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javafx.event.ActionEvent;
-import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.view.HelloApplication;
@@ -81,7 +78,7 @@ public class NavigationController
     @FXML private TextField dishPriceField;
     @FXML private ComboBox<String> dishTypeComboBox;
     @FXML private Label newDishErrorLabel;
-    @FXML private TableView<MenuItems> menuTable;
+    @FXML private TableView<Object> menuTable;
 
     @FXML private ComboBox<String> tableModalWaiterComboBox;
     @FXML private Button tableModalPrimaryButton;
@@ -93,15 +90,20 @@ public class NavigationController
 
     @FXML private Label modalTitle;
 
-    @FXML
-    private StackPane newTableOverlay;
+    @FXML private StackPane newTableOverlay;
+    @FXML private TextField tableMaxSittingField;
+    @FXML private Label newTableErrorLabel;
 
-    @FXML
-    private TextField tableMaxSittingField;
+    @FXML private Button toggleMenuViewButton;
+    @FXML private Button menuPrimaryActionButton;
+    @FXML private StackPane newAllergyOverlay;
+    @FXML private TextField allergyNameField;
+    @FXML private Label newAllergyErrorLabel;
+    @FXML private Label allergyModalTitle;
 
-    @FXML
-    private Label newTableErrorLabel;
 
+    @FXML private Button deleteAllergyButton;
+    @FXML private Button createAllergyButton;
 
 
     private HostController hostController;
@@ -154,7 +156,17 @@ public class NavigationController
                         modalTitle
                 );
 
-                hostController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo, newTableOverlay,tableMaxSittingField,newTableErrorLabel , tableModalWaiterComboBox, tableModalPrimaryButton);
+                hostController.initTableModal(
+                        tableModalOverlay,
+                        tableModalTitle,
+                        tableModalStateBadge,
+                        tableModalInfo,
+                        newTableOverlay,
+                        tableMaxSittingField,
+                        newTableErrorLabel,
+                        tableModalWaiterComboBox,
+                        tableModalPrimaryButton
+                );
 
                 hostController.refreshSchedule();
                 showTablesPage();
@@ -202,6 +214,13 @@ public class NavigationController
                         deleteDishButton,
                         dishModalTitle
                 );
+                        modalTitle,
+                        toggleMenuViewButton,
+                        menuPrimaryActionButton,
+                        newAllergyOverlay, allergyNameField, newAllergyErrorLabel,
+                        createAllergyButton,
+                        deleteAllergyButton,
+                        allergyModalTitle);
 
                 managerController.refreshMenuTable();
 
@@ -488,4 +507,37 @@ public class NavigationController
     private void openNewTableModal() {
         if (managerController != null) managerController.openNewTableModal();
     }
+
+    @FXML
+    private void toggleMenuView()
+    {
+        if(managerController != null)
+        {
+            managerController.toggleMenuView(
+            );
+        }
+    }
+
+    public void closeNewAllergyModal() {
+        if(managerController != null)
+        {
+            managerController.closeNewAllergyModal(
+            );
+        }
+    }
+
+    public void createAllergy() {
+        if(managerController != null)
+        {
+            managerController.createAllergy();
+        }
+    }
+
+    public void deleteAllergy() {
+        if(managerController != null)
+        {
+            managerController.deleteAllergy();
+        }
+    }
+
 }

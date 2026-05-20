@@ -1,4 +1,4 @@
-package org.store.viarestaurant.server.dto.ReservationDto;
+package org.store.viarestaurant.server.dto.RestaurantTableDTO;
 
 import java.io.Serializable;
 

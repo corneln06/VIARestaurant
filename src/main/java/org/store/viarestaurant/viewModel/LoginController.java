@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.LoginRequest;
+import org.store.viarestaurant.server.dto.LoginDTO.LoginRequest;
 import org.store.viarestaurant.view.HelloApplication;
 
 import java.io.IOException;

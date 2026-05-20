@@ -53,7 +53,7 @@
         <StackPane styleClass="content-area">
             <children>
 
-                <AnchorPane styleClass="page-surface">
+                <AnchorPane fx:id="menuPage" styleClass="page-surface">
                     <children>
                         <VBox spacing="18.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
                               AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
@@ -62,12 +62,29 @@
                                     <children>
                                         <Label styleClass="page-title" text="Menu"/>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Button text="+ New Dish" onAction="#openNewDishModal">
-                                            <styleClass>
-                                                <String fx:value="btn-base"/>
-                                                <String fx:value="btn-primary"/>
-                                            </styleClass>
-                                        </Button>
+                                        <HBox spacing="10.0">
+                                            <children>
+
+                                                <Button fx:id="toggleMenuViewButton"
+                                                        text="Show Allergies"
+                                                        onAction="#toggleMenuView">
+                                                    <styleClass>
+                                                        <String fx:value="btn-base"/>
+                                                        <String fx:value="btn-secondary"/>
+                                                    </styleClass>
+                                                </Button>
+
+                                                <Button fx:id="menuPrimaryActionButton"
+                                                        text="+ New Dish"
+                                                        onAction="#openNewDishModal">
+                                                    <styleClass>
+                                                        <String fx:value="btn-base"/>
+                                                        <String fx:value="btn-primary"/>
+                                                    </styleClass>
+                                                </Button>
+
+                                            </children>
+                                        </HBox>
                                     </children>
                                 </HBox>
                                 <TableView fx:id="menuTable" VBox.vgrow="ALWAYS" styleClass="table-view">
@@ -132,6 +149,75 @@
                                             </styleClass>
                                         </Button>
                                         <Button fx:id="submitDishButton" onAction="#createDish" text="Create">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-primary"/>
+                                            </styleClass>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+
+                <StackPane fx:id="newAllergyOverlay"
+                           managed="false"
+                           visible="false"
+                           onMouseClicked="#closeNewAllergyModal"
+                           styleClass="modal-overlay">
+                    <children>
+                        <VBox maxWidth="360.0"
+                              maxHeight="240.0"
+                              spacing="14.0"
+                              onMouseClicked="#consumeModalClick"
+                              styleClass="modal-card modal-card-medium">
+                            <styleClass>
+                                <String fx:value="modal-card"/>
+                                <String fx:value="modal-card-medium"/>
+                            </styleClass>
+
+
+                            <children>
+                                <Label fx:id="allergyModalTitle" text="New Allergy" styleClass="modal-title"/>
+
+                                <TextField fx:id="allergyNameField"
+                                           promptText="Allergy name"
+                                           styleClass="input-field"/>
+
+                                <Label fx:id="newAllergyErrorLabel"
+                                       visible="false"
+                                       managed="false"
+                                       wrapText="true"
+                                       styleClass="error-label"/>
+
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <children>
+
+                                        <Button text="Cancel"
+                                                onAction="#closeNewAllergyModal"
+                                                styleClass="btn-base btn-secondary">
+                                            <styleClass>
+                                                <String fx:value="btn-base"/>
+                                                <String fx:value="btn-secondary"/>
+                                            </styleClass>
+                                        </Button>
+                                        <Button text="Delete"
+                                                onAction="#deleteAllergy"
+                                                styleClass="btn-base btn-danger"
+                                                fx:id="deleteAllergyButton"
+                                                visible="false"
+                                                managed="false">
+                                        <styleClass>
+                                            <String fx:value="btn-base"/>
+                                            <String fx:value="btn-danger"/>
+                                        </styleClass>
+                                        </Button>
+
+                                        <Button text="Create"
+                                                onAction="#createAllergy"
+                                                fx:id="createAllergyButton"
+                                                styleClass="btn-base btn-primary">
                                             <styleClass>
                                                 <String fx:value="btn-base"/>
                                                 <String fx:value="btn-primary"/>
