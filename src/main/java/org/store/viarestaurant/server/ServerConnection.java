@@ -1,5 +1,6 @@
 package org.store.viarestaurant.server;
 
+import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.dao.*;
 import org.store.viarestaurant.model.entities.*;
 import org.store.viarestaurant.model.enums.WorkerRole;
@@ -8,9 +9,15 @@ import org.store.viarestaurant.model.state.SeatedState;
 import org.store.viarestaurant.server.dto.AllergyDTO.*;
 import org.store.viarestaurant.server.dto.LoginDTO.LoginRequest;
 import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
+import org.store.viarestaurant.server.dto.MenuItemsDTO.GetMenuItemsRequest;
+import org.store.viarestaurant.server.dto.MenuItemsDTO.GetMenuItemsResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
+import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersRequest;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
@@ -18,8 +25,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ServerConnection implements Runnable
 {
@@ -32,6 +42,8 @@ public class ServerConnection implements Runnable
   private final ReservationDAO reservationDAO;
   private final TableOrderDAO tableOrderDAO;
   private final AllergyDAO allergyDAO;
+  private final MenuItemDAO menuItemDAO;
+  private final MenuItemTableOrderDAO menuItemTableOrderDAO;
 
   private Workers currentUser;
 
@@ -49,6 +61,8 @@ public class ServerConnection implements Runnable
       this.restaurantTableDAO = RestaurantTableDAOImpl.getInstance();
       this.tableOrderDAO = TableOrderDAOImpl.getInstance();
       this.allergyDAO = AllergyDAOImpl.getInstance();
+      this.menuItemDAO = MenuItemDAOImpl.getInstance();
+      this.menuItemTableOrderDAO = MenuItemTableOrderDAOImpl.getInstance();
     }
     catch(SQLException e)
     {
@@ -154,6 +168,21 @@ public class ServerConnection implements Runnable
         {
           System.out.println("[SERVER] DeleteAllergyRequest detected");
           handleDeleteAllergy(request);
+        }
+        else if (object instanceof GetMenuItemsRequest)
+        {
+          System.out.println("[SERVER] GetMenuItemsRequest detected");
+          handleGetMenuItems();
+        }
+        else if (object instanceof GetOrdersByWaiterRequest request)
+        {
+          System.out.println("[SERVER] GetOrdersByWaiterRequest detected");
+          handleGetOrdersByWaiter(request);
+        }
+        else if (object instanceof AddItemsToOrderRequest request)
+        {
+          System.out.println("[SERVER] AddItemsToOrderRequest detected");
+          handleAddItemsToOrder(request);
         }
         else
         {
@@ -633,6 +662,82 @@ public class ServerConnection implements Runnable
     {
       e.printStackTrace();
       send(new GetAllergiesResponse(new ArrayList<>()));
+    }
+  }
+
+  private void handleGetMenuItems() throws IOException
+  {
+    try
+    {
+      send(new GetMenuItemsResponse(menuItemDAO.getAllMenuItems()));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetMenuItemsResponse(new ArrayList<>()));
+    }
+  }
+
+  private void handleGetOrdersByWaiter(GetOrdersByWaiterRequest request) throws IOException
+  {
+    try
+    {
+      ArrayList<TableOrder> all =
+          tableOrderDAO.getTableOrdersByWaiterId(request.getWaiterId());
+
+      // The DAO query uses a LEFT JOIN on menu items, so an order with N items
+      // comes back as N rows — deduplicate by order ID before sending.
+      // Only include unpaid orders (open tables) for the picker ComboBox.
+      Map<Integer, TableOrder> seen = new LinkedHashMap<>();
+      for (TableOrder o : all)
+      {
+        if (!o.isPaid()) seen.putIfAbsent(o.getId(), o);
+      }
+
+      send(new GetOrdersByWaiterResponse(new ArrayList<>(seen.values())));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetOrdersByWaiterResponse(new ArrayList<>()));
+    }
+  }
+
+  private void handleAddItemsToOrder(AddItemsToOrderRequest request) throws IOException
+  {
+    try
+    {
+      // Step 1: insert into the junction table (requires an explicit Connection)
+      // ON CONFLICT DO NOTHING means already-present items are silently skipped.
+      Connection conn = DatabaseConnection.getConnection();
+      try
+      {
+        menuItemTableOrderDAO.addMenuItemsInTableOrder(
+            conn, request.getTableOrderId(), request.getItemNames());
+      }
+      finally
+      {
+        conn.close();
+      }
+
+      // Step 2: recompute bill from DB truth so skipped duplicates are not counted
+      ArrayList<MenuItems> currentItems =
+          menuItemTableOrderDAO.getMenuItemsByTableOrderId(request.getTableOrderId());
+      double newBill = currentItems.stream()
+          .mapToDouble(MenuItems::getPrice)
+          .sum();
+
+      // Step 3: persist the updated bill
+      TableOrder order = tableOrderDAO.getTableOrderByID(request.getTableOrderId());
+      order.setBill(newBill);
+      tableOrderDAO.updateTableOrder(order);
+
+      send(new AddItemsToOrderResponse(true, "Items added", newBill));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new AddItemsToOrderResponse(false, "Database error: " + e.getMessage(), 0.0));
     }
   }
 
