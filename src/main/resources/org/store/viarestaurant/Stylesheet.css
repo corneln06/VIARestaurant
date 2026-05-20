@@ -421,3 +421,31 @@
     -fx-alignment: center;
     -fx-font-size: 15px;
 }
+
+.menu-item-tile {
+    -fx-cursor: hand;
+}
+
+.menu-item-tile-staged {
+    -fx-background-color: #d4e9f7;
+    -fx-border-color: #52aecf;
+}
+
+.staged-chip {
+    -fx-background-color: #e8f4fd;
+    -fx-border-color: #aed6f1;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 4px 10px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.staged-chip-remove {
+    -fx-cursor: hand;
+    -fx-text-fill: #888;
+    -fx-font-weight: bold;
+}
+
+.staged-chip-remove:hover {
+    -fx-text-fill: #c00;
+}

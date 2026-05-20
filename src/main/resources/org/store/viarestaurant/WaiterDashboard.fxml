@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
@@ -94,16 +95,51 @@
                 </StackPane>
                 <AnchorPane fx:id="ordersListPage" managed="false" styleClass="page-surface" visible="false">
                     <children>
-                        <VBox spacing="20.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
+                        <VBox spacing="16.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0"
                               AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0">
                             <children>
+                                <!-- Page header -->
                                 <HBox alignment="CENTER_LEFT">
                                     <children>
                                         <Label styleClass="page-title" text="Orders"/>
                                         <Region HBox.hgrow="ALWAYS"/>
                                     </children>
                                 </HBox>
-                                <GridPane fx:id="ordersTableGrid" hgap="18.0" vgap="18.0"/>
+                                <!-- Filter chips — wired to OrdersComponent via NavigationController -->
+                                <HBox spacing="8.0">
+                                    <children>
+                                        <ToggleButton fx:id="filterOrderAllBtn"      styleClass="filter-chip" text="All"      onAction="#filterOrderAll"/>
+                                        <ToggleButton fx:id="filterOrderStartersBtn" styleClass="filter-chip" text="Starters" onAction="#filterOrderStarters"/>
+                                        <ToggleButton fx:id="filterOrderMainsBtn"    styleClass="filter-chip" text="Mains"    onAction="#filterOrderMains"/>
+                                        <ToggleButton fx:id="filterOrderDessertsBtn" styleClass="filter-chip" text="Desserts" onAction="#filterOrderDesserts"/>
+                                        <ToggleButton fx:id="filterOrderDrinksBtn"   styleClass="filter-chip" text="Drinks"   onAction="#filterOrderDrinks"/>
+                                    </children>
+                                </HBox>
+                                <!-- TOP: scrollable menu item grid — cards added dynamically by OrdersComponent -->
+                                <ScrollPane fitToWidth="true" pannable="true" styleClass="plain-scroll" VBox.vgrow="ALWAYS">
+                                    <content>
+                                        <TilePane fx:id="ordersMenuItemsPane" hgap="14.0" prefColumns="4" prefTileWidth="180.0" vgap="14.0"/>
+                                    </content>
+                                </ScrollPane>
+                                <!-- BOTTOM: staged items cart + action button -->
+                                <VBox spacing="10.0" styleClass="summary-card">
+                                    <children>
+                                        <Label styleClass="section-title" text="Staged Items"/>
+                                        <ScrollPane fitToWidth="true" prefHeight="80.0" styleClass="plain-scroll">
+                                            <content>
+                                                <FlowPane fx:id="stagedItemsFlow" hgap="8.0" vgap="8.0"/>
+                                            </content>
+                                        </ScrollPane>
+                                        <HBox alignment="CENTER_RIGHT">
+                                            <children>
+                                                <Button fx:id="addToOrderButton" disable="true"
+                                                        styleClass="btn-base btn-primary"
+                                                        text="Add to Order"
+                                                        onAction="#openOrderPicker"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
                             </children>
                         </VBox>
                     </children>
@@ -235,6 +271,34 @@
                         </VBox>
                     </children>
                 </AnchorPane>
+                <!-- Order picker modal — sibling of all pages so it floats on top -->
+                <StackPane fx:id="orderPickerOverlay" managed="false" visible="false"
+                           styleClass="modal-overlay"
+                           onMouseClicked="#closeOrderPickerOverlay">
+                    <children>
+                        <VBox maxWidth="400.0" spacing="16.0"
+                              styleClass="modal-card modal-card-medium"
+                              onMouseClicked="#consumeModalClick">
+                            <children>
+                                <Label styleClass="modal-title" text="Add to Order"/>
+                                <Label styleClass="muted-label" wrapText="true"
+                                       text="Select the open order to add the staged items to."/>
+                                <ComboBox fx:id="orderComboBox" maxWidth="Infinity"
+                                          promptText="Choose a table order…"/>
+                                <Label fx:id="orderPickerErrorLabel" styleClass="error-label"
+                                       managed="false" visible="false" wrapText="true"/>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <children>
+                                        <Button styleClass="btn-base btn-secondary" text="Cancel"
+                                                onAction="#closeOrderPickerAction"/>
+                                        <Button styleClass="btn-base btn-primary" text="Confirm"
+                                                onAction="#confirmAddToOrder"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
             </children>
         </StackPane>
     </center>
