@@ -1,6 +1,8 @@
 package org.store.viarestaurant.model.entities;
 
-public class Allergy
+import java.io.Serializable;
+
+public class Allergy implements Serializable
 {
   private int id;
   private String name;

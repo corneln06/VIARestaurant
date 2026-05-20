@@ -1,8 +1,5 @@
-package org.store.viarestaurant.server.dto.ReservationDto;
+package org.store.viarestaurant.server.dto.RestaurantTableDTO;
 
-import org.store.viarestaurant.model.entities.InternalSchedule;
-import org.store.viarestaurant.model.entities.RestaurantTable;
-import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.state.AvailableState;
 import org.store.viarestaurant.model.state.TableState;
 

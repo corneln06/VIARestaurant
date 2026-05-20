@@ -1,10 +1,6 @@
-package org.store.viarestaurant.server.dto.ReservationDto;
-
-import org.store.viarestaurant.model.entities.RestaurantTable;
-import org.store.viarestaurant.model.entities.Workers;
+package org.store.viarestaurant.server.dto.TableOrderDTO;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class GetTableOrderRequest implements Serializable
 {
