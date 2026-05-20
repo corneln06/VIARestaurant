@@ -7,6 +7,7 @@ import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.model.state.AvailableState;
+import org.store.viarestaurant.model.state.ReservedState;
 import org.store.viarestaurant.model.state.SeatedState;
 import org.store.viarestaurant.server.dto.LoginRequest;
 import org.store.viarestaurant.server.dto.LoginResponse;
@@ -127,6 +128,10 @@ public class ServerConnection implements Runnable
         else if (object instanceof SetTableAvailableRequest request)
         {
           handleSetTableAvailable(request);
+        }
+        else if (object instanceof SetTableReservedRequest request)
+        {
+            handleSetTableReserved(request);
         }
         else if (object instanceof TableCreateRequest request) {
           System.out.println("[SERVER] CreateTableRequest detected");
@@ -526,6 +531,25 @@ public class ServerConnection implements Runnable
       send(new MessageResponse(false, "Could not seat table"));
     }
   }
+    private void handleSetTableReserved(SetTableReservedRequest request)
+            throws IOException
+    {
+        try
+        {
+            restaurantTableDAO.updateTableState(
+                    request.getTableId(),
+                    new ReservedState()
+            );
+
+            connectionPool.broadcast(
+                    new TableUpdatedMessage(request.getTableId())
+            );
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
   private void handleGetClosestReservationRequest(
       GetClosestReservationRequest request) throws IOException

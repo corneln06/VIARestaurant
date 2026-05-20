@@ -209,6 +209,15 @@ public class TableComponent
     waiterMap.clear();
     tableModalWaiterComboBox.getItems().clear();
 
+    try
+    {
+        reservationService.getClosestReservation(tableId);
+    }
+    catch (IOException e)
+    {
+        throw new RuntimeException(e);
+    }
+
     for(Workers worker : workers)
     {
       if(worker.getRole() == WorkerRole.Waiter)
@@ -261,6 +270,11 @@ public class TableComponent
       tableModalPrimaryButton.setOnAction(e -> setAvailable());
       tableModalSecondaryButton.setVisible(false);
       tableModalSecondaryButton.setManaged(false);
+      closestReservation = null;
+
+      if (closestReservation != null){
+          tableModalPrimaryButton.setOnAction(e -> setReserved());
+      }
     }
     else if(reserved)
     {
@@ -419,6 +433,20 @@ public class TableComponent
     {
       e.printStackTrace();
     }
+  }
+
+  public void setReserved()
+  {
+      try
+      {
+          client.send(
+                  new SetTableReservedRequest(currentTableId)
+          );
+      }
+      catch(IOException e)
+      {
+          e.printStackTrace();
+      }
   }
 
   public void closeNewTableModal() {
