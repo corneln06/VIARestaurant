@@ -1,11 +1,13 @@
 package org.store.viarestaurant.model.entities;
 
-import org.store.viarestaurant.model.enums.MenuTypes;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class MenuItems
+import org.store.viarestaurant.model.enums.MenuTypes;
+
+public class MenuItems implements Serializable
 {
+  private static final long serialVersionUID = 1L;
   private int id;
   private String name;
   private MenuTypes type;
