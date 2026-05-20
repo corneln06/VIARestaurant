@@ -4,12 +4,15 @@ import javafx.application.Platform;
 import org.store.viarestaurant.server.dto.AllergyDTO.CreateAllergyResponse;
 import org.store.viarestaurant.server.dto.AllergyDTO.GetAllergiesResponse;
 import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
+import org.store.viarestaurant.server.dto.MenuItemsDTO.GetMenuItemsResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.GetTablesResponse;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreateResponse;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreatedMessage;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableUpdatedMessage;
+import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;
@@ -43,6 +46,10 @@ public class Client
   private Consumer<GetAllergiesResponse> getAllergiesListener;
   private Consumer<MessageResponse> updateAllergyListener;
   private Consumer<MessageResponse> deleteAllergyListener;
+
+  private List<Consumer<GetMenuItemsResponse>>      menuItemsListeners    = new ArrayList<>();
+  private List<Consumer<GetOrdersByWaiterResponse>> waiterOrdersListeners = new ArrayList<>();
+  private List<Consumer<AddItemsToOrderResponse>>   addItemsListeners     = new ArrayList<>();
 
   public void connect() throws IOException
   {
@@ -148,6 +155,18 @@ public class Client
             {
               deleteAllergyListener.accept(response);
             }
+            else if (object instanceof GetMenuItemsResponse response && !menuItemsListeners.isEmpty())
+            {
+              for (var c : menuItemsListeners) c.accept(response);
+            }
+            else if (object instanceof GetOrdersByWaiterResponse response && !waiterOrdersListeners.isEmpty())
+            {
+              for (var c : waiterOrdersListeners) c.accept(response);
+            }
+            else if (object instanceof AddItemsToOrderResponse response && !addItemsListeners.isEmpty())
+            {
+              for (var c : addItemsListeners) c.accept(response);
+            }
 
           });
         }
@@ -220,4 +239,16 @@ public class Client
   public void setUpdateAllergyListener(Consumer<MessageResponse> listener) { this.updateAllergyListener = listener; }
 
   public void setDeleteAllergyListener(Consumer<MessageResponse> listener) { this.deleteAllergyListener = listener; }
+
+  public void setMenuItemsListener(Consumer<GetMenuItemsResponse> listener) {
+    menuItemsListeners.add(listener);
+  }
+
+  public void setWaiterOrdersListener(Consumer<GetOrdersByWaiterResponse> listener) {
+    waiterOrdersListeners.add(listener);
+  }
+
+  public void setAddItemsListener(Consumer<AddItemsToOrderResponse> listener) {
+    addItemsListeners.add(listener);
+  }
 }
