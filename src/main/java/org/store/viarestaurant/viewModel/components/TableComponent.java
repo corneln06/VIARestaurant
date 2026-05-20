@@ -22,6 +22,7 @@ import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.ReservationDto.UpdateReservationRequest;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.SeatTableRequest;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.SetTableAvailableRequest;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.SetTableReservedRequest;
@@ -281,11 +282,12 @@ public class TableComponent
       tableModalInfo.setText("Table is currently occupied.");
       tableModalPrimaryButton.setText("Set Available");
       tableModalPrimaryButton.setOnAction(e -> setAvailable());
+      tableModalPrimaryButton.setDisable(false);
       tableModalSecondaryButton.setVisible(false);
       tableModalSecondaryButton.setManaged(false);
       closestReservation = null;
 
-      if (closestReservation != null){
+      if (closestReservation != null && !closestReservation.isSeated()){
           tableModalPrimaryButton.setOnAction(e -> setReserved());
       }
     }
@@ -312,6 +314,21 @@ public class TableComponent
         {
             e.printStackTrace();
         }
+
+
+        tableModalSecondaryButton.setOnAction(e -> {
+            System.out.println(1);
+            seatTable();
+            System.out.println(2);
+            UpdateReservationRequest request = new UpdateReservationRequest(closestReservation.getId(), closestReservation.getName(), closestReservation.getDateTime(), closestReservation.getPartySize(), closestReservation.getTable(), true);
+            try {
+                System.out.println(3);
+                reservationService.updateReservation(request);
+                System.out.println(4);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
     else
     {

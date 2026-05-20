@@ -253,7 +253,8 @@ public class ReservationComponent {
                         guestName,
                         LocalDateTime.of(date, time),
                         partySize,
-                        table
+                        table,
+                        editingReservation.isSeated()
                 );
 
         reservationService.updateReservation(request);

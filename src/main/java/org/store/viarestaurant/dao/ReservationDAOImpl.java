@@ -335,6 +335,7 @@ public class ReservationDAOImpl implements ReservationDAO
       FROM reservations r
       JOIN restauranttable t ON r.tableId = t.id
       WHERE r.tableId = ?
+        AND CAST(r.date AS DATE) = CURRENT_DATE
         AND r.date >= CURRENT_TIMESTAMP
       ORDER BY r.date ASC
       LIMIT 1
