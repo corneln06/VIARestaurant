@@ -4,6 +4,8 @@ import javafx.application.Platform;
 import org.store.viarestaurant.server.dto.AllergyDTO.CreateAllergyResponse;
 import org.store.viarestaurant.server.dto.AllergyDTO.GetAllergiesResponse;
 import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
+import org.store.viarestaurant.server.dto.MenuItemDTO.CreateMenuItemResponse;
+import org.store.viarestaurant.server.dto.MenuItemDTO.GetMenuItemsResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.GetTablesResponse;
@@ -46,6 +48,10 @@ public class Client
   private Consumer<GetAllergiesResponse> getAllergiesListener;
   private Consumer<MessageResponse> updateAllergyListener;
   private Consumer<MessageResponse> deleteAllergyListener;
+  private Consumer<GetMenuItemsResponse> getMenuItemsListener;
+  private Consumer<MessageResponse> updateMenuItemListener;
+  private Consumer<MessageResponse> deleteMenuItemListener;
+  private Consumer<CreateMenuItemResponse> createdMenuItemListener;
 
   public void connect() throws IOException
   {
@@ -159,7 +165,22 @@ public class Client
             {
               deleteAllergyListener.accept(response);
             }
-
+            else if (object instanceof GetMenuItemsResponse response && getMenuItemsListener != null)
+            {
+              getMenuItemsListener.accept(response);
+            }
+            else if (object instanceof CreateMenuItemResponse response && createdMenuItemListener != null)
+            {
+              createdMenuItemListener.accept(response);
+            }
+            else if (object instanceof MessageResponse response && updateMenuItemListener != null)
+            {
+              updateMenuItemListener.accept(response);
+            }
+            else if (object instanceof MessageResponse response && deleteMenuItemListener != null)
+            {
+              deleteMenuItemListener.accept(response);
+            }
           });
         }
       }
@@ -235,4 +256,12 @@ public class Client
   public void setUpdateAllergyListener(Consumer<MessageResponse> listener) { this.updateAllergyListener = listener; }
 
   public void setDeleteAllergyListener(Consumer<MessageResponse> listener) { this.deleteAllergyListener = listener; }
+
+  public void setGetMenuItemsListener(Consumer<GetMenuItemsResponse> listener)
+  {
+    this.getMenuItemsListener = listener;
+  }
+  public void setMenuItemCreatedListener(Consumer<CreateMenuItemResponse> listener) { this.createdMenuItemListener = listener; }
+  public void setUpdateMenuItemListener(Consumer<MessageResponse> listener) { this.updateMenuItemListener = listener; }
+  public void setDeleteMenuItemListener(Consumer<MessageResponse> listener) { this.deleteMenuItemListener = listener; }
 }

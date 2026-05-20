@@ -67,6 +67,10 @@ public class NavigationController
     @FXML private ComboBox<String> tableComboBox;
     @FXML private Label newReservationErrorLabel;
 
+    @FXML private Button submitDishButton;
+    @FXML private Button deleteDishButton;
+    @FXML private Label dishModalTitle;
+
     @FXML private StackPane newDishOverlay;
     @FXML private TextField dishNameField;
     @FXML private CheckBox isVegetarianCheckBox;
@@ -187,33 +191,35 @@ public class NavigationController
                         reservationOverlayPane, tableGrid
                 );
 
-                managerController.initModal(
-                        //Reservation Modal props
-                        newReservationOverlay,
-                        guestNameField,
-                        reservationDatePicker,
-                        reservationTimeField,
-                        partySizeField,
-                        tableComboBox,
-                        newReservationErrorLabel,
-                        // Menu Modal props
-                        newDishOverlay,
-                        dishNameField,
-                        dishTypeComboBox,
-                        dishPriceField,
-                        isVegetarianCheckBox,
-                        allergiesListView,
-                        newDishErrorLabel,
-                        menuTable,
-                        submitReservationButton,
-                        deleteReservationButton,
-                        modalTitle,
-                        toggleMenuViewButton,
-                        menuPrimaryActionButton,
-                        newAllergyOverlay, allergyNameField, newAllergyErrorLabel,
-                        createAllergyButton,
-                        deleteAllergyButton,
-                        allergyModalTitle);
+              managerController.initModal(
+                  newReservationOverlay,
+                  guestNameField,
+                  reservationDatePicker,
+                  reservationTimeField,
+                  partySizeField,
+                  tableComboBox,
+                  newReservationErrorLabel,
+                  newDishOverlay,
+                  dishNameField,
+                  dishTypeComboBox,
+                  dishPriceField,
+                  isVegetarianCheckBox,
+                  allergiesListView,
+                  newDishErrorLabel,
+                  menuTable,
+                  submitReservationButton,
+                  deleteReservationButton,
+                  modalTitle,
+                  submitDishButton,
+                  deleteDishButton,
+                  dishModalTitle,
+                  toggleMenuViewButton,
+                  menuPrimaryActionButton,
+                  newAllergyOverlay, allergyNameField, newAllergyErrorLabel,
+                  createAllergyButton,
+                  deleteAllergyButton,
+                  allergyModalTitle
+              );
 
                 managerController.refreshMenuTable();
 
@@ -474,6 +480,11 @@ public class NavigationController
     @FXML
     private void createDish() {
         if (managerController != null) managerController.createDish();
+    }
+
+    @FXML
+    private void deleteDish() {
+      if (managerController != null) managerController.deleteDish();
     }
     @FXML
     private void seatTable(){
