@@ -1,17 +1,19 @@
 package org.store.viarestaurant.server.dto.TableOrderDTO;
 
+import org.store.viarestaurant.model.entities.TableOrder;
+
 import java.io.Serializable;
 
 public class GetTableOrderResponse implements Serializable
 {
-  private GetTableOrderRequest tableOrder;
+  private TableOrder tableOrder;
 
-  public GetTableOrderResponse(GetTableOrderRequest tableOrder)
+  public GetTableOrderResponse(TableOrder tableOrder)
   {
     this.tableOrder = tableOrder;
   }
 
-  public GetTableOrderRequest getTableOrder()
+  public TableOrder getTableOrder()
   {
     return tableOrder;
   }

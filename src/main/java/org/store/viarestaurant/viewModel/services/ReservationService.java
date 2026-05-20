@@ -80,4 +80,13 @@ public class ReservationService
   ){
     client.setUpdatedMessageListener(listener);
   }
+
+  public void onClosestReservationLoaded(Consumer<GetClosestReservationResponse> listener){
+      client.setClosestReservationListener(listener);
+  }
+
+    public void getClosestReservation(int tableId) throws IOException
+    {
+        client.send(new GetClosestReservationRequest(tableId));
+    }
 }

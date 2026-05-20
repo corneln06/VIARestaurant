@@ -107,9 +107,6 @@ public class ReservationComponent {
     reservationService.onReservationLoaded(response ->
     {
       reservations = response.getReservations();
-      System.out.println(
-          "[CLIENT] Reservations received: " + reservations.size()
-      );
       drawSchedule();
     });
 
@@ -285,8 +282,6 @@ public class ReservationComponent {
   }
 
   private void drawSchedule() {
-    System.out.println("Tables: " + tables.size());
-    System.out.println("Reservations: " + reservations.size());
     scheduleView.draw(
             scheduleGrid,
             scheduleOverlayPane,

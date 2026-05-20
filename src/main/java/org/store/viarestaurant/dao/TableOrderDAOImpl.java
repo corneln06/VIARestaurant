@@ -402,4 +402,74 @@ public class TableOrderDAOImpl implements TableOrderDAO {
                 return tableOrder;
         }
     }
+
+    @Override
+    public TableOrder getCurrentTableOrderByTableId(Integer tableId)
+            throws SQLException
+    {
+        try (Connection connection = getConnection())
+        {
+            PreparedStatement statement =
+                    connection.prepareStatement(
+                            "SELECT t.id, " +
+                                    "t.tableid, " +
+                                    "t.waiterid, " +
+                                    "t.notes, " +
+                                    "t.bill, " +
+                                    "t.isReservation as Reserved, " +
+                                    "t.isPaid as Paid, " +
+                                    "mi.name as ItemName " +
+                                    "FROM tableorders t " +
+                                    "LEFT JOIN MenuItemsTableOrder mt ON t.id = mt.tableorderid " +
+                                    "LEFT JOIN menuitems mi ON mt.menuitemid = mi.id " +
+                                    "WHERE t.tableid = ? " +
+                                    "AND t.isPaid = false " +
+                                    "LIMIT 1"
+                    );
+
+            statement.setInt(1, tableId);
+
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next())
+            {
+                Integer orderId = rs.getInt("id");
+                Integer waiterId = rs.getInt("waiterid");
+                String notes = rs.getString("notes");
+                double bill = rs.getDouble("bill");
+                boolean isReservation = rs.getBoolean("Reserved");
+                boolean isPaid = rs.getBoolean("Paid");
+
+                RestaurantTable restaurantTable =
+                        restaurantTableDAO.getRestaurantTableByID(tableId);
+
+                Workers waiter =
+                        workersDAO.getWorkerById(waiterId);
+
+                TableOrder tableOrder =
+                        new TableOrder(
+                                orderId,
+                                restaurantTable,
+                                waiter,
+                                notes,
+                                new ArrayList<>(),
+                                bill,
+                                isReservation
+                        );
+
+                tableOrder.setPaid(isPaid);
+
+                String itemName = rs.getString("ItemName");
+
+                if(itemName != null)
+                {
+                    tableOrder.addMenuItems(itemName);
+                }
+
+                return tableOrder;
+            }
+
+            return null;
+        }
+    }
 }

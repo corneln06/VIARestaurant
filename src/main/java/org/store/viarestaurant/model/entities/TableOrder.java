@@ -1,12 +1,10 @@
 package org.store.viarestaurant.model.entities;
 
-// import java.util.ArrayList;
-
-import javafx.concurrent.Worker;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class TableOrder {
+public class TableOrder implements Serializable
+{
     private final int id;
     private RestaurantTable restaurantTable;
     private Workers waiter;
