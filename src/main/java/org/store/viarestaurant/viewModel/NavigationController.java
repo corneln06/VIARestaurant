@@ -183,6 +183,8 @@ public class NavigationController
             case Manager -> {
                 managerController = new ManagerController();
 
+                managerController.initClient(client);
+
                 managerController.init(
                         reservationGrid,
                         reservationOverlayPane, tableGrid
@@ -233,8 +235,6 @@ public class NavigationController
                         tableModalSecondaryButton,
                         newTableDeleteButton,
                         newTableSubmitButton,newTableModalTitle);
-
-                managerController.initClient(client);
 
                 showTablesPage();
                 showMenuPage();

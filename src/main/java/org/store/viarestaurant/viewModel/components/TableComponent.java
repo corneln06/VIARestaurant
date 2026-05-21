@@ -204,7 +204,11 @@ public class TableComponent
   private void handleTableClick(RestaurantTable table) {
       if(role.equals(WorkerRole.Host))
       {
-        openTableModal(table.getId());
+        try {
+          openTableModal(table.getId());
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
       }
       else
       {
@@ -221,7 +225,7 @@ public class TableComponent
     else btn.getStyleClass().add("table-available");
   }
 
-  private void openTableModal(int tableId) throws SQLException, IOException
+  private void openTableModal(int tableId) throws IOException
   {
     currentTableId = tableId;
     waiterMap.clear();

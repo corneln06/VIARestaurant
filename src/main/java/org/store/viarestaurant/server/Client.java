@@ -47,7 +47,6 @@ public class Client
 
   private Consumer<GetWorkersResponse> workersListener;
 
-  private Consumer<GetClosestReservationResponse> closestReservationListener;
   private Consumer<GetTableOrderResponse> tableOrderResponseListener;
   private Consumer<CreateAllergyResponse> createdAllergyListener;
   private Consumer<GetAllergiesResponse> getAllergiesListener;
