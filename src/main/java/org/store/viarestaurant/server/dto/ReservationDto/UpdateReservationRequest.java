@@ -14,17 +14,20 @@ public class UpdateReservationRequest implements Serializable {
     private LocalDateTime dateTime;
     private int partySize;
     private RestaurantTable table;
+    private boolean isSeated;
 
     public UpdateReservationRequest(int id,
                                     String name,
                                     LocalDateTime dateTime,
                                     int partySize,
-                                    RestaurantTable table) {
+                                    RestaurantTable table,
+                                    boolean isSeated) {
         this.id = id;
         this.name = name;
         this.dateTime = dateTime;
         this.partySize = partySize;
         this.table = table;
+        this.isSeated = isSeated;
     }
 
     public int getId() {
@@ -45,5 +48,9 @@ public class UpdateReservationRequest implements Serializable {
 
     public RestaurantTable getTable() {
         return table;
+    }
+
+    public boolean isSeated() {
+        return isSeated;
     }
 }

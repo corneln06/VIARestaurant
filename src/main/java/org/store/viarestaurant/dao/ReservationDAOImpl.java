@@ -54,8 +54,8 @@ public class ReservationDAOImpl implements ReservationDAO
       throw new SQLException("The party size exceeds max sitting!");
     }
 
-    String sql = "INSERT INTO reservations (customer, date, partySize, tableId) " +
-        "VALUES (?, ?, ?, ?) " +
+    String sql = "INSERT INTO reservations (customer, date, partySize, tableId, isSeated) " +
+        "VALUES (?, ?, ?, ?, ?) " +
             " RETURNING id";
 
     try (Connection connection = getConnection();
@@ -65,6 +65,7 @@ public class ReservationDAOImpl implements ReservationDAO
       statement.setTimestamp(2, Timestamp.valueOf(dateTime));
       statement.setInt(3, partySize);
       statement.setInt(4, restaurantTable.getId());
+      statement.setBoolean(5, false);
 
       ArrayList<Reservation> sameDayReservations =
               getReservationByDate(dateTime);
@@ -74,7 +75,7 @@ public class ReservationDAOImpl implements ReservationDAO
                       .filter(r ->
                               r.getTable().getId().equals(restaurantTable.getId())
                                       && hasConflict(
-                                      new Reservation(-1, name, dateTime, partySize, restaurantTable),
+                                      new Reservation(-1, name, dateTime, partySize, restaurantTable, false),
                                       r
                               )
                       )
@@ -89,7 +90,7 @@ public class ReservationDAOImpl implements ReservationDAO
             if (rs.next())
             {
                 int id = rs.getInt("id");
-                return new Reservation(id, name, dateTime, partySize, restaurantTable);
+                return new Reservation(id, name, dateTime, partySize, restaurantTable, false);
             }
             else
             {
@@ -102,7 +103,7 @@ public class ReservationDAOImpl implements ReservationDAO
   @Override
   public ArrayList<Reservation> getAllReservationsForToday() throws SQLException
   {
-    String sql = "SELECT r.id, r.customer, r.date, r.partySize, t.id AS tableId, t.maxSitting " +
+    String sql = "SELECT r.id, r.customer, r.date, r.partySize, r.isSeated, t.id AS tableId, t.maxSitting " +
         "FROM reservations r JOIN restauranttable t ON r.tableId = t.id WHERE CAST(r.date AS DATE) = CURRENT_DATE";
 
     try (Connection connection = getConnection();
@@ -122,7 +123,8 @@ public class ReservationDAOImpl implements ReservationDAO
             rs.getString("customer"),
             rs.getTimestamp("date").toLocalDateTime(),
             rs.getInt("partySize"),
-            table
+            table,
+            rs.getBoolean("isSeated")
         ));
       }
 
@@ -132,7 +134,7 @@ public class ReservationDAOImpl implements ReservationDAO
   @Override
   public Reservation getReservationById(int id) throws SQLException
   {
-    String sql = "SELECT r.id, r.customer, r.date, r.partySize, t.id AS tableId, t.maxSitting " +
+    String sql = "SELECT r.id, r.customer, r.date, r.partySize, r.isSeated, t.id AS tableId, t.maxSitting " +
         "FROM reservations r JOIN restauranttable t ON r.tableId = t.id " +
         "WHERE r.id = ?";
 
@@ -153,7 +155,8 @@ public class ReservationDAOImpl implements ReservationDAO
             rs.getString("customer"),
             rs.getTimestamp("date").toLocalDateTime(),
             rs.getInt("partySize"),
-            table
+            table,
+            rs.getBoolean("isSeated")
         );
       }
       else
@@ -166,7 +169,7 @@ public class ReservationDAOImpl implements ReservationDAO
   @Override
   public Reservation getReservationByCustomerName(String name) throws SQLException
   {
-    String sql = "SELECT r.id, r.customer, r.date, r.partySize, t.id AS tableId, t.maxSitting " +
+    String sql = "SELECT r.id, r.customer, r.date, r.partySize, r.isSeated, t.id AS tableId, t.maxSitting " +
         "FROM reservations r JOIN restauranttable t ON r.tableId = t.id " +
         "WHERE r.customer = ?";
 
@@ -187,7 +190,8 @@ public class ReservationDAOImpl implements ReservationDAO
             rs.getString("customer"),
             rs.getTimestamp("date").toLocalDateTime(),
             rs.getInt("partySize"),
-            table
+            table,
+            rs.getBoolean("isSeated")
         );
       }
       else
@@ -200,7 +204,7 @@ public class ReservationDAOImpl implements ReservationDAO
   @Override
   public ArrayList<Reservation> getReservationByDate(LocalDateTime dateTime) throws SQLException
   {
-    String sql = "SELECT r.id, r.customer, r.date, r.partySize, t.id AS tableId, t.maxSitting " +
+    String sql = "SELECT r.id, r.customer, r.date, r.partySize, r.isSeated, t.id AS tableId, t.maxSitting " +
         "FROM reservations r JOIN restauranttable t ON r.tableId = t.id " +
         "WHERE CAST(r.date AS DATE) = CAST(? AS DATE)";
 
@@ -222,7 +226,8 @@ public class ReservationDAOImpl implements ReservationDAO
             rs.getString("customer"),
             rs.getTimestamp("date").toLocalDateTime(),
             rs.getInt("partySize"),
-            table
+            table,
+            rs.getBoolean("isSeated")
         ));
       }
 
@@ -281,7 +286,8 @@ public class ReservationDAOImpl implements ReservationDAO
               "update reservations set customer=?, " +
                       "date=?," +
                       "partySize=?," +
-                      "tableId=?" +
+                      "tableId=?," +
+                      "isSeated=?" +
                       " where id=?"
       );
 
@@ -289,7 +295,8 @@ public class ReservationDAOImpl implements ReservationDAO
       statement.setTimestamp(2, Timestamp.valueOf(reservation.getDateTime()));
       statement.setInt(3,reservation.getPartySize());
       statement.setInt(4, reservation.getTable().getId());
-      statement.setInt(5, reservation.getId());
+      statement.setBoolean(5, reservation.isSeated());
+      statement.setInt(6, reservation.getId());
 
 
       int affected = statement.executeUpdate();
@@ -319,7 +326,49 @@ public class ReservationDAOImpl implements ReservationDAO
       return reservation;
     }
   }
-  private boolean hasConflict(
+
+    @Override
+    public Reservation getClosestReservationInTimeForTable(int tableId) throws SQLException
+    {
+        String sql = """
+      SELECT r.id, r.customer, r.date, r.partySize, r.isSeated, t.id AS tableId, t.maxSitting
+      FROM reservations r
+      JOIN restauranttable t ON r.tableId = t.id
+      WHERE r.tableId = ?
+        AND CAST(r.date AS DATE) = CURRENT_DATE
+        AND r.date >= CURRENT_TIMESTAMP
+      ORDER BY r.date ASC
+      LIMIT 1
+      """;
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql))
+        {
+            statement.setInt(1, tableId);
+
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+            {
+                RestaurantTable table = new RestaurantTable(
+                        rs.getInt("tableId"),
+                        rs.getInt("maxSitting")
+                );
+
+                return new Reservation(
+                        rs.getInt("id"),
+                        rs.getString("customer"),
+                        rs.getTimestamp("date").toLocalDateTime(),
+                        rs.getInt("partySize"),
+                        table,
+                        rs.getBoolean("isSeated")
+                );
+            }
+
+            return null;
+        }
+    }
+
+    private boolean hasConflict(
           Reservation newRes,
           Reservation existing
   ) {

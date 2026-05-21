@@ -1,6 +1,7 @@
 package org.store.viarestaurant.viewModel;
 
 
+import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
 import org.store.viarestaurant.viewModel.components.TableComponent;
@@ -13,7 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import org.w3c.dom.Text;
 
 public class HostController
 {
@@ -71,10 +71,11 @@ public class HostController
           StackPane newOverlay,
           TextField maxSitting,
           Label error,
-      ComboBox<String> waiterComboBox,
-      Button primaryButton)
+          ComboBox<String> waiterComboBox,
+          Button primaryButton,
+          Button secondaryButton)
   {
-    tableComponent.initModal(overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton);
+    tableComponent.initModal(WorkerRole.Host,overlay, title, badge, info, newOverlay,maxSitting,error, waiterComboBox, primaryButton, secondaryButton,null, null,null);
   }
 
   public void initClient(Client client)
@@ -82,6 +83,7 @@ public class HostController
     reservationComponent.initClient(client);
     tableComponent.initClient(client);
     tableComponent.loadData();
+    tableComponent.loadTables();
   }
 
   //InitClient for Tables missing TODO
@@ -90,6 +92,7 @@ public class HostController
   {
     reservationComponent.refreshSchedule();
     tableComponent.loadTables();
+
   }
 
   public void openNewReservationModal()

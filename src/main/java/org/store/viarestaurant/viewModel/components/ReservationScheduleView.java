@@ -2,10 +2,7 @@ package org.store.viarestaurant.viewModel.components;
 
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.store.viarestaurant.model.entities.Reservation;
@@ -156,13 +153,6 @@ public class ReservationScheduleView
   {
     for(Reservation reservation : reservations)
     {
-      System.out.println(
-          "Reservation: "
-              + reservation.getName()
-              + ", table object: "
-              + reservation.getTable()
-              + ", table id: "
-              + (reservation.getTable() == null ? null : reservation.getTable().getId()));
       Integer tableId = getReservationTableId(reservation);
 
       if(tableId == null)
@@ -191,35 +181,52 @@ public class ReservationScheduleView
               )
           );
 
-      Label block =
-          new Label(
-              reservation.getName()
-                  + " • "
-                  + reservation.getPartySize()
-                  + " guests"
-          );
+        Label block =
+                new Label(
+                        reservation.getName()
+                                + " • "
+                                + reservation.getPartySize()
+                                + " guests"
+                );
 
-      block.getStyleClass().add("reservation-block");
-      block.setMaxWidth(Double.MAX_VALUE);
+        block.getStyleClass().add("reservation-block");
+        block.setMaxWidth(Double.MAX_VALUE);
 
-      block.setOnMouseEntered(e ->
-          block.setCursor(Cursor.HAND)
-      );
+        StackPane reservationPane = new StackPane();
+        reservationPane.getChildren().add(block);
 
-      block.setOnMouseExited(e ->
-          block.setCursor(Cursor.DEFAULT)
-      );
-
-      block.setOnMouseClicked(e ->
-      {
-        if(onReservationClicked != null)
+        if (reservation.isSeated())
         {
-          onReservationClicked.accept(reservation);
-        }
-      });
+            Rectangle line = new Rectangle();
 
-      grid.add(block, startCol + 1, row);
-      GridPane.setColumnSpan(block, 4);
+            line.setHeight(2);
+            line.setFill(Color.RED);
+
+            line.widthProperty().bind(
+                    reservationPane.widthProperty().subtract(10)
+            );
+
+            reservationPane.getChildren().add(line);
+        }
+
+        reservationPane.setOnMouseEntered(e ->
+                reservationPane.setCursor(Cursor.HAND)
+        );
+
+        reservationPane.setOnMouseExited(e ->
+                reservationPane.setCursor(Cursor.DEFAULT)
+        );
+
+        reservationPane.setOnMouseClicked(e ->
+        {
+            if(onReservationClicked != null)
+            {
+                onReservationClicked.accept(reservation);
+            }
+        });
+
+        grid.add(reservationPane, startCol + 1, row);
+        GridPane.setColumnSpan(reservationPane, 4);
     }
   }
 

@@ -84,6 +84,10 @@ public class NavigationController
     @FXML private ComboBox<String> tableComboBox;
     @FXML private Label newReservationErrorLabel;
 
+    @FXML private Button submitDishButton;
+    @FXML private Button deleteDishButton;
+    @FXML private Label dishModalTitle;
+
     @FXML private StackPane newDishOverlay;
     @FXML private TextField dishNameField;
     @FXML private CheckBox isVegetarianCheckBox;
@@ -95,6 +99,7 @@ public class NavigationController
 
     @FXML private ComboBox<String> tableModalWaiterComboBox;
     @FXML private Button tableModalPrimaryButton;
+    @FXML private Button tableModalSecondaryButton;
 
     protected Client client;
 
@@ -106,6 +111,9 @@ public class NavigationController
     @FXML private StackPane newTableOverlay;
     @FXML private TextField tableMaxSittingField;
     @FXML private Label newTableErrorLabel;
+    @FXML private Button newTableDeleteButton;
+    @FXML private Button newTableSubmitButton;
+    @FXML private Label newTableModalTitle;
 
     @FXML private Button toggleMenuViewButton;
     @FXML private Button menuPrimaryActionButton;
@@ -144,10 +152,6 @@ public class NavigationController
             );
         }
     }
-    public void initClient(Client client)
-    {
-        this.client = client;
-    }
     private void showDefaultPage(Workers worker)
     {
         switch (worker.getRole())
@@ -181,7 +185,8 @@ public class NavigationController
                         tableMaxSittingField,
                         newTableErrorLabel,
                         tableModalWaiterComboBox,
-                        tableModalPrimaryButton
+                        tableModalPrimaryButton,
+                        tableModalSecondaryButton
                 );
 
                 hostController.refreshSchedule();
@@ -213,43 +218,61 @@ public class NavigationController
                         reservationOverlayPane, tableGrid
                 );
 
-                managerController.initModal(
-                        //Reservation Modal props
-                        newReservationOverlay,
-                        guestNameField,
-                        reservationDatePicker,
-                        reservationTimeField,
-                        partySizeField,
-                        tableComboBox,
-                        newReservationErrorLabel,
-                        // Menu Modal props
-                        newDishOverlay,
-                        dishNameField,
-                        dishTypeComboBox,
-                        dishPriceField,
-                        isVegetarianCheckBox,
-                        allergiesListView,
-                        newDishErrorLabel,
-                        menuTable,
-                        submitReservationButton,
-                        deleteReservationButton,
-                        modalTitle,
-                        toggleMenuViewButton,
-                        menuPrimaryActionButton,
-                        newAllergyOverlay, allergyNameField, newAllergyErrorLabel,
-                        createAllergyButton,
-                        deleteAllergyButton,
-                        allergyModalTitle);
+              managerController.initModal(
+                  newReservationOverlay,
+                  guestNameField,
+                  reservationDatePicker,
+                  reservationTimeField,
+                  partySizeField,
+                  tableComboBox,
+                  newReservationErrorLabel,
+                  newDishOverlay,
+                  dishNameField,
+                  dishTypeComboBox,
+                  dishPriceField,
+                  isVegetarianCheckBox,
+                  allergiesListView,
+                  newDishErrorLabel,
+                  menuTable,
+                  submitReservationButton,
+                  deleteReservationButton,
+                  modalTitle,
+                  submitDishButton,
+                  deleteDishButton,
+                  dishModalTitle,
+                  toggleMenuViewButton,
+                  menuPrimaryActionButton,
+                  newAllergyOverlay, allergyNameField, newAllergyErrorLabel,
+                  createAllergyButton,
+                  deleteAllergyButton,
+                  allergyModalTitle
+              );
 
                 managerController.refreshMenuTable();
 
-                managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,
-                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton);
+                managerController.initTableModal(
+                        tableModalOverlay,
+                        tableModalTitle,
+                        tableModalStateBadge,
+                        tableModalInfo,
+                        newTableOverlay,
+                        tableMaxSittingField,
+                        newTableErrorLabel,
+                        tableModalWaiterComboBox,
+                        tableModalPrimaryButton,
+                        tableModalSecondaryButton,
+                        newTableDeleteButton,
+                        newTableSubmitButton,newTableModalTitle);
 
                 showTablesPage();
                 showMenuPage();
             }
         }
+    }
+
+    public void initClient(Client client)
+    {
+        this.client = client;
     }
 
     @FXML
@@ -498,6 +521,11 @@ public class NavigationController
     private void createDish() {
         if (managerController != null) managerController.createDish();
     }
+
+    @FXML
+    private void deleteDish() {
+      if (managerController != null) managerController.deleteDish();
+    }
     @FXML
     private void seatTable(){
       if(hostController != null) hostController.seatTable();
@@ -564,4 +592,11 @@ public class NavigationController
     // ── Pay order ────────────────────────────────────────────────────────────
     @FXML private void payOrder()             { if (waiterController != null) waiterController.payOrder(); }
 
+    public void deleteTable() {
+        if(managerController != null)
+        {
+            managerController.deleteTable();
+        }
+
+    }
 }

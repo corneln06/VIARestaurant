@@ -4,13 +4,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import org.store.viarestaurant.dao.AllergyDAOImpl;
-import org.store.viarestaurant.dao.MenuItemDAOImpl;
 import org.store.viarestaurant.model.entities.Allergy;
 import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.enums.MenuTypes;
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.AllergyDTO.GetAllergiesRequest;
 import org.store.viarestaurant.viewModel.services.AllergyService;
+import org.store.viarestaurant.viewModel.services.MenuItemService;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -35,6 +34,12 @@ public class MenuItemComponent
   private Label newAllergyErrorLabel;
 
   private AllergyService allergyService;
+  private MenuItemService menuItemService;
+  private boolean isEditMode = false;
+  private MenuItems editingMenuItem;
+  private Button submitDishButton;
+  private Button deleteDishButton;
+  private Label dishModalTitle;
 
   private Allergy selectedAllergy;
   private boolean editingAllergy = false;
@@ -58,6 +63,9 @@ public class MenuItemComponent
       ListView<String> allergiesList,
       Label errorLabel,
       TableView<Object> table,
+      Button submitButton,
+      Button deleteButton,
+      Label modalTitle,
       Button toggleB,
       Button primaryB
   )
@@ -70,6 +78,9 @@ public class MenuItemComponent
     this.allergiesListView = allergiesList;
     this.newDishErrorLabel = errorLabel;
     this.menuTable = table;
+    this.submitDishButton = submitButton;
+    this.deleteDishButton = deleteButton;
+    this.dishModalTitle = modalTitle;
     this.toggleButton = toggleB;
     this.primaryButton = primaryB;
 
@@ -95,6 +106,52 @@ public class MenuItemComponent
     });
 
     allergiesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+    allergiesListView.setCellFactory(lv -> {
+      ListCell<String> cell = new ListCell<>() {
+        @Override
+        protected void updateItem(String item, boolean empty) {
+          super.updateItem(item, empty);
+          setText(empty || item == null ? null : item);
+        }
+      };
+      cell.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+        lv.requestFocus();
+        if (!cell.isEmpty()) {
+          int index = cell.getIndex();
+          if (lv.getSelectionModel().isSelected(index)) {
+            lv.getSelectionModel().clearSelection(index);
+          } else {
+            lv.getSelectionModel().select(index);
+          }
+          event.consume();
+        }
+      });
+      return cell;
+    });
+  }
+
+  private void openMenuAsForm(MenuItems item)
+  {
+    setEditMode(true);
+    editingMenuItem = item;
+    dishNameField.setText(item.getName());
+    dishTypeComboBox.setValue(item.getType().toString());
+    dishPriceField.setText(String.valueOf(item.getPrice()));
+    isVegetarianCheckBox.setSelected(item.isVegetarian());
+
+    populateAllergies();
+
+    allergiesListView.getSelectionModel().clearSelection();
+    for (String allergy : item.getAllergies()) {
+      int index = allergiesListView.getItems().indexOf(allergy);
+      if (index >= 0) {
+        allergiesListView.getSelectionModel().select(index);
+      }
+    }
+
+    hideError();
+    showOverlay(newDishOverlay);
   }
 
   public void initAllergyModal(
@@ -117,6 +174,7 @@ public class MenuItemComponent
   public void initClient(Client client)
   {
     this.allergyService = new AllergyService(client);
+    this.menuItemService = new MenuItemService(client);
 
     this.allergyService.onAllergiesLoaded(response ->
     {
@@ -149,20 +207,34 @@ public class MenuItemComponent
         e.printStackTrace();
       }
     });
+    this.menuItemService.onMenuItemsLoaded(response ->
+        menuTable.getItems().setAll(response.getMenuItems()));
+
+    this.menuItemService.onMenuItemCreated(response -> {
+      try { refreshMenuTable(); } catch (Exception e) { e.printStackTrace(); }
+    });
+
+    this.menuItemService.onMenuItemUpdated(response -> {
+      try { refreshMenuTable(); } catch (Exception e) { e.printStackTrace(); }
+    });
+
+    this.menuItemService.onMenuItemDeleted(response -> {
+      try { refreshMenuTable(); } catch (Exception e) { e.printStackTrace(); }
+    });
   }
   private void initAllergyRowDoubleClick()
   {
     menuTable.setRowFactory(tv -> {
       TableRow<Object> row = new TableRow<>();
-
       row.setOnMouseClicked(event -> {
-        if (event.getClickCount() == 2 && !row.isEmpty() && showingAllergies)
-        {
-          Allergy allergy = (Allergy) row.getItem();
-          openEditAllergyModal(allergy);
+        if (event.getClickCount() == 2 && !row.isEmpty()) {
+          if (showingAllergies) {
+            openEditAllergyModal((Allergy) row.getItem());
+          } else {
+            openMenuAsForm((MenuItems) row.getItem());
+          }
         }
       });
-
       return row;
     });
   }
@@ -172,6 +244,7 @@ public class MenuItemComponent
 
   private void openNewDishModal()
   {
+    setEditMode(false);
     dishNameField.clear();
     dishPriceField.clear();
     dishTypeComboBox.getSelectionModel().clearSelection();
@@ -267,14 +340,26 @@ public class MenuItemComponent
     ArrayList<String> allergies =
         new ArrayList<>(allergiesListView.getSelectionModel().getSelectedItems());
 
+    if (isEditMode){
+      try {
+        MenuItems updated = new MenuItems(
+            editingMenuItem.getId(), name, MenuTypes.valueOf(typeStr), price, isVegetarian, allergies
+        );
+        menuItemService.updateMenuItem(editingMenuItem.getId(), name, MenuTypes.valueOf(typeStr), price, isVegetarian, allergies);
+        closeNewDishModal();
+      }
+      catch (IOException e){
+        showError("Connection Error: " + e.getMessage());
+      }
+      return;
+    }
     try {
-      MenuItemDAOImpl.getInstance().createMenuItem(
+      menuItemService.createMenuItem(
           name, MenuTypes.valueOf(typeStr), price, isVegetarian, allergies
       );
       closeNewDishModal();
-      refreshMenuTable();
-    } catch (SQLException e) {
-      showError("Database error: " + e.getMessage());
+    } catch (IOException e) {
+      showError("Connection error: " + e.getMessage());
     }
   }
 
@@ -336,13 +421,14 @@ public class MenuItemComponent
 
   public void refreshMenuTable()
   {
-
+    configureMenuColumns();
     try {
-      configureMenuColumns();
-      menuTable.getItems().setAll(MenuItemDAOImpl.getInstance().getAllMenuItems());
-    } catch (SQLException e) {
+      menuItemService.loadMenuItems();
+    }
+    catch (IOException e){
       e.printStackTrace();
     }
+
   }
   private void loadAllergyTable() throws IOException
   {
@@ -494,6 +580,27 @@ private void configureMenuColumns()
   {
     newDishErrorLabel.setVisible(false);
     newDishErrorLabel.setManaged(false);
+  }
+  private void setEditMode(boolean edit) {
+    isEditMode = edit;
+    submitDishButton.setText(edit ? "Apply" : "Create");
+    deleteDishButton.setVisible(edit);
+    deleteDishButton.setManaged(edit);
+    dishModalTitle.setText(edit ? "Edit Dish" : "New Dish");
+  }
+
+  public void deleteDish(){
+    if (editingMenuItem == null){
+      showError("No dish selected");
+      return;
+    }
+    try {
+      menuItemService.deleteMenuItem(editingMenuItem.getId());
+      closeNewDishModal();
+    }
+    catch (IOException e){
+      showError("Connection error: " + e.getMessage());
+    }
   }
 
   private void showAllergyError(String msg)

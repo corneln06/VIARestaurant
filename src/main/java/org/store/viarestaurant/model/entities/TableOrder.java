@@ -1,7 +1,5 @@
 package org.store.viarestaurant.model.entities;
 
-// import java.util.ArrayList;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 

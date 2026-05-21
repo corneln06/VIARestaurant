@@ -468,3 +468,32 @@
     -fx-min-width: 160px;
     -fx-effect: dropshadow(gaussian, rgba(39, 52, 105, 0.08), 12, 0.1, 0, 3);
 }
+.allergy-list {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: #d2d9ec;
+    -fx-border-radius: 10px;
+    -fx-padding: 4px;
+}
+
+.allergy-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1d2440;
+    -fx-background-radius: 8px;
+}
+
+.allergy-list .list-cell:hover {
+    -fx-background-color: #eef1f7;
+    -fx-cursor: hand;
+}
+
+.allergy-list .list-cell:selected {
+    -fx-background-color: rgba(82, 174, 207, 0.18);
+    -fx-text-fill: #1d2440;
+}
+
+.allergy-list .list-cell:selected:hover {
+    -fx-background-color: rgba(82, 174, 207, 0.28);
+}

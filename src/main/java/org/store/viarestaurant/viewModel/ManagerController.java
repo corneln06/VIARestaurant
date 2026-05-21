@@ -4,6 +4,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.viewModel.components.MenuItemComponent;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
@@ -33,30 +34,31 @@ public class ManagerController
   }
 
   public void initModal(
-          StackPane overlay,
-          TextField guestName,
-          DatePicker datePicker,
-          TextField timeField,
-          TextField partySize,
-          ComboBox<String> tableCombo,
-          Label errorLabel,
-          StackPane overlayNewDish,
-          TextField nameField,
-          ComboBox<String> typeCombo,
-          TextField priceField,
-          CheckBox vegetarianCheckBox,
-          ListView<String> allergiesList,
-          Label errorLabelNewDish,
-          TableView<Object> table,
-          Button submit,
-          Button delete,
-          Label title,
-          Button toggleButton,
-          Button primaryButton,
-          StackPane allergyOverlay,
-          TextField allergyNameField,
-          Label allergyErrorLabel, Button createAllergyButton, Button deleteAllergyButton,
-          Label allergyModalTitle)
+      StackPane overlay,
+      TextField guestName,
+      DatePicker datePicker,
+      TextField timeField,
+      TextField partySize,
+      ComboBox<String> tableCombo,
+      Label errorLabel,
+      StackPane overlayNewDish,
+      TextField nameField,
+      ComboBox<String> typeCombo,
+      TextField priceField,
+      CheckBox vegetarianCheckBox,
+      ListView<String> allergiesList,
+      Label errorLabelNewDish,
+      TableView<Object> table,
+      Button submit,
+      Button delete,
+      Label title,
+      Button submitDishButton,
+      Button deleteDishButton,
+      Label dishModalTitle,
+      Button toggleButton, Button primaryButton,
+      StackPane allergyOverlay, TextField allergyNameField,
+      Label allergyErrorLabel, Button createAllergyButton, Button deleteAllergyButton,
+      Label allergyModalTitle)
   {
     reservationComponent.initModal(
         overlay, guestName, datePicker, timeField,
@@ -66,7 +68,8 @@ public class ManagerController
     menuItemComponent.initModal(
         overlayNewDish, nameField, typeCombo, priceField,
         vegetarianCheckBox, allergiesList, errorLabelNewDish, table,
-            toggleButton, primaryButton
+        submitDishButton, deleteDishButton, dishModalTitle,
+        toggleButton, primaryButton
     );
     menuItemComponent.initAllergyModal( allergyOverlay,
             allergyNameField,
@@ -81,11 +84,18 @@ public class ManagerController
             Label title,
             Label badge,
             Label info,
-            StackPane newTableOverlay , TextField  tableMaxSittingField, Label newTableErrorLabel,
+            StackPane newTableOverlay ,
+            TextField tableMaxSittingField,
+            Label newTableErrorLabel,
             ComboBox<String> waiterComboBox,
-            Button primaryButton)
+            Button primaryButton,
+            Button secondaryButton,
+            Button deleteTable,
+            Button submitTable,
+            Label newTitle
+  )
     {
-        tableComponent.initModal(overlay, title, badge, info, newTableOverlay, tableMaxSittingField, newTableErrorLabel, waiterComboBox, primaryButton);
+      tableComponent.initModal(WorkerRole.Manager,overlay, title, badge, info, newTableOverlay, tableMaxSittingField, newTableErrorLabel, null, primaryButton, secondaryButton,deleteTable,submitTable,newTitle);
     }
 
   public void initClient(Client client)
@@ -146,6 +156,7 @@ public class ManagerController
   
   public void createDish() { menuItemComponent.createDish();}
 
+  public void deleteDish() { menuItemComponent.deleteDish();}
   public void openNewTableModal() { tableComponent.openNewTableModal();}
 
   public void closeNewTableModal() { tableComponent.closeNewTableModal(); }
@@ -164,4 +175,6 @@ public class ManagerController
   public void deleteAllergy() {
     menuItemComponent.deleteAllergy();
   }
+
+  public void deleteTable() { tableComponent.deleteTable(); }
 }
