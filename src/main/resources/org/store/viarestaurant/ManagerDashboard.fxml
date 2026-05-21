@@ -291,7 +291,7 @@
                                             </styleClass>
                                         </Button>
                                         <Button fx:id="newTableDeleteButton"
-                                                text="delete"
+                                                text="Delete"
                                                 onAction="#deleteTable"
                                                 visible="false"
                                                 managed="false"
