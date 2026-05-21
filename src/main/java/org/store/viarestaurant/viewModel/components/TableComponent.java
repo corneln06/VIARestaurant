@@ -259,7 +259,7 @@ public class TableComponent
     boolean reserved = reservations.stream()
         .anyMatch(r ->
             r.getTable() != null &&
-                r.getTable().getId() == tableId
+                r.getTable().getId() == tableId && !r.isSeated()
         );
 
     tableModalTitle.setText("Table " + tableId);
@@ -287,9 +287,6 @@ public class TableComponent
       tableModalSecondaryButton.setManaged(false);
       closestReservation = null;
 
-//      if (closestReservation != null && !closestReservation.isSeated()){
-//          tableModalPrimaryButton.setOnAction(e -> setReserved());
-//      }
     }
     else if(reserved)
     {
@@ -332,6 +329,7 @@ public class TableComponent
     }
     else
     {
+        System.out.println("Should be here");
       tableModalStateBadge.setText("Available");
       tableModalStateBadge.getStyleClass().add("badge-available");
       tableModalInfo.setText("Ready for walk-ins and upcoming service.");
@@ -420,9 +418,11 @@ public class TableComponent
 
         boolean lessThan1h30 = duration.toMinutes() >= 0 && duration.toMinutes() <= 90;
 
-        tableModalInfo.setText("This table has a reservation today at " + closestReservation
-                .getDateTime()
-                .format(DateTimeFormatter.ofPattern("HH:mm")));
+        if (!closestReservation.isSeated()){
+            tableModalInfo.setText("This table has a reservation today at " + closestReservation
+                    .getDateTime()
+                    .format(DateTimeFormatter.ofPattern("HH:mm")));
+        }
 
         tableModalPrimaryButton.setDisable(lessThan1h30);
       });
