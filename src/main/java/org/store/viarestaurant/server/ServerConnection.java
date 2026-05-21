@@ -149,6 +149,18 @@ public class ServerConnection implements Runnable {
           System.out.println("[SERVER] GetClosestReservationRequest detected");
           handleGetClosestReservationRequest(request);
         }
+        else if (object instanceof DeleteTableRequest request)
+        {
+          System.out.println("[SERVER] DeleteAllergyRequest detected");
+          handleDeleteTable(request);
+        }
+        else if (object instanceof UpdateTableRequest request)
+        {
+          System.out.println("[SERVER] DeleteAllergyRequest detected");
+          handleUpdateTable(request);
+        }
+
+
         else if (object instanceof GetMenuItemsRequest)
         {
           System.out.println("[SERVER] GetMenuItemsRequest detected");
@@ -203,6 +215,36 @@ public class ServerConnection implements Runnable {
     }
   }
 
+  private void handleUpdateTable(UpdateTableRequest request) throws IOException {
+    try {
+      RestaurantTable table = new RestaurantTable(request.getId(), request.getMaxSitting());
+      restaurantTableDAO.updateRestaurantTable(table);
+
+      send(new UpdateTableResponse(true, "Table updated successfully"));
+
+      connectionPool.broadcast(
+              new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables())
+      );
+    } catch (SQLException e) {
+      e.printStackTrace();
+      send(new UpdateTableResponse(false, "Database error while updating Table"));
+    }
+  }
+
+  private void handleDeleteTable(DeleteTableRequest request) throws IOException {
+    try {
+      restaurantTableDAO.deleteRestaurantTableByID(request.getRestaurantTableid());
+
+      send(new DeleteTableResponse(true, "Table deleted successfully"));
+
+      connectionPool.broadcast(
+              new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables())
+      );
+    } catch (SQLException e) {
+      e.printStackTrace();
+      send(new DeleteTableResponse(false, "Database error while deleting Table"));
+    }
+  }
   private void handleDeleteAllergy(DeleteAllergyRequest request) throws IOException
   {
     try

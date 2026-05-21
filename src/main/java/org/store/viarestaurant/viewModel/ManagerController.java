@@ -4,6 +4,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.viewModel.components.MenuItemComponent;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
@@ -83,12 +84,18 @@ public class ManagerController
             Label title,
             Label badge,
             Label info,
-            StackPane newTableOverlay , TextField  tableMaxSittingField, Label newTableErrorLabel,
+            StackPane newTableOverlay ,
+            TextField tableMaxSittingField,
+            Label newTableErrorLabel,
             ComboBox<String> waiterComboBox,
             Button primaryButton,
-            Button secondaryButton)
+            Button secondaryButton,
+            Button deleteTable,
+            Button submitTable,
+            Label newTitle
+  )
     {
-        tableComponent.initModal(overlay, title, badge, info, newTableOverlay, tableMaxSittingField, newTableErrorLabel, waiterComboBox, primaryButton, secondaryButton);
+      tableComponent.initModal(WorkerRole.Manager,overlay, title, badge, info, newTableOverlay, tableMaxSittingField, newTableErrorLabel, null, primaryButton, secondaryButton,deleteTable,submitTable,newTitle);
     }
 
   public void initClient(Client client)
@@ -168,4 +175,6 @@ public class ManagerController
   public void deleteAllergy() {
     menuItemComponent.deleteAllergy();
   }
+
+  public void deleteTable() { tableComponent.deleteTable(); }
 }

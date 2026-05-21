@@ -8,13 +8,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.store.viarestaurant.model.entities.*;
 import org.store.viarestaurant.model.enums.WorkerRole;
@@ -22,9 +16,7 @@ import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.SeatTableRequest;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.SetTableAvailableRequest;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.SetTableReservedRequest;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
 import org.store.viarestaurant.viewModel.services.ReservationService;
 import org.store.viarestaurant.viewModel.services.TableOrderService;
 import org.store.viarestaurant.viewModel.services.TablesService;
@@ -38,7 +30,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import org.store.viarestaurant.viewModel.services.WorkersService;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreateRequest;
 
 public class TableComponent
 {
@@ -54,6 +45,8 @@ public class TableComponent
   private StackPane newTableModalOverlay;
   private TextField maxSittingField;
   private Label newTableErrorLabel;
+  private Button deleteButton;
+  private Button submitButton;
 
   private ReservationService reservationService;
   private TablesService tablesService;
@@ -70,7 +63,11 @@ public class TableComponent
   private int currentTableId;
 
   private String labelSuffix = "";
+  private WorkerRole role;
+  private boolean isTableEditMode= false;
+  private RestaurantTable editingTable;
   private Reservation closestReservation;
+  private Label newTableTitle;
 
   public void setLabelSuffix(String labelSuffix) {
       this.labelSuffix = labelSuffix;
@@ -84,6 +81,7 @@ public class TableComponent
   }
 
   public void initModal(
+          WorkerRole role,
       StackPane overlay,
       Label title,
       Label badge,
@@ -93,8 +91,13 @@ public class TableComponent
       Label error,
       ComboBox<String> waiterComboBox,
       Button primaryButton,
-      Button secondaryButton)
+      Button secondaryButton,
+      Button deleteTable,
+      Button submitTable,
+      Label modalTitle
+      )
   {
+    this.role = role;
     this.tableModalOverlay = overlay;
     this.tableModalTitle = title;
     this.tableModalStateBadge = badge;
@@ -105,6 +108,9 @@ public class TableComponent
     this.newTableModalOverlay = newOverlay;
     this.maxSittingField = maxSitting;
     this.newTableErrorLabel = error;
+    this.deleteButton = deleteTable;
+    this.submitButton = submitTable;
+    this.newTableTitle= modalTitle;
   }
 
   public void loadTables(){
@@ -187,23 +193,28 @@ public class TableComponent
       btn.getStyleClass().add("table-btn");
       GridPane.setHgrow(btn, Priority.ALWAYS);
       GridPane.setVgrow(btn, Priority.ALWAYS);
-      final int id = table.getId();
-      btn.setOnAction(e -> {
-          if (labelSuffix.isEmpty()){
-              try {
-                  openTableModal(id);
-              } catch (SQLException | IOException ex) {
-                  throw new RuntimeException(ex);
-              }
-          } else {
-              System.out.println("YES");
-          }
-      });
+      btn.setOnAction(e -> handleTableClick(table));
       tableGrid.add(btn, i % 5, i / 5);
-      tableButtonMap.put(id, btn);
+      tableButtonMap.put(table.getId(), btn);
       updateTableButton(btn, false, false);
     }
     refreshTableGrid();
+  }
+
+  private void handleTableClick(RestaurantTable table) {
+      if(role.equals(WorkerRole.Host))
+      {
+        try {
+          openTableModal(table.getId());
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      else
+      {
+        openManagerOverlay(table);
+      }
+
   }
 
   private void updateTableButton(Button btn, boolean reserved, boolean seated)
@@ -214,12 +225,13 @@ public class TableComponent
     else btn.getStyleClass().add("table-available");
   }
 
-  private void openTableModal(int tableId) throws SQLException, IOException
+  private void openTableModal(int tableId) throws IOException
   {
     currentTableId = tableId;
     waiterMap.clear();
-    tableModalWaiterComboBox.getItems().clear();
-
+    if (tableModalWaiterComboBox != null) {
+      tableModalWaiterComboBox.getItems().clear();
+    }
     try
     {
         reservationService.getClosestReservation(tableId);
@@ -237,11 +249,15 @@ public class TableComponent
             worker.getFirstName() + " " + worker.getLastName();
 
         waiterMap.put(label, worker);
-        tableModalWaiterComboBox.getItems().add(label);
+        if (tableModalWaiterComboBox != null) {
+          tableModalWaiterComboBox.getItems().clear();
+        }
       }
     }
 
-    tableModalWaiterComboBox.getSelectionModel().clearSelection();
+    if (tableModalWaiterComboBox != null) {
+      tableModalWaiterComboBox.getItems().clear();
+    }
     if(tableModalOverlay == null)
     {
       return;
@@ -342,6 +358,7 @@ public class TableComponent
     tablesService.onTablesLoaded(response ->
     {
       tables = response.getTables();
+      tables.sort(Comparator.comparingInt(RestaurantTable::getId));
       buildTableGrid();
       refreshTableGrid();
     });
@@ -358,6 +375,24 @@ public class TableComponent
         showError(response.getMessage());
       }
     });
+
+    tablesService.onTablesDeleted(response -> {
+      if (response.isSuccess()) {
+        closeNewTableModal();
+        loadTables();
+      } else {
+        showError(response.getMessage());
+      }
+    });
+    tablesService.onTablesUpdated(response -> {
+      if (response.isSuccess()) {
+        closeNewTableModal();
+        loadTables();
+      } else {
+        showError(response.getMessage());
+      }
+    });
+
     reservationService.onUpdatedMessage(message ->
     {
       closeTableModal();
@@ -417,9 +452,18 @@ public class TableComponent
   public void openNewTableModal() {
     if (newTableModalOverlay == null) return;
 
+    editingTable=null;
+
     maxSittingField.clear();
 
+    setTableEditMode(false);
     hideError();
+
+    newTableTitle.setText("New Table");
+    submitButton.setText("Create");
+
+    deleteButton.setVisible(false);
+    deleteButton.setManaged(false);
 
     newTableModalOverlay.setVisible(true);
     newTableModalOverlay.setManaged(true);
@@ -483,6 +527,11 @@ public class TableComponent
   public void closeNewTableModal() {
     if (newTableModalOverlay == null) return;
 
+
+    deleteButton.setVisible(false);
+    deleteButton.setManaged(false);
+
+
     newTableModalOverlay.setVisible(false);
     newTableModalOverlay.setManaged(false);
   }
@@ -530,6 +579,19 @@ public class TableComponent
       return;
     }
 
+    if(isTableEditMode())
+    {
+      try {
+        UpdateTableRequest request = new UpdateTableRequest(editingTable.getId(),maxSitters);
+
+        tablesService.updateTable(request);
+        return;
+      } catch (IOException e) {
+        showError("Failed to send update request.");
+        return;
+      }
+    }
+
     try {
       TableCreateRequest request = new TableCreateRequest(maxSitters);
 
@@ -540,5 +602,51 @@ public class TableComponent
       e.printStackTrace();
     }
   }
+
+    public boolean isTableEditMode() {
+        return isTableEditMode;
+    }
+
+    public void setTableEditMode(boolean tableEditMode) {
+        isTableEditMode = tableEditMode;
+    }
+
+  public void deleteTable() {
+
+    if (editingTable == null)
+    {
+      showError("No Table selected.");
+      return;
+    }
+    DeleteTableRequest request = new DeleteTableRequest(editingTable.getId());
+
+    try
+    {
+     tablesService.deleteTable(request);
+    } catch (IOException e) {
+      showError("Failed to send delete request.");
+    }
+
+  }
+
+  private void openManagerOverlay(RestaurantTable table) {
+    editingTable = table;
+
+    maxSittingField.setText(String.valueOf(table.getMaxSitting()));
+
+    setTableEditMode(true);
+    hideError();
+
+
+    newTableTitle.setText("Table "+ editingTable.getId() +" details");
+
+    submitButton.setText("Apply");
+    deleteButton.setVisible(true);
+    deleteButton.setManaged(true);
+
+    newTableModalOverlay.setVisible(true);
+    newTableModalOverlay.setManaged(true);
+  }
+
 }
 
