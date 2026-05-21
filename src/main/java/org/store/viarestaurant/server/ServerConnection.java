@@ -602,7 +602,8 @@ public class ServerConnection implements Runnable {
           request.getName(),
           request.getDateTime(),
           request.getPartySize(),
-          request.getTable());
+          request.getTable(),
+          request.isSeated());
 
       reservationDAO.updateReservation(reservation);
 

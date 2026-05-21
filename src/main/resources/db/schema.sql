@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS Reservations (
     customer varchar(100) not null,
     date timestamp not null,
     partySize int,
-    tableId int not null
+    tableId int not null,
+    isSeated boolean DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS TableOrders (

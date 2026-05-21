@@ -142,7 +142,7 @@ public class TableComponent
 
     for (Reservation r : reservations)
     {
-      reservedIds.add(r.getTable().getId());
+      if (!r.isSeated())reservedIds.add(r.getTable().getId());
     }
     for (RestaurantTable table : tables)
     {
@@ -274,7 +274,7 @@ public class TableComponent
     boolean reserved = reservations.stream()
         .anyMatch(r ->
             r.getTable() != null &&
-                r.getTable().getId() == tableId
+                r.getTable().getId() == tableId && !r.isSeated()
         );
 
     tableModalTitle.setText("Table " + tableId);
@@ -297,13 +297,11 @@ public class TableComponent
       tableModalInfo.setText("Table is currently occupied.");
       tableModalPrimaryButton.setText("Set Available");
       tableModalPrimaryButton.setOnAction(e -> setAvailable());
+      tableModalPrimaryButton.setDisable(false);
       tableModalSecondaryButton.setVisible(false);
       tableModalSecondaryButton.setManaged(false);
       closestReservation = null;
 
-      if (closestReservation != null){
-          tableModalPrimaryButton.setOnAction(e -> setReserved());
-      }
     }
     else if(reserved)
     {
@@ -328,6 +326,17 @@ public class TableComponent
         {
             e.printStackTrace();
         }
+
+
+        tableModalSecondaryButton.setOnAction(e -> {
+            seatTable();
+            UpdateReservationRequest request = new UpdateReservationRequest(closestReservation.getId(), closestReservation.getName(), closestReservation.getDateTime(), closestReservation.getPartySize(), closestReservation.getTable(), true);
+            try {
+                reservationService.updateReservation(request);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
     else
     {
@@ -438,9 +447,11 @@ public class TableComponent
 
         boolean lessThan1h30 = duration.toMinutes() >= 0 && duration.toMinutes() <= 90;
 
-        tableModalInfo.setText("This table has a reservation today at " + closestReservation
-                .getDateTime()
-                .format(DateTimeFormatter.ofPattern("HH:mm")));
+        if (!closestReservation.isSeated()){
+            tableModalInfo.setText("This table has a reservation today at " + closestReservation
+                    .getDateTime()
+                    .format(DateTimeFormatter.ofPattern("HH:mm")));
+        }
 
         tableModalPrimaryButton.setDisable(lessThan1h30);
       });
