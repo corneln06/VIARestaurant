@@ -297,7 +297,7 @@ public class NavigationController
                         tableModalPrimaryButton,
                         tableModalSecondaryButton,
                         newTableDeleteButton,
-                        newTableSubmitButton,newTableModalTitle)
+                        newTableSubmitButton,newTableModalTitle);
 
                 showTablesPage();
                 showMenuPage();
