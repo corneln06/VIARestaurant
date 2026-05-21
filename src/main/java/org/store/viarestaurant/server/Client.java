@@ -9,7 +9,12 @@ import org.store.viarestaurant.server.dto.MenuItemDTO.GetMenuItemsResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
+import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderResponse;
+import org.store.viarestaurant.server.dto.ReservationDto.*;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;
@@ -56,6 +61,11 @@ public class Client
   private Consumer<MessageResponse> updateMenuItemListener;
   private Consumer<MessageResponse> deleteMenuItemListener;
   private Consumer<CreateMenuItemResponse> createdMenuItemListener;
+
+  private List<Consumer<GetMenuItemsResponse>>      menuItemsListeners    = new ArrayList<>();
+  private List<Consumer<GetOrdersByWaiterResponse>> waiterOrdersListeners = new ArrayList<>();
+  private List<Consumer<AddItemsToOrderResponse>>   addItemsListeners     = new ArrayList<>();
+  private Consumer<PayOrderResponse>                payOrderListener;
 
   public void connect() throws IOException
   {
@@ -177,6 +187,22 @@ public class Client
             {
               deleteAllergyListener.accept(response);
             }
+            else if (object instanceof GetMenuItemsResponse response && !menuItemsListeners.isEmpty())
+            {
+              for (var c : menuItemsListeners) c.accept(response);
+            }
+            else if (object instanceof GetOrdersByWaiterResponse response && !waiterOrdersListeners.isEmpty())
+            {
+              for (var c : waiterOrdersListeners) c.accept(response);
+            }
+            else if (object instanceof AddItemsToOrderResponse response && !addItemsListeners.isEmpty())
+            {
+              for (var c : addItemsListeners) c.accept(response);
+            }
+            else if (object instanceof PayOrderResponse response && payOrderListener != null)
+            {
+              payOrderListener.accept(response);
+            }
 
 
             else if (object instanceof GetMenuItemsResponse response && getMenuItemsListener != null)
@@ -272,6 +298,21 @@ public class Client
 
   public void setDeleteAllergyListener(Consumer<MessageResponse> listener) { this.deleteAllergyListener = listener; }
 
+  public void setMenuItemsListener(Consumer<GetMenuItemsResponse> listener) {
+    menuItemsListeners.add(listener);
+  }
+
+  public void setWaiterOrdersListener(Consumer<GetOrdersByWaiterResponse> listener) {
+    waiterOrdersListeners.add(listener);
+  }
+
+  public void setAddItemsListener(Consumer<AddItemsToOrderResponse> listener) {
+    addItemsListeners.add(listener);
+  }
+
+  public void setPayOrderListener(Consumer<PayOrderResponse> listener) {
+    this.payOrderListener = listener;
+  }
     public void setUpdateTableListener(Consumer<UpdateTableResponse> updateTableListener) {
         this.updateTableListener = updateTableListener;
     }

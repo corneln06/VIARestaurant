@@ -3,8 +3,8 @@ package org.store.viarestaurant.model.entities;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class TableOrder implements Serializable
-{
+public class TableOrder implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final int id;
     private RestaurantTable restaurantTable;
     private Workers waiter;
@@ -83,4 +83,5 @@ public class TableOrder implements Serializable
     public void removeMenuItems(String menuItem){
         menuItems.remove(menuItem);
     }
+
 }
