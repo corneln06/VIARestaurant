@@ -13,10 +13,8 @@ import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderResponse;
-import org.store.viarestaurant.server.dto.MenuItemDTO.CreateMenuItemResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
-import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;

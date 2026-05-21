@@ -10,8 +10,6 @@ import org.store.viarestaurant.model.state.SeatedState;
 import org.store.viarestaurant.server.dto.AllergyDTO.*;
 import org.store.viarestaurant.server.dto.LoginDTO.LoginRequest;
 import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
-import org.store.viarestaurant.server.dto.MenuItemsDTO.GetMenuItemsRequest;
-import org.store.viarestaurant.server.dto.MenuItemsDTO.GetMenuItemsResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
