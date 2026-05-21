@@ -3,18 +3,16 @@ package org.store.viarestaurant.viewModel.components;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
-import org.store.viarestaurant.dao.AllergyDAOImpl;
 import org.store.viarestaurant.model.entities.Allergy;
 import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.enums.MenuTypes;
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.AllergyDTO.GetAllergiesRequest;
 import org.store.viarestaurant.viewModel.services.AllergyService;
 import org.store.viarestaurant.viewModel.services.MenuItemService;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MenuItemComponent
 {
@@ -51,6 +49,7 @@ public class MenuItemComponent
 
   private boolean showingAllergies = false;
   private Label allergyModalTitle;
+  private List<Allergy> cachedAllergies = new ArrayList<>();
 
   ///////////////////////////////////
   ////////////// INITIALIZATIONS
@@ -179,7 +178,11 @@ public class MenuItemComponent
 
     this.allergyService.onAllergiesLoaded(response ->
     {
-      menuTable.getItems().setAll(response.getAllergies());
+      cachedAllergies = response.getAllergies();
+      if (showingAllergies)
+      { 
+        menuTable.getItems().setAll(response.getAllergies());
+      }
     });
 
     this.allergyService.onAllergyCreated(response ->
@@ -222,6 +225,9 @@ public class MenuItemComponent
     this.menuItemService.onMenuItemDeleted(response -> {
       try { refreshMenuTable(); } catch (Exception e) { e.printStackTrace(); }
     });
+
+    try { allergyService.loadAllergies(); }
+    catch (IOException e) { e.printStackTrace(); }
   }
   private void initAllergyRowDoubleClick()
   {
@@ -439,13 +445,8 @@ public class MenuItemComponent
 
   private void populateAllergies()
   {
-    try {
       allergiesListView.getItems().clear();
-      AllergyDAOImpl.getInstance().getAllAllergies()
-          .forEach(a -> allergiesListView.getItems().add(a.getName()));
-    } catch (SQLException e) {
-      showError("Could not load allergies.");
-    }
+      cachedAllergies.forEach(a -> allergiesListView.getItems().add(a.getName()));
   }
 
 
