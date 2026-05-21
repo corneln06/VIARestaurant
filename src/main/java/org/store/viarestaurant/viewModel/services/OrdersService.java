@@ -1,8 +1,8 @@
 package org.store.viarestaurant.viewModel.services;
 
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.MenuItemsDTO.GetMenuItemsRequest;
-import org.store.viarestaurant.server.dto.MenuItemsDTO.GetMenuItemsResponse;
+import org.store.viarestaurant.server.dto.MenuItemDTO.GetMenuItemsRequest;
+import org.store.viarestaurant.server.dto.MenuItemDTO.GetMenuItemsResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderRequest;
 import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterRequest;

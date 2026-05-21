@@ -226,132 +226,184 @@ public class TableComponent
     else btn.getStyleClass().add("table-available");
   }
 
-  private void openTableModal(int tableId) throws IOException
-  {
-    currentTableId = tableId;
-    waiterMap.clear();
-    if (tableModalWaiterComboBox != null) {
-      tableModalWaiterComboBox.getItems().clear();
-    }
-    try
+    private void openTableModal(int tableId) throws IOException
     {
-        reservationService.getClosestReservation(tableId);
-    }
-    catch (IOException e)
-    {
-        throw new RuntimeException(e);
-    }
+        currentTableId = tableId;
 
-    for(Workers worker : workers)
-    {
-      if(worker.getRole() == WorkerRole.Waiter)
-      {
-        String label =
-            worker.getFirstName() + " " + worker.getLastName();
+        waiterMap.clear();
 
-        waiterMap.put(label, worker);
         if (tableModalWaiterComboBox != null) {
-          tableModalWaiterComboBox.getItems().clear();
+            tableModalWaiterComboBox.getItems().clear();
         }
-      }
-    }
 
-    if (tableModalWaiterComboBox != null) {
-      tableModalWaiterComboBox.getItems().clear();
-    }
-    if(tableModalOverlay == null)
-    {
-      return;
-    }
-    RestaurantTable table = tables.stream()
-        .filter(t -> t.getId() == tableId)
-        .findFirst()
-        .orElse(null);
+        try {
+            reservationService.getClosestReservation(tableId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-    if(table == null)
-    {
-      return;
-    }
-    boolean reserved = reservations.stream()
-        .anyMatch(r ->
-            r.getTable() != null &&
-                r.getTable().getId() == tableId && !r.isSeated()
+        // Cargar waiters al ComboBox
+        for (Workers worker : workers)
+        {
+            if (worker.getRole() == WorkerRole.Waiter)
+            {
+                String label =
+                        worker.getFirstName() + " " +
+                                worker.getLastName();
+
+                waiterMap.put(label, worker);
+
+                if (tableModalWaiterComboBox != null)
+                {
+                    tableModalWaiterComboBox
+                            .getItems()
+                            .add(label);
+                }
+            }
+        }
+
+        if (tableModalOverlay == null)
+        {
+            return;
+        }
+
+        RestaurantTable table = tables.stream()
+                .filter(t -> t.getId() == tableId)
+                .findFirst()
+                .orElse(null);
+
+        if (table == null)
+        {
+            return;
+        }
+
+        boolean reserved = reservations.stream()
+                .anyMatch(r ->
+                        r.getTable() != null &&
+                                r.getTable().getId() == tableId &&
+                                !r.isSeated()
+                );
+
+        tableModalTitle.setText("Table " + tableId);
+
+        tableModalStateBadge.getStyleClass().removeAll(
+                "badge-available",
+                "badge-reserved",
+                "badge-unavailable"
         );
 
-    tableModalTitle.setText("Table " + tableId);
-    tableModalStateBadge.getStyleClass().removeAll(
-        "badge-available",
-        "badge-reserved",
-        "badge-unavailable"
-    );
+        boolean seated =
+                table.getStatus() != null &&
+                        table.getStatus().getName().equals("Seated");
 
-    boolean seated =
-        table.getStatus() != null &&
-            table.getStatus().getName().equals("Seated");
-
-    if(seated)
-    {
-      tableOrderService.loadTableOrder(tableId);
-
-      tableModalStateBadge.setText("Seated");
-      tableModalStateBadge.getStyleClass().add("badge-unavailable");
-      tableModalInfo.setText("Table is currently occupied.");
-      tableModalPrimaryButton.setText("Set Available");
-      tableModalPrimaryButton.setOnAction(e -> setAvailable());
-      tableModalPrimaryButton.setDisable(false);
-      tableModalSecondaryButton.setVisible(false);
-      tableModalSecondaryButton.setManaged(false);
-      closestReservation = null;
-
-    }
-    else if(reserved)
-    {
-        tableModalStateBadge.setText("Reserved");
-        tableModalStateBadge.getStyleClass().add("badge-reserved");
-
-        tableModalPrimaryButton.setText("Seat Table");
-        tableModalPrimaryButton.setOnAction(e -> seatTable());
-
-        tableModalSecondaryButton.setVisible(true);
-        tableModalSecondaryButton.setManaged(true);
-
-        tableModalInfo.setText("Loading reservation...");
-
-        closestReservation = null;
-
-        try
+        if (seated)
         {
-            reservationService.getClosestReservation(tableId);
+            tableOrderService.loadTableOrder(tableId);
+
+            tableModalStateBadge.setText("Seated");
+            tableModalStateBadge.getStyleClass().add("badge-unavailable");
+
+            tableModalInfo.setText(
+                    "Table is currently occupied."
+            );
+
+            tableModalPrimaryButton.setText(
+                    "Set Available"
+            );
+
+            tableModalPrimaryButton.setOnAction(
+                    e -> setAvailable()
+            );
+
+            tableModalPrimaryButton.setDisable(false);
+
+            tableModalSecondaryButton.setVisible(false);
+            tableModalSecondaryButton.setManaged(false);
+
+            closestReservation = null;
         }
-        catch(IOException e)
+        else if (reserved)
         {
-            e.printStackTrace();
-        }
+            tableModalStateBadge.setText("Reserved");
+            tableModalStateBadge.getStyleClass().add("badge-reserved");
 
+            tableModalPrimaryButton.setText(
+                    "Seat Table"
+            );
 
-        tableModalSecondaryButton.setOnAction(e -> {
-            seatTable();
-            UpdateReservationRequest request = new UpdateReservationRequest(closestReservation.getId(), closestReservation.getName(), closestReservation.getDateTime(), closestReservation.getPartySize(), closestReservation.getTable(), true);
-            try {
-                reservationService.updateReservation(request);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+            tableModalPrimaryButton.setOnAction(
+                    e -> seatTable()
+            );
+
+            tableModalSecondaryButton.setVisible(true);
+            tableModalSecondaryButton.setManaged(true);
+
+            tableModalInfo.setText(
+                    "Loading reservation..."
+            );
+
+            closestReservation = null;
+
+            try
+            {
+                reservationService.getClosestReservation(
+                        tableId
+                );
             }
-        });
-    }
-    else
-    {
-      tableModalStateBadge.setText("Available");
-      tableModalStateBadge.getStyleClass().add("badge-available");
-      tableModalInfo.setText("Ready for walk-ins and upcoming service.");
-      tableModalPrimaryButton.setText("Seat Table");
-      tableModalPrimaryButton.setOnAction(e -> seatTable());
-      tableModalSecondaryButton.setVisible(false);
-      tableModalSecondaryButton.setManaged(false);
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
 
-    }
-    tableModalOverlay.setVisible(true);
-    tableModalOverlay.setManaged(true);
+            tableModalSecondaryButton.setOnAction(e -> {
+                seatTable();
+
+                UpdateReservationRequest request =
+                        new UpdateReservationRequest(
+                                closestReservation.getId(),
+                                closestReservation.getName(),
+                                closestReservation.getDateTime(),
+                                closestReservation.getPartySize(),
+                                closestReservation.getTable(),
+                                true
+                        );
+
+                try {
+                    reservationService.updateReservation(
+                            request
+                    );
+                }
+                catch(IOException ex)
+                {
+                    throw new RuntimeException(ex);
+                }
+            });
+        }
+        else
+        {
+            tableModalStateBadge.setText("Available");
+            tableModalStateBadge.getStyleClass().add(
+                    "badge-available"
+            );
+
+            tableModalInfo.setText(
+                    "Ready for walk-ins and upcoming service."
+            );
+
+            tableModalPrimaryButton.setText(
+                    "Seat Table"
+            );
+
+            tableModalPrimaryButton.setOnAction(
+                    e -> seatTable()
+            );
+
+            tableModalSecondaryButton.setVisible(false);
+            tableModalSecondaryButton.setManaged(false);
+        }
+
+        tableModalOverlay.setVisible(true);
+        tableModalOverlay.setManaged(true);
     }
 
 

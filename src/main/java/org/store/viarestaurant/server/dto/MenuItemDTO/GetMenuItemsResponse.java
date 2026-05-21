@@ -9,6 +9,8 @@ public class GetMenuItemsResponse implements Serializable
 {
   private final List<MenuItems> menuItems;
 
+  private static final long serialVersionUID = 1L;
+
   public GetMenuItemsResponse(List<MenuItems> menuItems)
   {
     this.menuItems = menuItems;
