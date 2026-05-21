@@ -58,7 +58,7 @@ public class RestaurantTableDAOImpl implements RestaurantTableDAO {
     public ArrayList<RestaurantTable> getAllRestaurantTables() throws SQLException {
         try(Connection connection = getConnection()){
             PreparedStatement statement = connection.prepareStatement(
-                    "SELECT * FROM restauranttable"
+                    "SELECT * FROM restauranttable order by id"
             );
 
             ResultSet rs = statement.executeQuery();

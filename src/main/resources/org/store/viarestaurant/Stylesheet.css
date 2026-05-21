@@ -164,6 +164,7 @@
     -fx-font-weight: bold;
     -fx-cursor: hand;
     -fx-border-width: 0;
+    -fx-border-radius: 10px;
 }
 
 .btn-base:hover {
@@ -172,6 +173,13 @@
 
 .btn-primary {
     -fx-background-color: #52aecf;
+    -fx-text-fill: white;
+}
+
+.btn-pay {
+    -fx-border-width: 2px;
+    -fx-border-color: #00000010;
+    -fx-background-color: #52cf84;
     -fx-text-fill: white;
 }
 
@@ -420,6 +428,45 @@
 .table-row-cell .table-cell {
     -fx-alignment: center;
     -fx-font-size: 15px;
+}
+
+.menu-item-tile {
+    -fx-cursor: hand;
+}
+
+.menu-item-tile-staged {
+    -fx-background-color: #d4e9f7;
+    -fx-border-color: #52aecf;
+}
+
+.staged-chip {
+    -fx-background-color: #e8f4fd;
+    -fx-border-color: #aed6f1;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 4px 10px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.staged-chip-remove {
+    -fx-cursor: hand;
+    -fx-text-fill: #888;
+    -fx-font-weight: bold;
+}
+
+.staged-chip-remove:hover {
+    -fx-text-fill: #c00;
+}
+
+.order-table-card {
+    -fx-cursor: hand;
+    -fx-background-color: white;
+    -fx-background-radius: 14px;
+    -fx-padding: 18px;
+    -fx-border-color: #e2e7f3;
+    -fx-border-radius: 14px;
+    -fx-min-width: 160px;
+    -fx-effect: dropshadow(gaussian, rgba(39, 52, 105, 0.08), 12, 0.1, 0, 3);
 }
 .allergy-list {
     -fx-background-color: white;

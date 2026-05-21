@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS Workers (
     firstName varchar(100) not null ,
     lastName varchar(100) not null ,
     rol varchar(8) not null check ( rol in ('Manager', 'Host', 'Waiter') ),
-    email varchar(100) not null ,
+    email varchar(100) not null UNIQUE,
     password varchar(100) not null
 );
 
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS RestaurantTable (
 
 CREATE TABLE IF NOT EXISTS MenuItems (
     id serial primary key,
-    name varchar(100) not null,
+    name varchar(100) not null UNIQUE,
     type varchar(100) not null check ( type in ('Starter', 'Main', 'Dessert', 'Beverage', 'AlcoholicBeverage') ),
     price decimal not null,
     isVegetarian boolean not null
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS MenuItems (
 
 CREATE TABLE IF NOT EXISTS Allergies (
     id serial primary key,
-    name varchar(100) not null
+    name varchar(100) not null UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS MenuItemsAllergies (
@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS Reservations (
     customer varchar(100) not null,
     date timestamp not null,
     partySize int,
-    tableId int not null
+    tableId int not null,
+    isSeated boolean DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS TableOrders (

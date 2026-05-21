@@ -12,11 +12,23 @@ import org.store.viarestaurant.view.HelloApplication;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class NavigationController
@@ -46,8 +58,21 @@ public class NavigationController
     @FXML private Pane reservationOverlayPane;
 
     @FXML private GridPane tableGrid;
-    @FXML private GridPane ordersTableGrid;
     @FXML private StackPane tableModalOverlay;
+
+    // Orders tab (table-first flow)
+    @FXML private FlowPane     ordersTableFlow;
+    @FXML private TilePane     menuItemsFlow;
+    @FXML private Label        selectedOrderTableLabel;
+    @FXML private VBox         orderSummaryLinesBox;
+    @FXML private Label        orderSubtotalLabel;
+    @FXML private Label        roundLabel;
+    @FXML private Button       sendToKitchenButton;
+    @FXML private ToggleButton filterAllButton;
+    @FXML private ToggleButton filterStartersButton;
+    @FXML private ToggleButton filterMainsButton;
+    @FXML private ToggleButton filterSidesButton;
+    @FXML private ToggleButton filterDrinksButton;
     @FXML private Label tableModalTitle;
     @FXML private Label tableModalStateBadge;
     @FXML private Label tableModalInfo;
@@ -87,6 +112,9 @@ public class NavigationController
     @FXML private StackPane newTableOverlay;
     @FXML private TextField tableMaxSittingField;
     @FXML private Label newTableErrorLabel;
+    @FXML private Button newTableDeleteButton;
+    @FXML private Button newTableSubmitButton;
+    @FXML private Label newTableModalTitle;
 
     @FXML private Button toggleMenuViewButton;
     @FXML private Button menuPrimaryActionButton;
@@ -119,11 +147,14 @@ public class NavigationController
     private HostController hostController;
     private ManagerController managerController;
     private WaiterController waiterController;
+    private int currentWaiterId = -1;
 
 
 
     public void initData(Workers worker)
     {
+        this.currentWaiterId = worker.getId();
+
         if (sidebarName != null)
         {
             sidebarName.setText(worker.getFirstName() + " " + worker.getLastName());
@@ -139,10 +170,6 @@ public class NavigationController
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
             );
         }
-    }
-    public void initClient(Client client)
-    {
-        this.client = client;
     }
     private void showDefaultPage(Workers worker)
     {
@@ -186,8 +213,16 @@ public class NavigationController
             }
             case Waiter -> {
                 waiterController = new WaiterController();
-                waiterController.init(tableGrid, ordersTableGrid);
-                waiterController.initClient(client);
+                waiterController.init(tableGrid);
+                waiterController.initOrdersComponent(
+                        ordersTableFlow,
+                        menuItemsFlow, selectedOrderTableLabel,
+                        orderSummaryLinesBox, orderSubtotalLabel, roundLabel, sendToKitchenButton,
+                        filterAllButton, filterStartersButton, filterMainsButton,
+                        filterSidesButton, filterDrinksButton,
+                        this::showOrderDetailPage,
+                        this::showOrdersPage);
+                waiterController.initClient(client, currentWaiterId);
 
                 showTablesPage();
                 showWaiterTablesPage();
@@ -250,13 +285,29 @@ public class NavigationController
 
               managerController.refreshWorkersTable();
 
-                managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,
-                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton, tableModalSecondaryButton);
+                managerController.initTableModal(
+                        tableModalOverlay,
+                        tableModalTitle,
+                        tableModalStateBadge,
+                        tableModalInfo,
+                        newTableOverlay,
+                        tableMaxSittingField,
+                        newTableErrorLabel,
+                        tableModalWaiterComboBox,
+                        tableModalPrimaryButton,
+                        tableModalSecondaryButton,
+                        newTableDeleteButton,
+                        newTableSubmitButton,newTableModalTitle)
 
                 showTablesPage();
                 showMenuPage();
             }
         }
+    }
+
+    public void initClient(Client client)
+    {
+        this.client = client;
     }
 
     @FXML
@@ -269,7 +320,7 @@ public class NavigationController
             managerController.closeNewTableModal();
             managerController.refreshTableGrid();
             managerController.loadTables();}
-        if (waiterController != null) {waiterController.refreshTableGrid(); waiterController.loadtables();}
+        if (waiterController != null) {waiterController.refreshTableGrid(); waiterController.loadTables();}
     }
 
     @FXML
@@ -309,10 +360,7 @@ public class NavigationController
         showOnly(ordersListPage);
         setActive(btnOrders, btnBills, btnTables);
 
-        if (waiterController != null) {
-            waiterController.refreshTableGrid();
-            waiterController.loadtables();
-        }
+        if (waiterController != null) waiterController.loadOrders();
     }
 
     @FXML
@@ -588,5 +636,24 @@ public class NavigationController
         }
     }
 
+    // ── Orders detail page — filter chips ───────────────────────────────────
+    @FXML private void filterDetailAll()      { if (waiterController != null) waiterController.applyOrderFilter("All"); }
+    @FXML private void filterDetailStarters() { if (waiterController != null) waiterController.applyOrderFilter("Starters"); }
+    @FXML private void filterDetailMains()    { if (waiterController != null) waiterController.applyOrderFilter("Mains"); }
+    @FXML private void filterDetailDesserts() { if (waiterController != null) waiterController.applyOrderFilter("Desserts"); }
+    @FXML private void filterDetailDrinks()   { if (waiterController != null) waiterController.applyOrderFilter("Drinks"); }
 
+    // ── Send to kitchen ──────────────────────────────────────────────────────
+    @FXML private void sendToKitchen()        { if (waiterController != null) waiterController.sendToKitchen(); }
+
+    // ── Pay order ────────────────────────────────────────────────────────────
+    @FXML private void payOrder()             { if (waiterController != null) waiterController.payOrder(); }
+
+    public void deleteTable() {
+        if(managerController != null)
+        {
+            managerController.deleteTable();
+        }
+
+    }
 }

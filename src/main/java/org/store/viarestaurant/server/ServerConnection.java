@@ -5,6 +5,7 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.concurrent.Worker;
+import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.dao.*;
 import org.store.viarestaurant.model.entities.*;
 import org.store.viarestaurant.model.enums.WorkerRole;
@@ -17,6 +18,12 @@ import org.store.viarestaurant.server.dto.LoginDTO.LoginResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
+import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderRequest;
+import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderRequest;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.*;
@@ -26,8 +33,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ServerConnection implements Runnable {
   private final Socket socket;
@@ -40,6 +50,7 @@ public class ServerConnection implements Runnable {
   private final TableOrderDAO tableOrderDAO;
   private final AllergyDAO allergyDAO;
   private final MenuItemDAO menuItemDAO;
+  private final MenuItemTableOrderDAO menuItemTableOrderDAO;
 
   private Workers currentUser;
 
@@ -56,6 +67,7 @@ public class ServerConnection implements Runnable {
       this.tableOrderDAO = TableOrderDAOImpl.getInstance();
       this.allergyDAO = AllergyDAOImpl.getInstance();
       this.menuItemDAO = MenuItemDAOImpl.getInstance();
+      this.menuItemTableOrderDAO = MenuItemTableOrderDAOImpl.getInstance();
     }
     catch(SQLException e)
     {
@@ -172,6 +184,18 @@ public class ServerConnection implements Runnable {
           System.out.println("[SERVER] GetClosestReservationRequest detected");
           handleGetClosestReservationRequest(request);
         }
+        else if (object instanceof DeleteTableRequest request)
+        {
+          System.out.println("[SERVER] DeleteAllergyRequest detected");
+          handleDeleteTable(request);
+        }
+        else if (object instanceof UpdateTableRequest request)
+        {
+          System.out.println("[SERVER] DeleteAllergyRequest detected");
+          handleUpdateTable(request);
+        }
+
+
         else if (object instanceof GetMenuItemsRequest)
         {
           System.out.println("[SERVER] GetMenuItemsRequest detected");
@@ -191,6 +215,26 @@ public class ServerConnection implements Runnable {
         {
           System.out.println("[SERVER] DeleteMenuItemRequest detected");
           handleDeleteMenuItem(request);
+        }
+        else if (object instanceof GetMenuItemsRequest)
+        {
+          System.out.println("[SERVER] GetMenuItemsRequest detected");
+          handleGetMenuItems();
+        }
+        else if (object instanceof GetOrdersByWaiterRequest request)
+        {
+          System.out.println("[SERVER] GetOrdersByWaiterRequest detected");
+          handleGetOrdersByWaiter(request);
+        }
+        else if (object instanceof AddItemsToOrderRequest request)
+        {
+          System.out.println("[SERVER] AddItemsToOrderRequest detected");
+          handleAddItemsToOrder(request);
+        }
+        else if (object instanceof PayOrderRequest request)
+        {
+          System.out.println("[SERVER] PayOrderRequest detected");
+          handlePayOrder(request);
         }
         else
         {
@@ -296,6 +340,36 @@ public class ServerConnection implements Runnable {
     }
   }
 
+  private void handleUpdateTable(UpdateTableRequest request) throws IOException {
+    try {
+      RestaurantTable table = new RestaurantTable(request.getId(), request.getMaxSitting());
+      restaurantTableDAO.updateRestaurantTable(table);
+
+      send(new UpdateTableResponse(true, "Table updated successfully"));
+
+      connectionPool.broadcast(
+              new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables())
+      );
+    } catch (SQLException e) {
+      e.printStackTrace();
+      send(new UpdateTableResponse(false, "Database error while updating Table"));
+    }
+  }
+
+  private void handleDeleteTable(DeleteTableRequest request) throws IOException {
+    try {
+      restaurantTableDAO.deleteRestaurantTableByID(request.getRestaurantTableid());
+
+      send(new DeleteTableResponse(true, "Table deleted successfully"));
+
+      connectionPool.broadcast(
+              new GetTablesResponse(restaurantTableDAO.getAllRestaurantTables())
+      );
+    } catch (SQLException e) {
+      e.printStackTrace();
+      send(new DeleteTableResponse(false, "Database error while deleting Table"));
+    }
+  }
   private void handleDeleteAllergy(DeleteAllergyRequest request) throws IOException
   {
     try
@@ -365,19 +439,6 @@ public class ServerConnection implements Runnable {
     {
       e.printStackTrace();
       send(new MessageResponse(false, "Database error while creating allergy"));
-    }
-  }
-
-  private void handleGetMenuItems() throws IOException
-  {
-    try
-    {
-      send(new GetMenuItemsResponse(menuItemDAO.getAllMenuItems()));
-    }
-    catch (SQLException e)
-    {
-      e.printStackTrace();
-      send(new GetMenuItemsResponse(new ArrayList<>()));
     }
   }
 
@@ -656,7 +717,8 @@ public class ServerConnection implements Runnable {
           request.getName(),
           request.getDateTime(),
           request.getPartySize(),
-          request.getTable());
+          request.getTable(),
+          request.isSeated());
 
       reservationDAO.updateReservation(reservation);
 
@@ -733,6 +795,110 @@ public class ServerConnection implements Runnable {
     }
   }
 
+  private void handleGetMenuItems() throws IOException
+  {
+    try
+    {
+      send(new GetMenuItemsResponse(menuItemDAO.getAllMenuItems()));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetMenuItemsResponse(new ArrayList<>()));
+    }
+  }
+
+  private void handleGetOrdersByWaiter(GetOrdersByWaiterRequest request) throws IOException
+  {
+    try
+    {
+      ArrayList<TableOrder> all =
+          tableOrderDAO.getTableOrdersByWaiterId(request.getWaiterId());
+
+      // The DAO query uses a LEFT JOIN on menu items, so an order with N items
+      // comes back as N rows — deduplicate by order ID before sending.
+      // Only include unpaid orders (open tables) for the picker ComboBox.
+      Map<Integer, TableOrder> seen = new LinkedHashMap<>();
+      for (TableOrder o : all)
+      {
+        if (o.isPaid()) continue;
+        TableOrder existing = seen.get(o.getId());
+        if (existing == null)
+        {
+          seen.put(o.getId(), o);
+        }
+        else if (o.getMenuItems() != null)
+        {
+          for (String name : o.getMenuItems())
+          {
+            if (name != null && !name.isBlank() && !existing.getMenuItems().contains(name))
+              existing.addMenuItems(name);
+          }
+        }
+      }
+
+      send(new GetOrdersByWaiterResponse(new ArrayList<>(seen.values())));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new GetOrdersByWaiterResponse(new ArrayList<>()));
+    }
+  }
+
+  private void handleAddItemsToOrder(AddItemsToOrderRequest request) throws IOException
+  {
+    try
+    {
+      // Step 1: insert into the junction table (requires an explicit Connection)
+      // ON CONFLICT DO NOTHING means already-present items are silently skipped.
+      Connection conn = DatabaseConnection.getConnection();
+      try
+      {
+        menuItemTableOrderDAO.addMenuItemsInTableOrder(
+            conn, request.getTableOrderId(), request.getItemNames());
+      }
+      finally
+      {
+        conn.close();
+      }
+
+      // Step 2: recompute bill from DB truth so skipped duplicates are not counted
+      ArrayList<MenuItems> currentItems =
+          menuItemTableOrderDAO.getMenuItemsByTableOrderId(request.getTableOrderId());
+      double newBill = currentItems.stream()
+          .mapToDouble(MenuItems::getPrice)
+          .sum();
+
+      // Step 3: persist the updated bill
+      TableOrder order = tableOrderDAO.getTableOrderByID(request.getTableOrderId());
+      order.setBill(newBill);
+      tableOrderDAO.updateTableOrder(order);
+
+      send(new AddItemsToOrderResponse(true, "Items added", newBill));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new AddItemsToOrderResponse(false, "Database error: " + e.getMessage(), 0.0));
+    }
+  }
+
+  private void handlePayOrder(PayOrderRequest request) throws IOException
+  {
+    try
+    {
+      TableOrder order = tableOrderDAO.getTableOrderByID(request.getTableOrderId());
+      order.setPaid(true);
+      tableOrderDAO.updateTableOrder(order);
+      send(new PayOrderResponse(true));
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new PayOrderResponse(false));
+    }
+  }
   private void handleSetTableReserved(SetTableReservedRequest request)
       throws IOException {
     try {

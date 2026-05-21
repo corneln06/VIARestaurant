@@ -8,12 +8,14 @@ import org.store.viarestaurant.server.dto.MenuItemDTO.CreateMenuItemResponse;
 import org.store.viarestaurant.server.dto.MenuItemDTO.GetMenuItemsResponse;
 import org.store.viarestaurant.server.dto.MessageResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.GetTablesResponse;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreateResponse;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableCreatedMessage;
-import org.store.viarestaurant.server.dto.RestaurantTableDTO.TableUpdatedMessage;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
+import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
 import org.store.viarestaurant.server.dto.WorkersDTO.CreateWorkerResponse;
+import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderResponse;
+import org.store.viarestaurant.server.dto.ReservationDto.*;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
 import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
 
 import java.io.IOException;
@@ -32,18 +34,25 @@ public class Client
   private ObjectInputStream inFromServer;
 
   private Consumer<LoginResponse> loginListener;
+
   private Consumer<GetTablesResponse> reservationTablesListener;
   private List<Consumer<GetReservationsResponse>> reservationsListener = new ArrayList<>();
   private Consumer<MessageResponse> createReservationListener;
   private Consumer<ReservationCreatedMessage> reservationCreatedListener;
-  private List<Consumer<GetTablesResponse>> tablesPageListener = new ArrayList<>();
-  private Consumer<TableCreatedMessage> tableCreatedListener;
+  private Consumer<GetClosestReservationResponse> closestReservationListener;
+
   private Consumer<DeleteReservationResponse> deleteReservationListener;
   private Consumer<UpdateReservationResponse> updateReservationListener;
   private Consumer<ReservationDeletedMessage> reservationDeletedListener;
-  private Consumer<GetWorkersResponse> workersListener;
+
+  private List<Consumer<GetTablesResponse>> tablesPageListener = new ArrayList<>();
+  private Consumer<TableCreatedMessage> tableCreatedListener;
   private Consumer<TableUpdatedMessage> updatedMessageListener;
-  private Consumer<GetClosestReservationResponse> closestReservationListener;
+  private Consumer<UpdateTableResponse> updateTableListener;
+  private Consumer<DeleteTableResponse> deleteTableListener;
+
+  private Consumer<GetWorkersResponse> workersListener;
+
   private Consumer<GetTableOrderResponse> tableOrderResponseListener;
   private Consumer<CreateAllergyResponse> createdAllergyListener;
   private Consumer<GetAllergiesResponse> getAllergiesListener;
@@ -56,6 +65,11 @@ public class Client
   private Consumer<CreateWorkerResponse> workerCreatedListener;
   private Consumer<MessageResponse> deleteWorkerListener;
   private Consumer<MessageResponse> updateWorkerListener;
+
+  private List<Consumer<GetMenuItemsResponse>>      menuItemsListeners    = new ArrayList<>();
+  private List<Consumer<GetOrdersByWaiterResponse>> waiterOrdersListeners = new ArrayList<>();
+  private List<Consumer<AddItemsToOrderResponse>>   addItemsListeners     = new ArrayList<>();
+  private Consumer<PayOrderResponse>                payOrderListener;
 
   public void connect() throws IOException
   {
@@ -124,6 +138,14 @@ public class Client
             {
               tableCreatedListener.accept(message);
             }
+            else if (object instanceof UpdateTableResponse response && updateTableListener != null)
+            {
+              updateTableListener.accept(response);
+            }
+            else if (object instanceof DeleteTableResponse response && deleteTableListener != null)
+            {
+              deleteTableListener.accept(response);
+            }
             else if (object instanceof TableUpdatedMessage response && updatedMessageListener !=null)
             {
               updatedMessageListener.accept(response);
@@ -169,6 +191,24 @@ public class Client
             {
               deleteAllergyListener.accept(response);
             }
+            else if (object instanceof GetMenuItemsResponse response && !menuItemsListeners.isEmpty())
+            {
+              for (var c : menuItemsListeners) c.accept(response);
+            }
+            else if (object instanceof GetOrdersByWaiterResponse response && !waiterOrdersListeners.isEmpty())
+            {
+              for (var c : waiterOrdersListeners) c.accept(response);
+            }
+            else if (object instanceof AddItemsToOrderResponse response && !addItemsListeners.isEmpty())
+            {
+              for (var c : addItemsListeners) c.accept(response);
+            }
+            else if (object instanceof PayOrderResponse response && payOrderListener != null)
+            {
+              payOrderListener.accept(response);
+            }
+
+
             else if (object instanceof GetMenuItemsResponse response && getMenuItemsListener != null)
             {
               getMenuItemsListener.accept(response);
@@ -262,6 +302,7 @@ public class Client
   }
 
   public void setClosestReservationListener(Consumer<GetClosestReservationResponse> listener){this.closestReservationListener = listener;}
+
   
   public void setTableOrderListener(Consumer<GetTableOrderResponse> listener){this.tableOrderResponseListener = listener;}
   
@@ -273,6 +314,28 @@ public class Client
 
   public void setDeleteAllergyListener(Consumer<MessageResponse> listener) { this.deleteAllergyListener = listener; }
 
+  public void setMenuItemsListener(Consumer<GetMenuItemsResponse> listener) {
+    menuItemsListeners.add(listener);
+  }
+
+  public void setWaiterOrdersListener(Consumer<GetOrdersByWaiterResponse> listener) {
+    waiterOrdersListeners.add(listener);
+  }
+
+  public void setAddItemsListener(Consumer<AddItemsToOrderResponse> listener) {
+    addItemsListeners.add(listener);
+  }
+
+  public void setPayOrderListener(Consumer<PayOrderResponse> listener) {
+    this.payOrderListener = listener;
+  }
+    public void setUpdateTableListener(Consumer<UpdateTableResponse> updateTableListener) {
+        this.updateTableListener = updateTableListener;
+    }
+
+    public void setDeleteTableListener(Consumer<DeleteTableResponse> deleteTableListener) {
+        this.deleteTableListener = deleteTableListener;
+    }
   public void setGetMenuItemsListener(Consumer<GetMenuItemsResponse> listener)
   {
     this.getMenuItemsListener = listener;
