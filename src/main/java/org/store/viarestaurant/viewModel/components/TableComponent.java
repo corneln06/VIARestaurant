@@ -16,6 +16,7 @@ import org.store.viarestaurant.model.entities.Reservation;
 import org.store.viarestaurant.model.entities.RestaurantTable;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.ReservationDto.UpdateReservationRequest;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
 import org.store.viarestaurant.viewModel.services.ReservationService;
 import org.store.viarestaurant.viewModel.services.TableOrderService;
