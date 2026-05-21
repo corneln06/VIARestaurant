@@ -1,5 +1,10 @@
 package org.store.viarestaurant.server;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.concurrent.Worker;
 import org.store.viarestaurant.config.DatabaseConnection;
 import org.store.viarestaurant.dao.*;
 import org.store.viarestaurant.model.entities.*;
@@ -21,8 +26,7 @@ import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderRequest;
 import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderRequest;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
-import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersRequest;
-import org.store.viarestaurant.server.dto.WorkersDTO.GetWorkersResponse;
+import org.store.viarestaurant.server.dto.WorkersDTO.*;
 import org.store.viarestaurant.server.dto.MenuItemDTO.*;
 
 import java.io.IOException;
@@ -116,9 +120,6 @@ public class ServerConnection implements Runnable {
         } else if (object instanceof UpdateReservationRequest request) {
           System.out.println("[SERVER] Update Reservation detected");
           handleUpdateReservation(request);
-        } else if (object instanceof GetWorkersRequest) {
-          System.out.println("[SERVER] Get Workers detected ");
-          handleGetWorkers();
         } else if (object instanceof DeleteReservationRequest request) {
           System.out.println("[SERVER] DeleteReservationRequest detected");
           handleDeleteReservation(request);
@@ -157,7 +158,29 @@ public class ServerConnection implements Runnable {
         {
           System.out.println("[SERVER] DeleteAllergyRequest detected");
           handleDeleteAllergy(request);
-        } else if (object instanceof GetClosestReservationRequest request) {
+        }
+        else if (object instanceof CreateWorkerRequest request)
+        {
+          System.out.println("[SERVER] CreateWorkerRequest detected");
+          handleCreateWorker(request);
+        }
+        else if (object instanceof GetWorkersRequest)
+        {
+          System.out.println("[SERVER] GetWorkersRequest detected");
+          handleGetWorkers();
+        }
+        else if (object instanceof UpdateWorkerRequest request)
+        {
+          System.out.println("[SERVER] UpdateWorkerRequest detected");
+          handleUpdateWorker(request);
+        }
+        else if (object instanceof DeleteWorkerRequest request)
+        {
+          System.out.println("[SERVER] DeleteWorkerRequest detected");
+          handleDeleteWorker(request);
+        }
+
+        else if (object instanceof GetClosestReservationRequest request) {
           System.out.println("[SERVER] GetClosestReservationRequest detected");
           handleGetClosestReservationRequest(request);
         }
@@ -244,6 +267,76 @@ public class ServerConnection implements Runnable {
       } catch (IOException e) {
         e.printStackTrace();
       }
+    }
+  }
+
+  private void handleDeleteWorker(DeleteWorkerRequest request) throws IOException
+  {
+    try
+    {
+      workersDAO.deleteWorkerById(request.getId());
+
+      send(new MessageResponse(true, "Worker deleted successfully"));
+
+      connectionPool.broadcast(
+          new GetWorkersResponse(workersDAO.getAllWorkers())
+      );
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while deleting worker"));
+    }
+  }
+
+  private void handleUpdateWorker(UpdateWorkerRequest request) throws IOException
+  {
+    try
+    {
+      Workers existing = workersDAO.getWorkerById(request.getId());
+
+      existing.setFirstName(request.getFirstName());
+      existing.setLastName(request.getLastName());
+      existing.setEmail(request.getEmail());
+      existing.setRole(request.getRole());
+
+      workersDAO.updateWorker(existing);
+
+      send(new MessageResponse(true, "Worker updated successfully"));
+
+      connectionPool.broadcast(
+          new GetWorkersResponse(workersDAO.getAllWorkers())
+      );
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while updating worker"));
+    }
+  }
+
+  private void handleCreateWorker(CreateWorkerRequest request) throws IOException
+  {
+    try
+    {
+      Workers worker = workersDAO.createWorkers(
+          request.getFirstName(),
+          request.getLastName(),
+          request.getEmail(),
+          request.getPassword(),
+          request.getRole()
+      );
+
+      send(new CreateWorkerResponse(worker));
+
+      connectionPool.broadcast(
+          new GetWorkersResponse(workersDAO.getAllWorkers())
+      );
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+      send(new MessageResponse(false, "Database error while creating worker"));
     }
   }
 
@@ -405,11 +498,14 @@ public class ServerConnection implements Runnable {
     }
   }
 
-  private void handleGetWorkers() throws IOException {
-    try {
-      send(new GetWorkersResponse(
-          workersDAO.getAllWorkers()));
-    } catch (SQLException e) {
+  private void handleGetWorkers() throws IOException
+  {
+    try
+    {
+      send(new GetWorkersResponse(workersDAO.getAllWorkers()));
+    }
+    catch (SQLException e)
+    {
       e.printStackTrace();
       send(new GetWorkersResponse(new ArrayList<>()));
     }

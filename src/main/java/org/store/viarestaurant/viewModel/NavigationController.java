@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import javafx.scene.control.*;
 import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.view.HelloApplication;
@@ -123,14 +124,32 @@ public class NavigationController
     @FXML private Label allergyModalTitle;
 
 
+    @FXML private AnchorPane workersPage;
+    @FXML private TableView<Workers> workersTable;
+    @FXML private StackPane newWorkerOverlay;
+    @FXML private TextField workerFirstNameField;
+    @FXML private TextField workerLastNameField;
+    @FXML private ComboBox<String> workerRoleComboBox;
+    @FXML private TextField workerEmailField;
+    @FXML private PasswordField workerPasswordField;
+    @FXML private Label newWorkerErrorLabel;
+    @FXML private Label workerModalTitle;
+    @FXML private Button submitWorkerButton;
+    @FXML private Button deleteWorkerButton;
+
+
     @FXML private Button deleteAllergyButton;
     @FXML private Button createAllergyButton;
+
+
 
 
     private HostController hostController;
     private ManagerController managerController;
     private WaiterController waiterController;
     private int currentWaiterId = -1;
+
+
 
     public void initData(Workers worker)
     {
@@ -250,6 +269,22 @@ public class NavigationController
 
                 managerController.refreshMenuTable();
 
+              managerController.initWorkerModal(
+                  newWorkerOverlay,
+                  workerFirstNameField,
+                  workerLastNameField,
+                  workerRoleComboBox,
+                  workerEmailField,
+                  workerPasswordField,
+                  newWorkerErrorLabel,
+                  workersTable,
+                  submitWorkerButton,
+                  deleteWorkerButton,
+                  workerModalTitle
+              );
+
+              managerController.refreshWorkersTable();
+
                 managerController.initTableModal(
                         tableModalOverlay,
                         tableModalTitle,
@@ -262,7 +297,7 @@ public class NavigationController
                         tableModalPrimaryButton,
                         tableModalSecondaryButton,
                         newTableDeleteButton,
-                        newTableSubmitButton,newTableModalTitle);
+                        newTableSubmitButton,newTableModalTitle)
 
                 showTablesPage();
                 showMenuPage();
@@ -307,18 +342,9 @@ public class NavigationController
     @FXML
     private void showWorkersPage()
     {
-//        showOnly(reservationsPage);
-        setActive(btnWorkers, btnMenu, btnReservations, btnTables);
-
-//        if(hostController != null)
-//        {
-//            hostController.closeNewReservationModal();
-//            hostController.refreshSchedule();
-//        }
-//        else if(managerController != null)
-//        {
-//            managerController.refreshSchedule();
-//        }
+      showOnly(workersPage);
+      setActive(btnWorkers, btnMenu, btnReservations, btnTables);
+      if (managerController != null) managerController.refreshWorkersTable();
     }
 
     @FXML
@@ -462,6 +488,7 @@ public class NavigationController
         setVisible(billsListPage, selectedPage == billsListPage);
         setVisible(billDetailPage, selectedPage == billDetailPage);
         setVisible(menuPage, selectedPage == menuPage);
+        setVisible(workersPage, selectedPage == workersPage);
     }
 
     private void setVisible(AnchorPane page, boolean visible)
@@ -555,6 +582,36 @@ public class NavigationController
             managerController.toggleMenuView(
             );
         }
+    }
+
+    @FXML
+    private void openNewWorkerModal()
+    {
+      if (managerController != null) managerController.openNewWorkerModal();
+    }
+
+    @FXML
+    private void closeNewWorkerModal(MouseEvent event)
+    {
+      if (managerController != null) managerController.closeNewWorkerModal();
+    }
+
+    @FXML
+    private void closeNewWorkerModalAction()
+    {
+      if (managerController != null) managerController.closeNewWorkerModal();
+    }
+
+    @FXML
+    private void createWorker()
+    {
+      if (managerController != null) managerController.createWorker();
+    }
+
+    @FXML
+    private void deleteWorker()
+    {
+      if (managerController != null) managerController.deleteWorker();
     }
 
     public void closeNewAllergyModal() {

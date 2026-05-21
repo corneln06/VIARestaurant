@@ -12,6 +12,7 @@ import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
 import org.store.viarestaurant.server.dto.TableOrderDTO.AddItemsToOrderResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetOrdersByWaiterResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.GetTableOrderResponse;
+import org.store.viarestaurant.server.dto.WorkersDTO.CreateWorkerResponse;
 import org.store.viarestaurant.server.dto.TableOrderDTO.PayOrderResponse;
 import org.store.viarestaurant.server.dto.ReservationDto.*;
 import org.store.viarestaurant.server.dto.RestaurantTableDTO.*;
@@ -61,6 +62,9 @@ public class Client
   private Consumer<MessageResponse> updateMenuItemListener;
   private Consumer<MessageResponse> deleteMenuItemListener;
   private Consumer<CreateMenuItemResponse> createdMenuItemListener;
+  private Consumer<CreateWorkerResponse> workerCreatedListener;
+  private Consumer<MessageResponse> deleteWorkerListener;
+  private Consumer<MessageResponse> updateWorkerListener;
 
   private List<Consumer<GetMenuItemsResponse>>      menuItemsListeners    = new ArrayList<>();
   private List<Consumer<GetOrdersByWaiterResponse>> waiterOrdersListeners = new ArrayList<>();
@@ -221,6 +225,18 @@ public class Client
             {
               deleteMenuItemListener.accept(response);
             }
+            else if (object instanceof CreateWorkerResponse response && workerCreatedListener != null)
+            {
+              workerCreatedListener.accept(response);
+            }
+            else if (object instanceof MessageResponse response && deleteWorkerListener != null)
+            {
+              deleteWorkerListener.accept(response);
+            }
+            else if (object instanceof MessageResponse response && updateWorkerListener != null)
+            {
+              updateWorkerListener.accept(response);
+            }
           });
         }
       }
@@ -327,4 +343,19 @@ public class Client
   public void setMenuItemCreatedListener(Consumer<CreateMenuItemResponse> listener) { this.createdMenuItemListener = listener; }
   public void setUpdateMenuItemListener(Consumer<MessageResponse> listener) { this.updateMenuItemListener = listener; }
   public void setDeleteMenuItemListener(Consumer<MessageResponse> listener) { this.deleteMenuItemListener = listener; }
+
+  public void setWorkerCreatedListener(Consumer<CreateWorkerResponse> listener)
+  {
+    this.workerCreatedListener = listener;
+  }
+
+  public void setDeleteWorkerListener(Consumer<MessageResponse> listener)
+  {
+    this.deleteWorkerListener = listener;
+  }
+
+  public void setUpdateWorkerListener(Consumer<MessageResponse> listener)
+  {
+    this.updateWorkerListener = listener;
+  }
 }

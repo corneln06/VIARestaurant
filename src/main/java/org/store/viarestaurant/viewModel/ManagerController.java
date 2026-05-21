@@ -4,11 +4,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import org.store.viarestaurant.model.entities.Workers;
 import org.store.viarestaurant.model.enums.WorkerRole;
 import org.store.viarestaurant.server.Client;
 import org.store.viarestaurant.viewModel.components.MenuItemComponent;
 import org.store.viarestaurant.viewModel.components.ReservationComponent;
 import org.store.viarestaurant.viewModel.components.TableComponent;
+import org.store.viarestaurant.viewModel.components.WorkerComponent;
 
 public class ManagerController
 {
@@ -16,6 +18,7 @@ public class ManagerController
       new ReservationComponent();
   private final TableComponent tableComponent = new TableComponent();
   private final MenuItemComponent menuItemComponent = new MenuItemComponent();
+  private final WorkerComponent workerComponent = new WorkerComponent();
 
 
     ////// MAIN
@@ -103,6 +106,27 @@ public class ManagerController
     reservationComponent.initClient(client);
     tableComponent.initClient(client);
     menuItemComponent.initClient(client);
+    workerComponent.initClient(client);
+  }
+
+  public void initWorkerModal(
+      StackPane overlay,
+      TextField firstNameField,
+      TextField lastNameField,
+      ComboBox<String> roleComboBox,
+      TextField emailField,
+      PasswordField passwordField,
+      Label errorLabel,
+      TableView<Workers> table,
+      Button submitButton,
+      Button deleteButton,
+      Label modalTitle)
+  {
+    workerComponent.initModal(
+        overlay, firstNameField, lastNameField, roleComboBox,
+        emailField, passwordField, errorLabel, table,
+        submitButton, deleteButton, modalTitle
+    );
   }
 
   public void refreshSchedule()
@@ -176,5 +200,34 @@ public class ManagerController
     menuItemComponent.deleteAllergy();
   }
 
-  public void deleteTable() { tableComponent.deleteTable(); }
+  public void refreshWorkersTable()
+  {
+    try { workerComponent.refreshWorkersTable(); }
+    catch (Exception e) { e.printStackTrace(); }
+  }
+
+  public void openNewWorkerModal()
+  {
+    workerComponent.openNewWorkerModal();
+  }
+
+  public void closeNewWorkerModal()
+  {
+    workerComponent.closeNewWorkerModal();
+  }
+
+  public void createWorker()
+  {
+    workerComponent.createWorker();
+  }
+
+  public void deleteWorker()
+  {
+    workerComponent.deleteWorker();
+  }
+
+  public void deleteTable() 
+  { 
+    tableComponent.deleteTable(); 
+  }
 }

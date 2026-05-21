@@ -88,6 +88,10 @@ public abstract class Workers implements Serializable
     {
         return password.equals(rawPass);
     }
+    public String getPassword()
+    {
+      return password;
+    }
 
     public abstract WorkerRole getRole();
 
