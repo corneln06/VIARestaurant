@@ -5,9 +5,15 @@ import javafx.scene.layout.*;
 import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.entities.TableOrder;
 import org.store.viarestaurant.model.enums.MenuTypes;
+import org.store.viarestaurant.model.state.AvailableState;
 import org.store.viarestaurant.server.Client;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.SetTableAvailableRequest;
+import org.store.viarestaurant.server.dto.RestaurantTableDTO.UpdateTableRequest;
 import org.store.viarestaurant.viewModel.services.OrdersService;
+import org.store.viarestaurant.viewModel.services.TableOrderService;
+import org.store.viarestaurant.viewModel.services.TablesService;
 
+import java.io.IOException;
 import java.util.*;
 
 public class OrdersComponent
@@ -28,14 +34,16 @@ public class OrdersComponent
 
   private OrdersService ordersService;
   private int currentWaiterId;
+  private Client client;
 
   private List<MenuItems>  allMenuItems = new ArrayList<>();
   private List<MenuItems>  stagedItems  = new ArrayList<>();
   private List<TableOrder> openOrders   = new ArrayList<>();
   private TableOrder       selectedOrder;
   private String           activeFilter = "All";
+  private TablesService tablesService;
 
-  public void init(
+    public void init(
       FlowPane ordersTableFlow,
       TilePane menuItemsPane,
       Label selectedOrderTableLabel,
@@ -74,6 +82,9 @@ public class OrdersComponent
   {
     this.currentWaiterId = waiterId;
     this.ordersService   = new OrdersService(client);
+    this.client = client;
+
+    tablesService =  new TablesService(client);
 
     ordersService.onMenuItemsLoaded(response -> {
       allMenuItems = new ArrayList<>(response.getMenuItems());
@@ -262,10 +273,16 @@ public class OrdersComponent
     sendToKitchenButton.setDisable(stagedItems.isEmpty());
   }
 
-  public void payOrder()
-  {
+  public void payOrder(){
     if (selectedOrder == null) return;
     ordersService.payOrder(selectedOrder.getId());
+    try{
+      client.send(
+              new SetTableAvailableRequest(selectedOrder.getTable().getId())
+      );
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
   }
 
   // Called from NavigationController → WaiterController when "Send to Kitchen" is clicked.
