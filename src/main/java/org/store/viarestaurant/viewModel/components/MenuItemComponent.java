@@ -8,7 +8,6 @@ import org.store.viarestaurant.model.entities.Allergy;
 import org.store.viarestaurant.model.entities.MenuItems;
 import org.store.viarestaurant.model.enums.MenuTypes;
 import org.store.viarestaurant.server.Client;
-import org.store.viarestaurant.server.dto.AllergyDTO.GetAllergiesRequest;
 import org.store.viarestaurant.viewModel.services.AllergyService;
 import org.store.viarestaurant.viewModel.services.MenuItemService;
 

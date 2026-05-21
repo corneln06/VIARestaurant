@@ -94,6 +94,9 @@ public class NavigationController
     @FXML private StackPane newTableOverlay;
     @FXML private TextField tableMaxSittingField;
     @FXML private Label newTableErrorLabel;
+    @FXML private Button newTableDeleteButton;
+    @FXML private Button newTableSubmitButton;
+    @FXML private Label newTableModalTitle;
 
     @FXML private Button toggleMenuViewButton;
     @FXML private Button menuPrimaryActionButton;
@@ -128,10 +131,6 @@ public class NavigationController
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
             );
         }
-    }
-    public void initClient(Client client)
-    {
-        this.client = client;
     }
     private void showDefaultPage(Workers worker)
     {
@@ -223,13 +222,29 @@ public class NavigationController
 
                 managerController.refreshMenuTable();
 
-                managerController.initTableModal(tableModalOverlay, tableModalTitle, tableModalStateBadge, tableModalInfo,
-                        newTableOverlay,tableMaxSittingField,newTableErrorLabel, tableModalWaiterComboBox, tableModalPrimaryButton, tableModalSecondaryButton);
+                managerController.initTableModal(
+                        tableModalOverlay,
+                        tableModalTitle,
+                        tableModalStateBadge,
+                        tableModalInfo,
+                        newTableOverlay,
+                        tableMaxSittingField,
+                        newTableErrorLabel,
+                        tableModalWaiterComboBox,
+                        tableModalPrimaryButton,
+                        tableModalSecondaryButton,
+                        newTableDeleteButton,
+                        newTableSubmitButton,newTableModalTitle);
 
                 showTablesPage();
                 showMenuPage();
             }
         }
+    }
+
+    public void initClient(Client client)
+    {
+        this.client = client;
     }
 
     @FXML
@@ -539,4 +554,11 @@ public class NavigationController
         }
     }
 
+    public void deleteTable() {
+        if(managerController != null)
+        {
+            managerController.deleteTable();
+        }
+
+    }
 }
