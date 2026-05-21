@@ -314,14 +314,10 @@ public class TableComponent
 
 
         tableModalSecondaryButton.setOnAction(e -> {
-            System.out.println(1);
             seatTable();
-            System.out.println(2);
             UpdateReservationRequest request = new UpdateReservationRequest(closestReservation.getId(), closestReservation.getName(), closestReservation.getDateTime(), closestReservation.getPartySize(), closestReservation.getTable(), true);
             try {
-                System.out.println(3);
                 reservationService.updateReservation(request);
-                System.out.println(4);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -329,7 +325,6 @@ public class TableComponent
     }
     else
     {
-        System.out.println("Should be here");
       tableModalStateBadge.setText("Available");
       tableModalStateBadge.getStyleClass().add("badge-available");
       tableModalInfo.setText("Ready for walk-ins and upcoming service.");
