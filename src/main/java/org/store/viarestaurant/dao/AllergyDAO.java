@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public interface AllergyDAO {
-
+//comment
     Allergy createAllergy(String name) throws SQLException;
     ArrayList<Allergy> getAllAllergies() throws SQLException;
     Allergy getAllergyById(Integer id) throws SQLException;
